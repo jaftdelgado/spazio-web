@@ -1,1 +1,1 @@
-export { default as ArrowRightIcon } from "./ArrowRightIcon.svelte";
+export { default as ArrowRightIcon } from './ArrowRightIcon.svelte';

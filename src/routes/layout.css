@@ -1,21 +1,21 @@
-@import "tailwindcss";
-@import "@shizen-ui/styles";
+@import 'tailwindcss';
+@import '@shizen-ui/styles';
 
 @font-face {
-  font-family: "Geist";
-  src: url("/fonts/Geist.woff2") format("woff2");
-  font-weight: normal;
-  font-style: normal;
+	font-family: 'Geist';
+	src: url('/fonts/Geist.woff2') format('woff2');
+	font-weight: normal;
+	font-style: normal;
 }
 
 @font-face {
-  font-family: "Nyght Serif";
-  src: url("/fonts/NyghtSerif-RegularItalic.woff2") format("woff2");
-  font-weight: normal;
-  font-style: italic;
+	font-family: 'Nyght Serif';
+	src: url('/fonts/NyghtSerif-RegularItalic.woff2') format('woff2');
+	font-weight: normal;
+	font-style: italic;
 }
 
 @theme {
-  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Nyght Serif", ui-serif, Georgia, serif;
+	--font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+	--font-serif: 'Nyght Serif', ui-serif, Georgia, serif;
 }
