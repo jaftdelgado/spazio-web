@@ -1,23 +1,28 @@
-<script>
-	let { href = '' } = $props();
+<script lang="ts">
+  import { ArrowRightIcon } from "$lib/assets/icons";
+
+  let { href = "", class: className = "" } = $props();
+
+  let buttonEl = $state<HTMLButtonElement | null>(null);
+  let innerRadius = $derived.by(() => {
+    if (!buttonEl) return "0.75rem";
+    const r = parseFloat(getComputedStyle(buttonEl).borderRadius);
+    return `${Math.max(0, r - 4)}px`;
+  });
 </script>
 
 <button
-	class="group relative flex h-12 items-center rounded-2xl bg-slate-50 pr-6 pl-16 font-semibold text-black shadow-xs transition-all duration-300"
-	type="button"
-	onclick={() => href && (window.location.href = href)}
+  bind:this={buttonEl}
+  class="group relative flex h-12 items-center justify-end rounded-full bg-control pr-16 pl-6 font-medium text-primary-text shadow-xs hover:bg-control-hover {className}"
+  type="button"
+  onclick={() => href && (window.location.href = href)}
 >
-	<div
-		class="absolute top-1 left-1 z-10 flex size-10 items-center justify-center rounded-xl bg-slate-900 duration-500 group-hover:w-[calc(100%-8px)]"
-	>
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" height="25px" width="25px">
-			<path d="M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64z" fill="#ffffff" />
-			<path
-				d="m237.248 512 265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312L237.248 512z"
-				fill="#ffffff"
-			/>
-		</svg>
-	</div>
+  <div
+    class="absolute top-1 right-1 z-10 flex size-10 items-center justify-center bg-slate-900 group-hover:w-[calc(100%-8px)]"
+    style="border-radius: {innerRadius}; transition: width 600ms cubic-bezier(0.76, 0, 0.24, 1);"
+  >
+    <ArrowRightIcon class="size-5 text-white" />
+  </div>
 
-	<span class="font-sans text-base whitespace-nowrap"> Explorar propiedades </span>
+  <span class="font-sans text-base whitespace-nowrap"> Explorar propiedades </span>
 </button>
