@@ -1,11 +1,13 @@
 @import 'tailwindcss';
 @import '@shizen-ui/styles';
+@import '../lib/styles/index.css';
 
 @font-face {
 	font-family: 'Geist';
 	src: url('/fonts/Geist.woff2') format('woff2');
 	font-weight: normal;
 	font-style: normal;
+	font-display: swap;
 }
 
 @font-face {
@@ -13,6 +15,7 @@
 	src: url('/fonts/NyghtSerif-RegularItalic.woff2') format('woff2');
 	font-weight: normal;
 	font-style: italic;
+	font-display: swap;
 }
 
 @theme {

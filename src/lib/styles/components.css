@@ -1,0 +1,14 @@
+/* src/lib/styles/components.css */
+
+@layer base {
+	:root {
+		--accent: #141414;
+		--accent-foreground: #ffffff;
+	}
+}
+
+@layer components {
+	.button {
+		border-radius: 9999px;
+	}
+}
