@@ -19,7 +19,21 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@config/*": ["./src/config/*"],
+      "@types/*": ["./src/types/*"],
+      "@components/*": ["./src/components/*"],
+      "@catalogs/*": ["./src/modules/catalogs/*"],
+      "@clauses/*": ["./src/modules/clauses/*"],
+      "@contracts/*": ["./src/modules/contracts/*"],
+      "@locations/*": ["./src/modules/locations/*"],
+      "@payments/*": ["./src/modules/payments/*"],
+      "@properties/*": ["./src/modules/properties/*"],
+      "@services/*": ["./src/modules/services/*"],
+      "@uploads/*": ["./src/modules/uploads/*"],
+      "@users/*": ["./src/modules/users/*"],
+      "@visits/*": ["./src/modules/visits/*"]
     }
   },
   "include": [

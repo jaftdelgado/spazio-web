@@ -1,21 +1,34 @@
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
-import { catalogsHttpAdapter } from "../../infra/catalogs.http-adapter";
+import { catalogHttpAdapter } from "@catalogs/infra/catalog.http-adapter";
 
-export function useCatalogs() {
-  const catalogsQuery = useQuery({
-    queryKey: ["catalogs"],
-    queryFn: () => catalogsHttpAdapter.list(),
+export const useModalities = () => {
+  return useQuery({
+    queryKey: ["catalogs", "modalities"],
+    queryFn: () => catalogHttpAdapter.listModalities(),
   });
+};
 
-  const createCatalogsMutation = useMutation({
-    mutationFn: () => Promise.resolve({}),
+export const usePropertyTypes = () => {
+  return useQuery({
+    queryKey: ["catalogs", "property-types"],
+    queryFn: () => catalogHttpAdapter.listPropertyTypes(),
   });
+};
 
-  return {
-    catalogsQuery,
-    createCatalogsMutation,
-  };
-}
+export const useRentPeriods = (propertyTypeId: number) => {
+  return useQuery({
+    queryKey: ["catalogs", "rent-periods", propertyTypeId],
+    queryFn: () => catalogHttpAdapter.listRentPeriods(propertyTypeId),
+    enabled: propertyTypeId > 0,
+  });
+};
+
+export const useOrientations = () => {
+  return useQuery({
+    queryKey: ["catalogs", "orientations"],
+    queryFn: () => catalogHttpAdapter.listOrientations(),
+  });
+};

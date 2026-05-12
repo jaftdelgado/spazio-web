@@ -1,20 +1,59 @@
+"use client";
+
+import { env } from "@/config/env";
+
+import { HttpError } from "./http-errors";
+
+type HttpMethod = "DELETE" | "GET" | "POST" | "PUT";
+
+type RequestOptions = {
+  body?: unknown;
+  method: HttpMethod;
+};
+
+const buildUrl = (path: string) => {
+  return new URL(path, env.NEXT_PUBLIC_API_URL).toString();
+};
+
+const parseResponseBody = async (response: Response) => {
+  const contentType = response.headers.get("content-type");
+  const text = await response.text();
+
+  if (text.length === 0) {
+    return null;
+  }
+
+  if (contentType?.includes("application/json")) {
+    return JSON.parse(text) as unknown;
+  }
+
+  return text;
+};
+
+const request = async <T>(path: string, options: RequestOptions): Promise<T> => {
+  const response = await fetch(buildUrl(path), {
+    method: options.method,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body:
+      options.body === undefined ? undefined : JSON.stringify(options.body),
+  });
+
+  const responseBody = await parseResponseBody(response);
+
+  if (!response.ok) {
+    throw new HttpError(response.status, responseBody);
+  }
+
+  return responseBody as T;
+};
+
 export const httpClient = {
-  get: async <T>(url: string) => {
-    void url;
-    return Promise.resolve({} as T);
-  },
-  post: async <T>(url: string, body?: unknown) => {
-    void url;
-    void body;
-    return Promise.resolve({} as T);
-  },
-  put: async <T>(url: string, body?: unknown) => {
-    void url;
-    void body;
-    return Promise.resolve({} as T);
-  },
-  delete: async <T>(url: string) => {
-    void url;
-    return Promise.resolve({} as T);
-  },
+  get: <T>(path: string) => request<T>(path, { method: "GET" }),
+  post: <T>(path: string, body?: unknown) =>
+    request<T>(path, { method: "POST", body }),
+  put: <T>(path: string, body?: unknown) =>
+    request<T>(path, { method: "PUT", body }),
+  delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),
 };
