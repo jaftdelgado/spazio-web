@@ -4,7 +4,7 @@ import { env } from "@/config/env";
 
 import { HttpError } from "./http-errors";
 
-type HttpMethod = "DELETE" | "GET" | "POST" | "PUT";
+type HttpMethod = "DELETE" | "GET" | "PATCH" | "POST" | "PUT";
 
 type RequestOptions = {
   body?: unknown;
@@ -51,9 +51,12 @@ const request = async <T>(path: string, options: RequestOptions): Promise<T> => 
 
 export const httpClient = {
   get: <T>(path: string) => request<T>(path, { method: "GET" }),
+  patch: <T>(path: string, body?: unknown) =>
+    request<T>(path, { method: "PATCH", body }),
   post: <T>(path: string, body?: unknown) =>
     request<T>(path, { method: "POST", body }),
   put: <T>(path: string, body?: unknown) =>
     request<T>(path, { method: "PUT", body }),
-  delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),
+  delete: <T>(path: string, body?: unknown) =>
+    request<T>(path, { method: "DELETE", body }),
 };
