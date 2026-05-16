@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type { UpdatePropertyServicesInput } from "@properties/domain/property.entity";
-import { propertyServicesHttpAdapter } from "@properties/services/infra/property-services.http-adapter";
+import { propertyServicesHttpAdapter } from "@properties/infra/services/property-services.http-adapter";
 
 export const usePropertyServices = (uuid: string) => {
   return useQuery({

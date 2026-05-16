@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type { UpdatePropertyPhotosInput } from "@properties/domain/property.entity";
-import { propertyPhotosHttpAdapter } from "@properties/photos/infra/property-photos.http-adapter";
+import { propertyPhotosHttpAdapter } from "@properties/infra/photos/property-photos.http-adapter";
 
 export const usePropertyPhotos = (uuid: string) => {
   return useQuery({

@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type { UpdatePropertyPricesInput } from "@properties/domain/property.entity";
-import { propertyPricesHttpAdapter } from "@properties/prices/infra/property-prices.http-adapter";
+import { propertyPricesHttpAdapter } from "@properties/infra/prices/property-prices.http-adapter";
 
 export const usePropertyPrices = (uuid: string) => {
   return useQuery({

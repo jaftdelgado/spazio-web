@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import type { CreatePropertyInput } from "@properties/domain/property.entity";
-import { propertyPostHttpAdapter } from "@properties/infra/property-post.http-adapter";
+import { propertyPostHttpAdapter } from "@properties/infra/post/property-post.http-adapter";
 
 export const useCreateProperty = () => {
   const queryClient = useQueryClient();

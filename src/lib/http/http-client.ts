@@ -30,14 +30,22 @@ const parseResponseBody = async (response: Response) => {
   return text;
 };
 
-const request = async <T>(path: string, options: RequestOptions): Promise<T> => {
+const request = async <T>(
+  path: string,
+  options: RequestOptions,
+): Promise<T> => {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if (env.NEXT_PUBLIC_DEV_BEARER_TOKEN) {
+    headers["Authorization"] = `Bearer ${env.NEXT_PUBLIC_DEV_BEARER_TOKEN}`;
+  }
+
   const response = await fetch(buildUrl(path), {
     method: options.method,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body:
-      options.body === undefined ? undefined : JSON.stringify(options.body),
+    headers,
+    body: options.body === undefined ? undefined : JSON.stringify(options.body),
   });
 
   const responseBody = await parseResponseBody(response);
