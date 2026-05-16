@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { Navbar } from "@/components/layout/Navbar";
 import { PageWrapper } from "@/components/layout/PageWrapper";
+import { AppQueryClientProvider } from "@lib/query/query-client-provider";
 
 import "./globals.css";
 
@@ -15,8 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Navbar />
-        <PageWrapper>{children}</PageWrapper>
+        <AppQueryClientProvider>
+          <Navbar />
+          <PageWrapper>{children}</PageWrapper>
+        </AppQueryClientProvider>
       </body>
     </html>
   );
