@@ -7,7 +7,7 @@ import { PropertiesPageContent } from "@properties/components/PropertiesPageCont
 
 export default function AdminPropertiesPage() {
   return (
-    <div className="admin-page-view space-y-6">
+    <div className="admin-page-view flex min-h-full flex-col gap-6">
       <PageHeader
         title="Propiedades"
         description="Administra el inventario de propiedades desde esta seccion."

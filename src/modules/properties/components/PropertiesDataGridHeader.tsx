@@ -9,10 +9,19 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { SearchField, Tabs } from "@heroui/react";
+import { PropertiesFiltersPopover } from "./PropertiesFiltersPopover";
+
+type PropertyTypeOption = {
+  propertyTypeId: number;
+  name: string;
+};
 
 type PropertiesDataGridHeaderProps = {
   searchValue: string;
   onSearchChange: (value: string) => void;
+  propertyTypeOptions: PropertyTypeOption[];
+  selectedPropertyTypeIds: number[];
+  onSelectedPropertyTypeIdsChange: (value: number[]) => void;
   viewMode: "table" | "grid";
   onViewModeChange: (value: "table" | "grid") => void;
 };
@@ -20,6 +29,9 @@ type PropertiesDataGridHeaderProps = {
 export function PropertiesDataGridHeader({
   searchValue,
   onSearchChange,
+  propertyTypeOptions,
+  selectedPropertyTypeIds,
+  onSelectedPropertyTypeIdsChange,
   viewMode,
   onViewModeChange,
 }: PropertiesDataGridHeaderProps) {
@@ -44,33 +56,41 @@ export function PropertiesDataGridHeader({
         </SearchField.Group>
       </SearchField>
 
-      <Tabs
-        selectedKey={viewMode}
-        variant="primary"
-        onSelectionChange={(key: Key) => {
-          if (key === "table" || key === "grid") {
-            onViewModeChange(key);
-          }
-        }}
-      >
-        <Tabs.ListContainer>
-          <Tabs.List aria-label="Vista de propiedades">
-            <Tabs.Tab id="table">
-              <HugeiconsIcon icon={TableIcon} size={16} strokeWidth={1.8} />
-              <Tabs.Indicator />
-            </Tabs.Tab>
-            <Tabs.Tab id="grid">
-              <Tabs.Separator />
-              <HugeiconsIcon
-                icon={GridTableIcon}
-                size={16}
-                strokeWidth={1.8}
-              />
-              <Tabs.Indicator />
-            </Tabs.Tab>
-          </Tabs.List>
-        </Tabs.ListContainer>
-      </Tabs>
+      <div className="flex items-center gap-3 self-end md:self-auto">
+        <PropertiesFiltersPopover
+          onSelectedPropertyTypeIdsChange={onSelectedPropertyTypeIdsChange}
+          propertyTypeOptions={propertyTypeOptions}
+          selectedPropertyTypeIds={selectedPropertyTypeIds}
+        />
+
+        <Tabs
+          selectedKey={viewMode}
+          variant="primary"
+          onSelectionChange={(key: Key) => {
+            if (key === "table" || key === "grid") {
+              onViewModeChange(key);
+            }
+          }}
+        >
+          <Tabs.ListContainer>
+            <Tabs.List aria-label="Vista de propiedades">
+              <Tabs.Tab id="table">
+                <HugeiconsIcon icon={TableIcon} size={16} strokeWidth={1.8} />
+                <Tabs.Indicator />
+              </Tabs.Tab>
+              <Tabs.Tab id="grid">
+                <Tabs.Separator />
+                <HugeiconsIcon
+                  icon={GridTableIcon}
+                  size={16}
+                  strokeWidth={1.8}
+                />
+                <Tabs.Indicator />
+              </Tabs.Tab>
+            </Tabs.List>
+          </Tabs.ListContainer>
+        </Tabs>
+      </div>
     </div>
   );
 }

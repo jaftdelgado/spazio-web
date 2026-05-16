@@ -4,15 +4,18 @@ import * as React from "react";
 
 import {
   Building03Icon,
+  Delete02Icon,
   DollarCircleIcon,
+  Edit03Icon,
   Home07Icon,
   MapsLocation01Icon,
+  MoreVerticalIcon,
   NoteIcon,
   RulerIcon,
   TaskDone02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Chip } from "@heroui/react";
+import { Button, Dropdown, Label, Chip } from "@heroui/react";
 
 import {
   DataGrid,
@@ -20,6 +23,7 @@ import {
   type DataGridRowBase,
 } from "@components/core/DataGrid";
 import type { PropertyCard } from "@properties/domain/property.entity";
+import { PropertyDeleteAlertDialog } from "./PropertyDeleteAlertDialog";
 
 type PropertyGridColumnId =
   | "title"
@@ -28,7 +32,8 @@ type PropertyGridColumnId =
   | "modality"
   | "status"
   | "price"
-  | "builtArea";
+  | "builtArea"
+  | "actions";
 
 type PropertyGridRow = DataGridRowBase & PropertyCard;
 
@@ -36,8 +41,8 @@ const columnLabel = (
   icon: React.ComponentProps<typeof HugeiconsIcon>["icon"],
   label: string,
 ) => (
-  <span className="flex items-center gap-2">
-    <HugeiconsIcon className="h-4 w-4 text-slate-500" icon={icon} />
+  <span className="flex items-center gap-2 text-muted">
+    <HugeiconsIcon className="h-4 w-4 shrink-0 text-muted" icon={icon} />
     <span>{label}</span>
   </span>
 );
@@ -78,14 +83,20 @@ const PROPERTY_COLUMNS: DataGridColumn<PropertyGridColumnId>[] = [
     label: columnLabel(DollarCircleIcon, "Precio"),
     width: 180,
     minWidth: 160,
-    align: "right",
   },
   {
     id: "builtArea",
     label: columnLabel(RulerIcon, "Area"),
     width: 130,
     minWidth: 110,
-    align: "right",
+  },
+  {
+    id: "actions",
+    label: "",
+    width: 56,
+    minWidth: 56,
+    align: "center",
+    sticky: "right",
   },
 ];
 
@@ -118,6 +129,7 @@ function renderPropertyCell(
   row: PropertyGridRow,
   columnId: PropertyGridColumnId,
   propertyAddressMap: Record<string, string | null>,
+  onDeletePress: (row: PropertyGridRow) => void,
 ) {
   switch (columnId) {
     case "title":
@@ -143,9 +155,61 @@ function renderPropertyCell(
         </Chip>
       );
     case "price":
-      return formatCurrency(row.price);
+      return <span className="tabular-nums">{formatCurrency(row.price)}</span>;
     case "builtArea":
-      return formatArea(row.builtArea);
+      return <span className="tabular-nums">{formatArea(row.builtArea)}</span>;
+    case "actions":
+      return (
+        <Dropdown>
+          <Button isIconOnly aria-label="Acciones" size="sm" variant="ghost">
+            <HugeiconsIcon
+              icon={MoreVerticalIcon}
+              size={18}
+              strokeWidth={1.8}
+            />
+          </Button>
+          <Dropdown.Popover placement="bottom end">
+            <Dropdown.Menu
+              onAction={() => {
+                // Placeholder until property detail/edit/delete flows are implemented.
+              }}
+            >
+              <Dropdown.Item id="view" textValue="Consultar detalles">
+                <HugeiconsIcon
+                  className="size-4 shrink-0 text-slate-500"
+                  icon={Building03Icon}
+                  size={16}
+                  strokeWidth={1.8}
+                />
+                <Label>Consultar detalles</Label>
+              </Dropdown.Item>
+              <Dropdown.Item id="edit" textValue="Modificar">
+                <HugeiconsIcon
+                  className="size-4 shrink-0 text-slate-500"
+                  icon={Edit03Icon}
+                  size={16}
+                  strokeWidth={1.8}
+                />
+                <Label>Modificar</Label>
+              </Dropdown.Item>
+              <Dropdown.Item
+                id="delete"
+                textValue="Eliminar"
+                variant="danger"
+                onAction={() => onDeletePress(row)}
+              >
+                <HugeiconsIcon
+                  className="size-4 shrink-0 text-danger"
+                  icon={Delete02Icon}
+                  size={16}
+                  strokeWidth={1.8}
+                />
+                <Label>Eliminar</Label>
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown.Popover>
+        </Dropdown>
+      );
     default:
       return null;
   }
@@ -153,30 +217,43 @@ function renderPropertyCell(
 
 type PropertiesDataGridProps = {
   rows: PropertyGridRow[];
-  totalCount: number;
   propertyAddressMap: Record<string, string | null>;
 };
 
 export function PropertiesDataGrid({
   rows,
-  totalCount,
   propertyAddressMap,
 }: PropertiesDataGridProps) {
+  const [propertyPendingDelete, setPropertyPendingDelete] =
+    React.useState<PropertyGridRow | null>(null);
+
   return (
-    <DataGrid<PropertyGridRow, PropertyGridColumnId>
-      columns={PROPERTY_COLUMNS}
-      getRowLabel={(row) => row.title}
-      renderCell={(row, columnId) =>
-        renderPropertyCell(row, columnId, propertyAddressMap)
-      }
-      renderToolbar={({ visibleRowCount }) => (
-        <div className="mb-4 text-sm text-slate-600">
-          Mostrando {visibleRowCount} de{" "}
-          {totalCount} propiedades
-        </div>
-      )}
-      rows={rows}
-      tableContainerClassName="rounded-xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-    />
+    <>
+      <DataGrid<PropertyGridRow, PropertyGridColumnId>
+        columns={PROPERTY_COLUMNS}
+        fillAvailableHeight
+        getRowLabel={(row) => row.title}
+        renderCell={(row, columnId) =>
+          renderPropertyCell(
+            row,
+            columnId,
+            propertyAddressMap,
+            setPropertyPendingDelete,
+          )
+        }
+        rows={rows}
+        tableContainerClassName="rounded-xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      />
+
+      <PropertyDeleteAlertDialog
+        isOpen={propertyPendingDelete !== null}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
+            setPropertyPendingDelete(null);
+          }
+        }}
+        propertyTitle={propertyPendingDelete?.title ?? ""}
+      />
+    </>
   );
 }

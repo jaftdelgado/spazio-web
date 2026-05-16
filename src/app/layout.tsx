@@ -2,6 +2,8 @@
 
 import type { ReactNode } from "react";
 
+import { Toast } from "@heroui/react";
+
 import { Navbar } from "@/components/layout/Navbar";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { AppQueryClientProvider } from "@lib/query/query-client-provider";
@@ -17,6 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AppQueryClientProvider>
+          <Toast.Provider placement="bottom" />
           <Navbar />
           <PageWrapper>{children}</PageWrapper>
         </AppQueryClientProvider>
