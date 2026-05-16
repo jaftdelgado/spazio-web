@@ -5,8 +5,12 @@ import { useQuery } from "@tanstack/react-query";
 import type { PropertyListFilters } from "@properties/domain/property.repository";
 import { propertyGetHttpAdapter } from "@properties/infra/get/property-get.http-adapter";
 
-export const usePropertyList = (filters: PropertyListFilters = {}) => {
+export const usePropertyList = (
+  filters: PropertyListFilters = {},
+  enabled = true,
+) => {
   return useQuery({
+    enabled,
     queryKey: ["properties", "list", filters],
     queryFn: () => propertyGetHttpAdapter.listProperties(filters),
   });

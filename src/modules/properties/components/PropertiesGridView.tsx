@@ -17,7 +17,6 @@ type PropertyGridRow = DataGridRowBase & PropertyCard;
 
 type PropertiesGridViewProps = {
   rows: PropertyGridRow[];
-  totalCount: number;
   propertyAddressMap: Record<string, string | null>;
 };
 
@@ -48,16 +47,10 @@ const formatAddress = (address: string | null | undefined) => {
 
 export function PropertiesGridView({
   rows,
-  totalCount,
   propertyAddressMap,
 }: PropertiesGridViewProps) {
   return (
-    <div className="space-y-4">
-      <div className="text-sm text-slate-600">
-        Mostrando {rows.length} de {totalCount} propiedades
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {rows.map((row) => (
           <Card key={row.id} className="overflow-hidden">
             {row.coverPhotoUrl ? (
@@ -127,7 +120,6 @@ export function PropertiesGridView({
             </Card.Footer>
           </Card>
         ))}
-      </div>
     </div>
   );
 }

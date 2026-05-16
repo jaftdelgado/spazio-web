@@ -24,9 +24,9 @@ export const propertyGetHttpAdapter: Pick<
       params.set("page_size", String(filters.pageSize));
     }
     if (filters.q) params.set("q", filters.q);
-    if (filters.propertyTypeId !== undefined) {
-      params.set("property_type_id", String(filters.propertyTypeId));
-    }
+    filters.propertyTypeId?.forEach((id) => {
+      params.append("property_type_id", String(id));
+    });
     if (filters.modalityId !== undefined) {
       params.set("modality_id", String(filters.modalityId));
     }

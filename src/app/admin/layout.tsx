@@ -61,8 +61,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </div>
           </header>
 
-          <main className="flex-1 p-6">
-            <div className="mx-auto w-full max-w-7xl">{children}</div>
+          <main className="flex flex-1 flex-col p-6">
+            <div className="mx-auto flex min-h-full w-full max-w-7xl flex-1 flex-col">
+              {children}
+            </div>
           </main>
         </div>
       </SidebarInset>
