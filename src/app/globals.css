@@ -4,6 +4,12 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --admin-shell-bg: linear-gradient(180deg, #f3f6fb 0%, #e8eef8 100%);
+  --admin-sidebar-bg: #fafafa;
+  --admin-sidebar-fg: #171717;
+  --admin-topbar-bg: rgb(255 255 255 / 0.85);
+  --admin-page-padding-x: 1.5rem;
+  --admin-page-padding-y: 0.75rem;
 }
 
 @theme inline {
@@ -16,4 +22,22 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.admin-shell {
+  background: var(--admin-shell-bg);
+}
+
+.admin-sidebar {
+  background: var(--admin-sidebar-bg);
+  color: var(--admin-sidebar-fg);
+}
+
+.admin-topbar {
+  background: var(--admin-topbar-bg);
+}
+
+.admin-page-view {
+  padding-inline: var(--admin-page-padding-x);
+  padding-block: var(--admin-page-padding-y);
 }
