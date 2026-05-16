@@ -1,11 +1,18 @@
 "use client";
 
-import { PropertiesPageContent } from "@/modules/properties/components/PropertiesPageContent";
+import { Button } from "@heroui/react";
+
+import { PageHeader } from "@components/layout/PageHeader";
+import { PropertiesPageContent } from "@properties/components/PropertiesPageContent";
 
 export default function AdminPropertiesPage() {
   return (
-    <div>
-      Admin Properties Page
+    <div className="admin-page-view space-y-6">
+      <PageHeader
+        title="Propiedades"
+        description="Administra el inventario de propiedades desde esta seccion."
+        actions={<Button>Agregar propiedad</Button>}
+      />
       <PropertiesPageContent />
     </div>
   );
