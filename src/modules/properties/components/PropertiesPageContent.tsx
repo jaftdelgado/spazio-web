@@ -2,9 +2,19 @@
 
 import * as React from "react";
 
+import { Alert02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Button, Skeleton } from "@heroui/react";
 import { useInfiniteQuery, useQueries } from "@tanstack/react-query";
 
+import {
+  FeedbackState,
+  FeedbackStateContent,
+  FeedbackStateDescription,
+  FeedbackStateHeader,
+  FeedbackStateMedia,
+  FeedbackStateTitle,
+} from "@components/core/FeedbackState";
 import { usePropertyTypes } from "@catalogs/application/hooks/useCatalogs";
 import type { DataGridRowBase } from "@components/core/DataGrid";
 import { usePropertyList } from "@properties/application/get/hooks/useProperty";
@@ -37,6 +47,7 @@ function PropertiesDataGridFooterSkeleton() {
 export function PropertiesPageContent() {
   const { t } = usePropertiesTranslation();
   const [searchValue, setSearchValue] = React.useState("");
+  const [isRetrying, setIsRetrying] = React.useState(false);
   const [viewMode, setViewMode] = React.useState<PropertiesViewMode>("table");
   const [selectedPropertyTypeIds, setSelectedPropertyTypeIds] = React.useState<
     number[] | null
@@ -217,6 +228,21 @@ export function PropertiesPageContent() {
       ? propertiesQuery.isLoading || isTableDetailsLoading
       : propertiesInfiniteQuery.isLoading;
 
+  const handleRetry = React.useCallback(async () => {
+    setIsRetrying(true);
+
+    try {
+      if (viewMode === "table") {
+        await propertiesQuery.refetch();
+        return;
+      }
+
+      await propertiesInfiniteQuery.refetch();
+    } finally {
+      setIsRetrying(false);
+    }
+  }, [propertiesInfiniteQuery, propertiesQuery, viewMode]);
+
   return (
     <div className="flex flex-1 flex-col gap-4 min-h-0">
       <PropertiesDataGridHeader
@@ -247,28 +273,31 @@ export function PropertiesPageContent() {
       ) : (viewMode === "table"
           ? propertiesQuery.isError
           : propertiesInfiniteQuery.isError) ? (
-        <div className="space-y-4 rounded-xl border border-red-200 bg-red-50 px-4 py-5">
-          <div className="space-y-1">
-            <p className="text-sm font-medium text-red-700">
-              {t("states.loadErrorTitle")}
-            </p>
-            <p className="text-sm text-red-600">
+        <FeedbackState className="min-h-0 flex-1" tone="danger">
+          <FeedbackStateHeader>
+            <FeedbackStateMedia variant="icon">
+              <HugeiconsIcon icon={Alert02Icon} size={24} strokeWidth={1.8} />
+            </FeedbackStateMedia>
+            <FeedbackStateTitle>{t("states.loadErrorTitle")}</FeedbackStateTitle>
+            <FeedbackStateDescription>
               {viewMode === "table"
                 ? propertiesQuery.error?.message
                 : propertiesInfiniteQuery.error?.message}
-            </p>
-          </div>
-          <Button
-            onPress={() =>
-              viewMode === "table"
-                ? propertiesQuery.refetch()
-                : propertiesInfiniteQuery.refetch()
-            }
-            size="sm"
-          >
-            {t("states.retry")}
-          </Button>
-        </div>
+            </FeedbackStateDescription>
+          </FeedbackStateHeader>
+          <FeedbackStateContent>
+            <Button
+              isDisabled={isRetrying}
+              onPress={() => {
+                void handleRetry();
+              }}
+              size="sm"
+              variant="primary"
+            >
+              {t("states.retry")}
+            </Button>
+          </FeedbackStateContent>
+        </FeedbackState>
       ) : !isPropertiesLoading && rows.length === 0 ? (
         <div className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-600">
           {t("states.empty")}

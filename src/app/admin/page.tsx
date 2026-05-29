@@ -25,7 +25,7 @@ export default function AdminDashboardPage() {
         <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
           <p className="text-sm font-medium text-slate-500">Comportamiento</p>
           <p className="mt-2 text-xl font-semibold text-slate-900">
-            Sidebar y topbar permanecen
+            La barra superior permanece
           </p>
         </div>
 
