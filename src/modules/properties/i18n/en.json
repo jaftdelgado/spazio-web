@@ -1,0 +1,56 @@
+{
+  "page": {
+    "title": "Properties",
+    "description": "Manage the property inventory from this section.",
+    "addProperty": "Add property"
+  },
+  "searchPlaceholder": "Search properties...",
+  "viewAriaLabel": "Properties view",
+  "filters": {
+    "propertyTypeButton": "Type",
+    "propertyTypeTitle": "Property types"
+  },
+  "address": {
+    "interiorNumberPrefix": "Unit"
+  },
+  "columns": {
+    "title": "Property",
+    "propertyType": "Type",
+    "address": "Address",
+    "modality": "Modality",
+    "status": "Status",
+    "price": "Price",
+    "builtArea": "Area"
+  },
+  "actions": {
+    "ariaLabel": "Actions",
+    "view": "View details",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "states": {
+    "empty": "There are no properties to display.",
+    "loading": "Loading properties...",
+    "loadingRowLabel": "Loading property",
+    "loadErrorTitle": "Properties could not be loaded.",
+    "retry": "Retry"
+  },
+  "grid": {
+    "price": "Price",
+    "area": "Area"
+  },
+  "footer": {
+    "showing": "Showing {{visibleRowCount}} of {{totalCount}} properties"
+  },
+  "deleteDialog": {
+    "title": "Delete property",
+    "bodyPrefix": "This action will delete",
+    "bodySuffix": "and it cannot be undone.",
+    "bodyWithoutTitle": "This action will delete the property and it cannot be undone.",
+    "cancel": "Cancel",
+    "confirm": "Delete",
+    "successTitle": "Property deleted",
+    "successDescription": "{{propertyTitle}} was deleted successfully.",
+    "successDescriptionFallback": "The property was deleted successfully."
+  }
+}

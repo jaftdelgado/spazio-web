@@ -15,7 +15,7 @@ import {
   TaskDone02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button, Dropdown, Label, Chip } from "@heroui/react";
+import { Button, Dropdown, Label, Chip, Skeleton } from "@heroui/react";
 
 import {
   DataGrid,
@@ -23,6 +23,7 @@ import {
   type DataGridRowBase,
 } from "@components/core/DataGrid";
 import type { PropertyCard } from "@properties/domain/property.entity";
+import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 import { PropertyDeleteAlertDialog } from "./PropertyDeleteAlertDialog";
 
 type PropertyGridColumnId =
@@ -36,6 +37,12 @@ type PropertyGridColumnId =
   | "actions";
 
 type PropertyGridRow = DataGridRowBase & PropertyCard;
+type LoadingPropertyGridRow = DataGridRowBase & {
+  isLoading: true;
+};
+type PropertiesDataGridRow = PropertyGridRow | LoadingPropertyGridRow;
+
+const LOADING_ROW_COUNT = 8;
 
 const columnLabel = (
   icon: React.ComponentProps<typeof HugeiconsIcon>["icon"],
@@ -47,63 +54,10 @@ const columnLabel = (
   </span>
 );
 
-const PROPERTY_COLUMNS: DataGridColumn<PropertyGridColumnId>[] = [
-  {
-    id: "title",
-    label: columnLabel(Home07Icon, "Propiedad"),
-    width: 280,
-    minWidth: 220,
-  },
-  {
-    id: "propertyType",
-    label: columnLabel(Building03Icon, "Tipo"),
-    width: 160,
-    minWidth: 140,
-  },
-  {
-    id: "address",
-    label: columnLabel(MapsLocation01Icon, "Direccion"),
-    width: 300,
-    minWidth: 220,
-  },
-  {
-    id: "modality",
-    label: columnLabel(NoteIcon, "Modalidad"),
-    width: 150,
-    minWidth: 130,
-  },
-  {
-    id: "status",
-    label: columnLabel(TaskDone02Icon, "Estado"),
-    width: 150,
-    minWidth: 130,
-  },
-  {
-    id: "price",
-    label: columnLabel(DollarCircleIcon, "Precio"),
-    width: 180,
-    minWidth: 160,
-  },
-  {
-    id: "builtArea",
-    label: columnLabel(RulerIcon, "Area"),
-    width: 130,
-    minWidth: 110,
-  },
-  {
-    id: "actions",
-    label: "",
-    width: 56,
-    minWidth: 56,
-    align: "center",
-    sticky: "right",
-  },
-];
-
-const formatCurrency = (price: PropertyCard["price"]) => {
+const formatCurrency = (price: PropertyCard["price"], locale: string) => {
   if (!price) return "-";
 
-  const formattedAmount = new Intl.NumberFormat("es-MX", {
+  const formattedAmount = new Intl.NumberFormat(locale, {
     style: "currency",
     currency: price.currency,
     maximumFractionDigits: 0,
@@ -116,21 +70,59 @@ const formatCurrency = (price: PropertyCard["price"]) => {
   return formattedAmount;
 };
 
-const formatArea = (value: number | null) => {
+const formatArea = (value: number | null, locale: string) => {
   if (value === null) return "-";
-  return `${new Intl.NumberFormat("es-MX").format(value)} m2`;
+  return `${new Intl.NumberFormat(locale).format(value)} m2`;
 };
 
 const formatAddress = (address: string | null | undefined) => {
   return address && address.trim().length > 0 ? address : "-";
 };
 
+function isLoadingRow(
+  row: PropertiesDataGridRow,
+): row is LoadingPropertyGridRow {
+  return "isLoading" in row;
+}
+
+function renderLoadingCell(columnId: PropertyGridColumnId) {
+  switch (columnId) {
+    case "title":
+      return <Skeleton className="h-4 w-40 rounded-lg" />;
+    case "propertyType":
+    case "modality":
+    case "status":
+      return <Skeleton className="h-4 w-24 rounded-full" />;
+    case "address":
+      return <Skeleton className="h-4 w-52 rounded-lg" />;
+    case "price":
+      return <Skeleton className="ml-auto h-4 w-28 rounded-lg" />;
+    case "builtArea":
+      return <Skeleton className="ml-auto h-4 w-16 rounded-lg" />;
+    case "actions":
+      return <Skeleton className="ml-auto h-4 w-4 rounded-lg" />;
+    default:
+      return null;
+  }
+}
+
 function renderPropertyCell(
-  row: PropertyGridRow,
+  row: PropertiesDataGridRow,
   columnId: PropertyGridColumnId,
   propertyAddressMap: Record<string, string | null>,
+  locale: string,
+  labels: {
+    actionsAriaLabel: string;
+    view: string;
+    edit: string;
+    delete: string;
+  },
   onDeletePress: (row: PropertyGridRow) => void,
 ) {
+  if (isLoadingRow(row)) {
+    return renderLoadingCell(columnId);
+  }
+
   switch (columnId) {
     case "title":
       return <div className="font-medium text-slate-950">{row.title}</div>;
@@ -155,13 +147,24 @@ function renderPropertyCell(
         </Chip>
       );
     case "price":
-      return <span className="tabular-nums">{formatCurrency(row.price)}</span>;
+      return (
+        <span className="tabular-nums">{formatCurrency(row.price, locale)}</span>
+      );
     case "builtArea":
-      return <span className="tabular-nums">{formatArea(row.builtArea)}</span>;
+      return (
+        <span className="tabular-nums">
+          {formatArea(row.builtArea, locale)}
+        </span>
+      );
     case "actions":
       return (
         <Dropdown>
-          <Button isIconOnly aria-label="Acciones" size="sm" variant="ghost">
+          <Button
+            isIconOnly
+            aria-label={labels.actionsAriaLabel}
+            size="sm"
+            variant="ghost"
+          >
             <HugeiconsIcon
               icon={MoreVerticalIcon}
               size={18}
@@ -174,27 +177,27 @@ function renderPropertyCell(
                 // Placeholder until property detail/edit/delete flows are implemented.
               }}
             >
-              <Dropdown.Item id="view" textValue="Consultar detalles">
+              <Dropdown.Item id="view" textValue={labels.view}>
                 <HugeiconsIcon
                   className="size-4 shrink-0 text-slate-500"
                   icon={Building03Icon}
                   size={16}
                   strokeWidth={1.8}
                 />
-                <Label>Consultar detalles</Label>
+                <Label>{labels.view}</Label>
               </Dropdown.Item>
-              <Dropdown.Item id="edit" textValue="Modificar">
+              <Dropdown.Item id="edit" textValue={labels.edit}>
                 <HugeiconsIcon
                   className="size-4 shrink-0 text-slate-500"
                   icon={Edit03Icon}
                   size={16}
                   strokeWidth={1.8}
                 />
-                <Label>Modificar</Label>
+                <Label>{labels.edit}</Label>
               </Dropdown.Item>
               <Dropdown.Item
                 id="delete"
-                textValue="Eliminar"
+                textValue={labels.delete}
                 variant="danger"
                 onAction={() => onDeletePress(row)}
               >
@@ -204,7 +207,7 @@ function renderPropertyCell(
                   size={16}
                   strokeWidth={1.8}
                 />
-                <Label>Eliminar</Label>
+                <Label>{labels.delete}</Label>
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown.Popover>
@@ -218,30 +221,111 @@ function renderPropertyCell(
 type PropertiesDataGridProps = {
   rows: PropertyGridRow[];
   propertyAddressMap: Record<string, string | null>;
+  isLoading?: boolean;
 };
 
 export function PropertiesDataGrid({
   rows,
   propertyAddressMap,
+  isLoading = false,
 }: PropertiesDataGridProps) {
+  const { intlLocale, t } = usePropertiesTranslation();
   const [propertyPendingDelete, setPropertyPendingDelete] =
     React.useState<PropertyGridRow | null>(null);
+  const columns = React.useMemo<DataGridColumn<PropertyGridColumnId>[]>(
+    () => [
+      {
+        id: "title",
+        label: columnLabel(Home07Icon, t("columns.title")),
+        width: 280,
+        minWidth: 220,
+      },
+      {
+        id: "propertyType",
+        label: columnLabel(Building03Icon, t("columns.propertyType")),
+        width: 160,
+        minWidth: 140,
+      },
+      {
+        id: "address",
+        label: columnLabel(MapsLocation01Icon, t("columns.address")),
+        width: 300,
+        minWidth: 220,
+      },
+      {
+        id: "modality",
+        label: columnLabel(NoteIcon, t("columns.modality")),
+        width: 150,
+        minWidth: 130,
+      },
+      {
+        id: "status",
+        label: columnLabel(TaskDone02Icon, t("columns.status")),
+        width: 150,
+        minWidth: 130,
+      },
+      {
+        id: "price",
+        label: columnLabel(DollarCircleIcon, t("columns.price")),
+        width: 180,
+        minWidth: 160,
+      },
+      {
+        id: "builtArea",
+        label: columnLabel(RulerIcon, t("columns.builtArea")),
+        width: 130,
+        minWidth: 110,
+      },
+      {
+        id: "actions",
+        label: "",
+        width: 56,
+        minWidth: 56,
+        align: "center",
+        sticky: "right",
+      },
+    ],
+    [t],
+  );
+  const actionLabels = React.useMemo(
+    () => ({
+      actionsAriaLabel: t("actions.ariaLabel"),
+      view: t("actions.view"),
+      edit: t("actions.edit"),
+      delete: t("actions.delete"),
+    }),
+    [t],
+  );
+  const rowsToRender = React.useMemo<PropertiesDataGridRow[]>(
+    () =>
+      isLoading
+        ? Array.from({ length: LOADING_ROW_COUNT }, (_, index) => ({
+            id: `loading-row-${index}`,
+            isLoading: true,
+          }))
+        : rows,
+    [isLoading, rows],
+  );
 
   return (
     <>
-      <DataGrid<PropertyGridRow, PropertyGridColumnId>
-        columns={PROPERTY_COLUMNS}
+      <DataGrid<PropertiesDataGridRow, PropertyGridColumnId>
+        columns={columns}
         fillAvailableHeight
-        getRowLabel={(row) => row.title}
+        getRowLabel={(row) =>
+          isLoadingRow(row) ? t("states.loadingRowLabel") : row.title
+        }
         renderCell={(row, columnId) =>
           renderPropertyCell(
             row,
             columnId,
             propertyAddressMap,
+            intlLocale,
+            actionLabels,
             setPropertyPendingDelete,
           )
         }
-        rows={rows}
+        rows={rowsToRender}
         tableContainerClassName="rounded-xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       />
 

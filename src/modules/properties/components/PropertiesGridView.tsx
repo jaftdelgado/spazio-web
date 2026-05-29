@@ -12,6 +12,7 @@ import { Card, Chip } from "@heroui/react";
 
 import type { DataGridRowBase } from "@components/core/DataGrid";
 import type { PropertyCard } from "@properties/domain/property.entity";
+import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 
 type PropertyGridRow = DataGridRowBase & PropertyCard;
 
@@ -20,10 +21,10 @@ type PropertiesGridViewProps = {
   propertyAddressMap: Record<string, string | null>;
 };
 
-const formatCurrency = (price: PropertyCard["price"]) => {
+const formatCurrency = (price: PropertyCard["price"], locale: string) => {
   if (!price) return "-";
 
-  const formattedAmount = new Intl.NumberFormat("es-MX", {
+  const formattedAmount = new Intl.NumberFormat(locale, {
     style: "currency",
     currency: price.currency,
     maximumFractionDigits: 0,
@@ -36,9 +37,9 @@ const formatCurrency = (price: PropertyCard["price"]) => {
   return formattedAmount;
 };
 
-const formatArea = (value: number | null) => {
+const formatArea = (value: number | null, locale: string) => {
   if (value === null) return "-";
-  return `${new Intl.NumberFormat("es-MX").format(value)} m2`;
+  return `${new Intl.NumberFormat(locale).format(value)} m2`;
 };
 
 const formatAddress = (address: string | null | undefined) => {
@@ -49,6 +50,8 @@ export function PropertiesGridView({
   rows,
   propertyAddressMap,
 }: PropertiesGridViewProps) {
+  const { intlLocale, t } = usePropertiesTranslation();
+
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {rows.map((row) => (
@@ -103,18 +106,18 @@ export function PropertiesGridView({
 
             <Card.Footer className="grid grid-cols-2 gap-3 text-sm">
               <div>
-                <p className="text-slate-500">Precio</p>
+                <p className="text-slate-500">{t("grid.price")}</p>
                 <p className="font-medium text-slate-950">
-                  {formatCurrency(row.price)}
+                  {formatCurrency(row.price, intlLocale)}
                 </p>
               </div>
               <div>
                 <p className="flex items-center gap-1 text-slate-500">
                   <HugeiconsIcon icon={RulerIcon} size={14} strokeWidth={1.8} />
-                  <span>Area</span>
+                  <span>{t("grid.area")}</span>
                 </p>
                 <p className="font-medium text-slate-950">
-                  {formatArea(row.builtArea)}
+                  {formatArea(row.builtArea, intlLocale)}
                 </p>
               </div>
             </Card.Footer>

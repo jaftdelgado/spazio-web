@@ -279,6 +279,7 @@ export function DataGrid<Row extends DataGridRowBase, ColumnId extends string>({
           ref={tableContainerRef}
           className={cn(
             "min-h-0 overflow-auto rounded-xl border border-slate-200 bg-white",
+            fillAvailableHeight && "h-full",
             tableContainerClassName,
           )}
         >
@@ -293,7 +294,7 @@ export function DataGrid<Row extends DataGridRowBase, ColumnId extends string>({
                     <th
                       key={column.id}
                       className={cn(
-                        "relative border-b border-slate-200 px-3 py-3 text-sm font-medium text-muted",
+                        "relative h-12 border-b border-slate-200 px-3 py-0 text-sm font-medium text-muted",
                         column.sticky === "right" &&
                           "bg-slate-50 shadow-[-1px_0_0_0_rgba(226,232,240,1)] after:pointer-events-none after:absolute after:inset-0 after:z-0 after:bg-slate-50 after:content-['']",
                         column.sticky === "left" &&
@@ -351,7 +352,7 @@ export function DataGrid<Row extends DataGridRowBase, ColumnId extends string>({
                       <td
                         key={column.id}
                         className={cn(
-                          "border-b border-slate-200 px-3 py-3 align-middle text-sm text-foreground",
+                          "h-12 border-b border-slate-200 px-3 py-0 align-middle text-sm text-foreground",
                           column.sticky === "right" &&
                             "shadow-[-1px_0_0_0_rgba(226,232,240,1)] after:pointer-events-none after:absolute after:inset-0 after:z-0 after:content-[''] before:pointer-events-none before:absolute before:inset-y-0 before:-left-10 before:z-0 before:w-10 before:bg-linear-to-l before:opacity-(--sticky-right-mask-opacity) before:transition-opacity before:duration-200",
                           column.sticky === "left" &&
@@ -378,7 +379,7 @@ export function DataGrid<Row extends DataGridRowBase, ColumnId extends string>({
                           <div className="relative z-10">
                             <input
                               ref={inputRef}
-                              className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-0"
+                              className="h-9 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-0"
                               onBlur={commitEdit}
                               onChange={(event) =>
                                 setDraftValue(event.currentTarget.value)

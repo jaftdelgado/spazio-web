@@ -1,0 +1,56 @@
+{
+  "page": {
+    "title": "Propiedades",
+    "description": "Administra el inventario de propiedades desde esta sección.",
+    "addProperty": "Agregar propiedad"
+  },
+  "searchPlaceholder": "Buscar propiedades...",
+  "viewAriaLabel": "Vista de propiedades",
+  "filters": {
+    "propertyTypeButton": "Tipo",
+    "propertyTypeTitle": "Tipos de propiedad"
+  },
+  "address": {
+    "interiorNumberPrefix": "Int."
+  },
+  "columns": {
+    "title": "Propiedad",
+    "propertyType": "Tipo",
+    "address": "Dirección",
+    "modality": "Modalidad",
+    "status": "Estado",
+    "price": "Precio",
+    "builtArea": "Área"
+  },
+  "actions": {
+    "ariaLabel": "Acciones",
+    "view": "Consultar detalles",
+    "edit": "Modificar",
+    "delete": "Eliminar"
+  },
+  "states": {
+    "empty": "No hay propiedades para mostrar.",
+    "loading": "Cargando propiedades...",
+    "loadingRowLabel": "Cargando propiedad",
+    "loadErrorTitle": "No se pudieron cargar las propiedades.",
+    "retry": "Reintentar"
+  },
+  "grid": {
+    "price": "Precio",
+    "area": "Área"
+  },
+  "footer": {
+    "showing": "Mostrando {{visibleRowCount}} de {{totalCount}} propiedades"
+  },
+  "deleteDialog": {
+    "title": "Eliminar propiedad",
+    "bodyPrefix": "Esta acción eliminará",
+    "bodySuffix": "y no se puede deshacer.",
+    "bodyWithoutTitle": "Esta acción eliminará la propiedad y no se puede deshacer.",
+    "cancel": "Cancelar",
+    "confirm": "Eliminar",
+    "successTitle": "Propiedad eliminada",
+    "successDescription": "{{propertyTitle}} fue eliminada correctamente.",
+    "successDescriptionFallback": "La propiedad fue eliminada correctamente."
+  }
+}
