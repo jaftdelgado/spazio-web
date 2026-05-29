@@ -3,6 +3,7 @@
 import { FilterHorizontalIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button, Popover, Tag, TagGroup } from "@heroui/react";
+import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 
 type PropertyTypeOption = {
   propertyTypeId: number;
@@ -20,6 +21,7 @@ export function PropertiesFiltersPopover({
   selectedPropertyTypeIds,
   onSelectedPropertyTypeIdsChange,
 }: PropertiesFiltersPopoverProps) {
+  const { t } = usePropertiesTranslation();
   const allPropertyTypeIds = propertyTypeOptions.map(
     (propertyType) => propertyType.propertyTypeId,
   );
@@ -33,13 +35,13 @@ export function PropertiesFiltersPopover({
             size={16}
             strokeWidth={1.8}
           />
-          <span>Tipo</span>
+          <span>{t("filters.propertyTypeButton")}</span>
         </Button>
       </Popover.Trigger>
       <Popover.Content className="w-[320px]" placement="bottom end">
         <Popover.Dialog className="space-y-3 p-4">
           <Popover.Heading className="text-sm font-medium text-foreground">
-            Tipos de propiedad
+            {t("filters.propertyTypeTitle")}
           </Popover.Heading>
           <TagGroup
             selectedKeys={new Set(selectedPropertyTypeIds.map(String))}

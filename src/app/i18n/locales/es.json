@@ -1,0 +1,32 @@
+{
+  "languages": {
+    "es": "Español",
+    "en": "Inglés"
+  },
+  "topbarUserMenu": {
+    "triggerLabel": "Abrir menú de usuario",
+    "sections": {
+      "account": "Cuenta",
+      "session": "Sesión"
+    },
+    "actions": {
+      "profile": "Perfil",
+      "settings": "Configuración",
+      "logout": "Cerrar sesión"
+    },
+    "toast": {
+      "title": "Próximamente",
+      "profileDescription": "La vista de perfil todavía no está disponible.",
+      "settingsDescription": "La configuración de la cuenta todavía no está disponible."
+    }
+  },
+  "adminTopbarNav": {
+    "ariaLabel": "Navegación del panel de administración",
+    "items": {
+      "summary": "Resumen",
+      "properties": "Propiedades",
+      "visits": "Visitas",
+      "payments": "Pagos"
+    }
+  }
+}

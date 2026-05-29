@@ -2,9 +2,19 @@
 
 import * as React from "react";
 
-import { Button } from "@heroui/react";
+import { Alert02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Button, Skeleton } from "@heroui/react";
 import { useInfiniteQuery, useQueries } from "@tanstack/react-query";
 
+import {
+  FeedbackState,
+  FeedbackStateContent,
+  FeedbackStateDescription,
+  FeedbackStateHeader,
+  FeedbackStateMedia,
+  FeedbackStateTitle,
+} from "@components/core/FeedbackState";
 import { usePropertyTypes } from "@catalogs/application/hooks/useCatalogs";
 import type { DataGridRowBase } from "@components/core/DataGrid";
 import { usePropertyList } from "@properties/application/get/hooks/useProperty";
@@ -14,12 +24,30 @@ import { PropertiesDataGridFooter } from "./PropertiesDataGridFooter";
 import { PropertiesGridView } from "./PropertiesGridView";
 import { propertyGetHttpAdapter } from "@properties/infra/get/property-get.http-adapter";
 import type { PropertyCard } from "@properties/domain/property.entity";
+import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 
 type PropertiesViewMode = "table" | "grid";
 type PropertyGridRow = DataGridRowBase & PropertyCard;
 
+function PropertiesDataGridFooterSkeleton() {
+  return (
+    <div className="grid w-full grid-cols-[auto_1fr] items-center gap-4 rounded-xl">
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-9 w-9 rounded-lg" />
+        <Skeleton className="h-9 w-9 rounded-lg" />
+        <Skeleton className="h-9 w-9 rounded-lg" />
+        <Skeleton className="h-9 w-9 rounded-lg" />
+        <Skeleton className="h-9 w-9 rounded-lg" />
+      </div>
+      <Skeleton className="h-4 w-48 justify-self-end rounded-lg" />
+    </div>
+  );
+}
+
 export function PropertiesPageContent() {
+  const { t } = usePropertiesTranslation();
   const [searchValue, setSearchValue] = React.useState("");
+  const [isRetrying, setIsRetrying] = React.useState(false);
   const [viewMode, setViewMode] = React.useState<PropertiesViewMode>("table");
   const [selectedPropertyTypeIds, setSelectedPropertyTypeIds] = React.useState<
     number[] | null
@@ -174,14 +202,46 @@ export function PropertiesPageContent() {
         const addressParts = [
           location.street,
           location.exteriorNumber,
-          location.interiorNumber ? `Int. ${location.interiorNumber}` : null,
+          location.interiorNumber
+            ? `${t("address.interiorNumberPrefix")} ${location.interiorNumber}`
+            : null,
           location.neighborhood,
         ].filter(Boolean);
 
         return [row.propertyUuid, addressParts.join(", ")];
       }),
     ) as Record<string, string | null>;
-  }, [propertyDetailsQueries, rows]);
+  }, [propertyDetailsQueries, rows, t]);
+
+  const isTableDetailsLoading = React.useMemo(
+    () =>
+      viewMode === "table" &&
+      rows.length > 0 &&
+      propertyDetailsQueries.some(
+        (query) => query.status === "pending" && query.data === undefined,
+      ),
+    [propertyDetailsQueries, rows.length, viewMode],
+  );
+
+  const isPropertiesLoading =
+    viewMode === "table"
+      ? propertiesQuery.isLoading || isTableDetailsLoading
+      : propertiesInfiniteQuery.isLoading;
+
+  const handleRetry = React.useCallback(async () => {
+    setIsRetrying(true);
+
+    try {
+      if (viewMode === "table") {
+        await propertiesQuery.refetch();
+        return;
+      }
+
+      await propertiesInfiniteQuery.refetch();
+    } finally {
+      setIsRetrying(false);
+    }
+  }, [propertiesInfiniteQuery, propertiesQuery, viewMode]);
 
   return (
     <div className="flex flex-1 flex-col gap-4 min-h-0">
@@ -208,70 +268,80 @@ export function PropertiesPageContent() {
       {selectedPropertyTypeIds !== null &&
       selectedPropertyTypeIds.length === 0 ? (
         <div className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-600">
-          No hay propiedades para mostrar.
-        </div>
-      ) : (viewMode === "table"
-        ? propertiesQuery.isLoading
-        : propertiesInfiniteQuery.isLoading) ? (
-        <div className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-600">
-          Cargando propiedades...
+          {t("states.empty")}
         </div>
       ) : (viewMode === "table"
           ? propertiesQuery.isError
           : propertiesInfiniteQuery.isError) ? (
-        <div className="space-y-4 rounded-xl border border-red-200 bg-red-50 px-4 py-5">
-          <div className="space-y-1">
-            <p className="text-sm font-medium text-red-700">
-              No se pudieron cargar las propiedades.
-            </p>
-            <p className="text-sm text-red-600">
+        <FeedbackState className="min-h-0 flex-1" tone="danger">
+          <FeedbackStateHeader>
+            <FeedbackStateMedia variant="icon">
+              <HugeiconsIcon icon={Alert02Icon} size={24} strokeWidth={1.8} />
+            </FeedbackStateMedia>
+            <FeedbackStateTitle>{t("states.loadErrorTitle")}</FeedbackStateTitle>
+            <FeedbackStateDescription>
               {viewMode === "table"
                 ? propertiesQuery.error?.message
                 : propertiesInfiniteQuery.error?.message}
-            </p>
-          </div>
-          <Button
-            onPress={() =>
-              viewMode === "table"
-                ? propertiesQuery.refetch()
-                : propertiesInfiniteQuery.refetch()
-            }
-            size="sm"
-          >
-            Reintentar
-          </Button>
-        </div>
-      ) : rows.length === 0 ? (
+            </FeedbackStateDescription>
+          </FeedbackStateHeader>
+          <FeedbackStateContent>
+            <Button
+              isDisabled={isRetrying}
+              onPress={() => {
+                void handleRetry();
+              }}
+              size="sm"
+              variant="primary"
+            >
+              {t("states.retry")}
+            </Button>
+          </FeedbackStateContent>
+        </FeedbackState>
+      ) : !isPropertiesLoading && rows.length === 0 ? (
         <div className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-600">
-          No hay propiedades para mostrar.
+          {t("states.empty")}
         </div>
       ) : viewMode === "table" ? (
         <div className="flex flex-1 flex-col gap-4 min-h-0">
-          <PropertiesDataGrid
-            propertyAddressMap={propertyAddressMap}
-            rows={rows}
-          />
-          <div className="mt-auto">
-            <PropertiesDataGridFooter
-              currentPage={propertiesQuery.data?.meta.currentPage ?? listState.page}
-              onPageChange={(page) =>
-                setListState((current) => ({
-                  ...current,
-                  page,
-                }))
-              }
-              totalCount={propertiesQuery.data?.meta.totalCount ?? 0}
-              totalPages={propertiesQuery.data?.meta.totalPages ?? 1}
-              visibleRowCount={rows.length}
+          <div className="min-h-0 flex-1">
+            <PropertiesDataGrid
+              isLoading={isPropertiesLoading}
+              propertyAddressMap={propertyAddressMap}
+              rows={rows}
             />
+          </div>
+          <div className="shrink-0">
+            {propertiesQuery.data ? (
+              <PropertiesDataGridFooter
+                currentPage={propertiesQuery.data.meta.currentPage}
+                onPageChange={(page) =>
+                  setListState((current) => ({
+                    ...current,
+                    page,
+                  }))
+                }
+                totalCount={propertiesQuery.data.meta.totalCount}
+                totalPages={propertiesQuery.data.meta.totalPages}
+                visibleRowCount={rows.length}
+              />
+            ) : (
+              <PropertiesDataGridFooterSkeleton />
+            )}
           </div>
         </div>
       ) : (
         <div className="flex flex-1 flex-col gap-4 min-h-0">
-          <PropertiesGridView
-            propertyAddressMap={propertyAddressMap}
-            rows={rows}
-          />
+          {isPropertiesLoading ? (
+            <div className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-600">
+              {t("states.loading")}
+            </div>
+          ) : (
+            <PropertiesGridView
+              propertyAddressMap={propertyAddressMap}
+              rows={rows}
+            />
+          )}
           <div ref={loadMoreRef} className="h-1 w-full" />
         </div>
       )}

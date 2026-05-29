@@ -1,6 +1,7 @@
 "use client";
 
 import { Pagination } from "@heroui/react";
+import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 
 type PropertiesDataGridFooterProps = {
   currentPage: number;
@@ -47,6 +48,7 @@ export function PropertiesDataGridFooter({
   visibleRowCount,
   onPageChange,
 }: PropertiesDataGridFooterProps) {
+  const { t } = usePropertiesTranslation();
   const pages = getPageNumbers(currentPage, totalPages);
 
   return (
@@ -91,7 +93,10 @@ export function PropertiesDataGridFooter({
       </Pagination>
 
       <span className="justify-self-end whitespace-nowrap text-sm leading-none text-slate-600">
-        Mostrando {visibleRowCount} de {totalCount} propiedades
+        {t("footer.showing", {
+          visibleRowCount,
+          totalCount,
+        })}
       </span>
     </div>
   );

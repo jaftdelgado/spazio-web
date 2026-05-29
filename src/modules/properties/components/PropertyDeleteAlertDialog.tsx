@@ -3,6 +3,7 @@
 import { Delete04Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { AlertDialog, Button, toast } from "@heroui/react";
+import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 
 type PropertyDeleteAlertDialogProps = {
   isOpen: boolean;
@@ -15,6 +16,8 @@ export function PropertyDeleteAlertDialog({
   propertyTitle,
   onOpenChange,
 }: PropertyDeleteAlertDialogProps) {
+  const { t } = usePropertiesTranslation();
+
   return (
     <AlertDialog.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
       <AlertDialog.Container>
@@ -24,30 +27,34 @@ export function PropertyDeleteAlertDialog({
             <AlertDialog.Icon status="danger">
               <HugeiconsIcon icon={Delete04Icon} size={20} strokeWidth={1.8} />
             </AlertDialog.Icon>
-            <AlertDialog.Heading>Eliminar propiedad</AlertDialog.Heading>
+            <AlertDialog.Heading>{t("deleteDialog.title")}</AlertDialog.Heading>
           </AlertDialog.Header>
           <AlertDialog.Body>
-            <p>
-              Esta accion eliminara <strong>{propertyTitle}</strong> y no se
-              puede deshacer.
-            </p>
+            {propertyTitle ? (
+              <p>
+                {t("deleteDialog.bodyPrefix")} <strong>{propertyTitle}</strong>{" "}
+                {t("deleteDialog.bodySuffix")}
+              </p>
+            ) : (
+              <p>{t("deleteDialog.bodyWithoutTitle")}</p>
+            )}
           </AlertDialog.Body>
           <AlertDialog.Footer>
             <Button slot="close" variant="tertiary">
-              Cancelar
+              {t("deleteDialog.cancel")}
             </Button>
             <Button
               slot="close"
               variant="danger"
               onPress={() => {
-                toast.success("Propiedad eliminada", {
+                toast.success(t("deleteDialog.successTitle"), {
                   description: propertyTitle
-                    ? `${propertyTitle} fue eliminada correctamente.`
-                    : "La propiedad fue eliminada correctamente.",
+                    ? t("deleteDialog.successDescription", { propertyTitle })
+                    : t("deleteDialog.successDescriptionFallback"),
                 });
               }}
             >
-              Eliminar
+              {t("deleteDialog.confirm")}
             </Button>
           </AlertDialog.Footer>
         </AlertDialog.Dialog>

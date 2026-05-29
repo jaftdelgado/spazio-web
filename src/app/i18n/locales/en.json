@@ -1,0 +1,32 @@
+{
+  "languages": {
+    "es": "Spanish",
+    "en": "English"
+  },
+  "topbarUserMenu": {
+    "triggerLabel": "Open user menu",
+    "sections": {
+      "account": "Account",
+      "session": "Session"
+    },
+    "actions": {
+      "profile": "Profile",
+      "settings": "Settings",
+      "logout": "Log out"
+    },
+    "toast": {
+      "title": "Coming soon",
+      "profileDescription": "The profile view is not available yet.",
+      "settingsDescription": "Account settings are not available yet."
+    }
+  },
+  "adminTopbarNav": {
+    "ariaLabel": "Admin panel navigation",
+    "items": {
+      "summary": "Overview",
+      "properties": "Properties",
+      "visits": "Visits",
+      "payments": "Payments"
+    }
+  }
+}

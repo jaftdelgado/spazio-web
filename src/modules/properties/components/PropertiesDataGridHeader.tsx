@@ -10,6 +10,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { SearchField, Tabs } from "@heroui/react";
 import { PropertiesFiltersPopover } from "./PropertiesFiltersPopover";
+import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 
 type PropertyTypeOption = {
   propertyTypeId: number;
@@ -35,6 +36,8 @@ export function PropertiesDataGridHeader({
   viewMode,
   onViewModeChange,
 }: PropertiesDataGridHeaderProps) {
+  const { t } = usePropertiesTranslation();
+
   return (
     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
       <SearchField
@@ -50,7 +53,7 @@ export function PropertiesDataGridHeader({
           </SearchField.SearchIcon>
           <SearchField.Input
             className="w-full"
-            placeholder="Buscar propiedades..."
+            placeholder={t("searchPlaceholder")}
           />
           <SearchField.ClearButton />
         </SearchField.Group>
@@ -73,7 +76,7 @@ export function PropertiesDataGridHeader({
           }}
         >
           <Tabs.ListContainer>
-            <Tabs.List aria-label="Vista de propiedades">
+            <Tabs.List aria-label={t("viewAriaLabel")}>
               <Tabs.Tab id="table">
                 <HugeiconsIcon icon={TableIcon} size={16} strokeWidth={1.8} />
                 <Tabs.Indicator />
