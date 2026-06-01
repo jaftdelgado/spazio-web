@@ -42,7 +42,9 @@ const request = async <T>(
     headers["Authorization"] = `Bearer ${env.NEXT_PUBLIC_DEV_BEARER_TOKEN}`;
   }
 
-  const response = await fetch(buildUrl(path), {
+  const url = buildUrl(path);
+
+  const response = await fetch(url, {
     method: options.method,
     headers,
     body: options.body === undefined ? undefined : JSON.stringify(options.body),

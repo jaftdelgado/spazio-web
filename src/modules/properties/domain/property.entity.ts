@@ -24,6 +24,7 @@ export interface PropertyCardStatus {
 }
 
 export interface PropertyCard {
+  propertyId: number;
   propertyUuid: string;
   title: string;
   coverPhotoUrl: string | null;

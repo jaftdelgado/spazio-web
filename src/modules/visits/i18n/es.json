@@ -1,0 +1,71 @@
+{
+  "title": "AGENDA DE VISITAS",
+  "actions": {
+    "schedule": "AGENDAR VISITA",
+    "reschedule": "Reagendar",
+    "confirm": "Confirmar",
+    "complete": "Completar"
+  },
+  "filters": {
+    "status": "Estado",
+    "statusAll": "Todos",
+    "dateFrom": "Fecha Desde",
+    "dateTo": "Fecha Hasta",
+    "property": "Propiedad",
+    "propertyAll": "Todas"
+  },
+  "calendar": {
+    "visitWith": "Visita con {{name}} a las {{time}}",
+    "days": {
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mié",
+      "thu": "Jue",
+      "fri": "Vie",
+      "sat": "Sáb",
+      "sun": "Dom"
+    }
+  },
+  "table": {
+    "title": "LISTA DE VISITAS",
+    "columns": {
+      "property": "Propiedad",
+      "client": "Cliente",
+      "agent": "Agente",
+      "date": "Fecha",
+      "time": "Hora",
+      "status": "Estado",
+      "actions": "Acciones"
+    }
+  },
+  "status": {
+    "Pending": "Programada",
+    "WaitingAgent": "Esperando Agente",
+    "WaitingClient": "Esperando Cliente",
+    "Confirmed": "Confirmada",
+    "Cancelled": "Cancelada",
+    "Completed": "Concluida"
+  },
+  "confirmDialog": {
+    "title": "Confirmar Visita",
+    "body": "¿Estás seguro de que deseas confirmar esta visita? Esta acción notificará a las partes involucradas.",
+    "cancel": "Cancelar",
+    "confirm": "Sí, confirmar"
+  },
+  "completeDialog": {
+    "title": "Completar Visita",
+    "body": "¿La visita ya se llevó a cabo? Al marcarla como completada, se cerrará el flujo de agendamiento para esta cita.",
+    "cancel": "Cancelar",
+    "confirm": "Sí, completar"
+  },
+  "toast": {
+    "confirmSuccess": "Visita confirmada",
+    "confirmSuccessDescription": "El estado de la visita ha sido actualizado correctamente.",
+    "confirmError": "Error al confirmar",
+    "confirmErrorDescription": "No se pudo actualizar el estado de la visita.",
+    "completeSuccess": "Visita completada",
+    "completeSuccessDescription": "La visita ha finalizado con éxito.",
+    "completeError": "Error al completar",
+    "completeErrorDescription": "No se pudo marcar la visita como completada."
+  }
+}
