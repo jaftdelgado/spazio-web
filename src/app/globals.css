@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "@heroui/styles";
+@import "maplibre-gl/dist/maplibre-gl.css";
 @import "./components.css";
 
 :root {
@@ -44,4 +45,24 @@ body {
 .admin-page-view {
   padding-inline: var(--admin-page-padding-x);
   padding-block: var(--admin-page-padding-y);
+}
+
+.property-description-group {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.property-description-group [data-slot="input-group-textarea"] {
+  padding-right: 0.875rem;
+}
+
+.property-description-group [data-slot="input-group-suffix"] {
+  width: 100%;
+  height: auto;
+  justify-content: flex-end;
+  border-left: none;
+  border-top: var(--border-width-field) solid var(--field-border);
+  border-top-color: var(--field-border);
+  padding: 0 0.75rem 0.5rem;
 }

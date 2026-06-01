@@ -4,6 +4,163 @@
     "description": "Administra el inventario de propiedades desde esta sección.",
     "addProperty": "Agregar propiedad"
   },
+  "create": {
+    "page": {
+      "title": "Registro de nueva propiedad"
+    },
+    "sidebar": {
+      "eyebrow": "Propiedad"
+    },
+    "nav": {
+      "general": "General",
+      "location": "Ubicación",
+      "pricing": "Precios",
+      "media": "Multimedia",
+      "settings": "Ajustes",
+      "notes": "Notas"
+    },
+    "header": {
+      "eyebrow": "Registro · {{section}}"
+    },
+    "sectionDescriptions": {
+      "general": "Información principal del inmueble.",
+      "location": "Dirección y contexto de la propiedad.",
+      "pricing": "Valores comerciales del inmueble.",
+      "media": "Portada y referencias visuales.",
+      "settings": "Preferencias de visibilidad y publicación.",
+      "notes": "Observaciones internas del registro."
+    },
+    "sections": {
+      "identity": {
+        "title": "Identidad",
+        "hint": "Visible en listados y resultados."
+      },
+      "propertyType": {
+        "label": "Tipo de propiedad",
+        "hint": "Selecciona un solo tipo para el inmueble.",
+        "error": "No se pudieron cargar los tipos de propiedad."
+      },
+      "modality": {
+        "label": "Modalidad",
+        "hint": "Selecciona una sola modalidad para la publicación.",
+        "error": "No se pudieron cargar las modalidades."
+      },
+      "description": {
+        "label": "Descripción",
+        "placeholder": "Descripción breve de la propiedad."
+      },
+      "locationDetails": {
+        "title": "Ubicación",
+        "hint": "Dirección base del inmueble."
+      },
+      "pricingDetails": {
+        "title": "Precio",
+        "hint": "Montos principales del inmueble."
+      },
+      "media": {
+        "title": "Multimedia"
+      },
+      "settings": {
+        "title": "Preferencias"
+      },
+      "notes": {
+        "title": "Notas internas"
+      }
+    },
+    "fields": {
+      "title": {
+        "label": "Título",
+        "hint": "Nombre comercial del inmueble.",
+        "placeholder": "Ej: Departamento amueblado cerca de Polanco"
+      },
+      "locationMap": {
+        "label": "Mapa",
+        "hint": "Haz clic o arrastra el marcador para fijar la ubicación exacta del inmueble.",
+        "selectionHint": "Usaremos tu ubicación actual cuando esté disponible; si no, iniciaremos en Ciudad de México.",
+        "loadingLocation": "Buscando tu ubicación actual para colocar el punto inicial del inmueble.",
+        "coordinatesSelected": "Ubicación seleccionada: latitud {{latitude}}, longitud {{longitude}}."
+      },
+      "city": {
+        "label": "Ciudad"
+      },
+      "neighborhood": {
+        "label": "Colonia",
+        "placeholder": "Zona o colonia"
+      },
+      "street": {
+        "label": "Calle",
+        "placeholder": "Nombre de la calle"
+      },
+      "exteriorNumber": {
+        "label": "Número exterior",
+        "placeholder": "123"
+      },
+      "postalCode": {
+        "label": "Código postal",
+        "placeholder": "00000"
+      },
+      "salePrice": {
+        "label": "Precio de venta",
+        "placeholder": "0"
+      },
+      "rentPrice": {
+        "label": "Precio de renta",
+        "placeholder": "0"
+      },
+      "maintenanceFee": {
+        "label": "Mantenimiento",
+        "hint": "Monto mensual si aplica.",
+        "placeholder": "0"
+      },
+      "mediaLabel": {
+        "label": "Etiqueta interna",
+        "hint": "Referencia breve para el equipo.",
+        "placeholder": "Fachada principal"
+      },
+      "mediaUpload": {
+        "action": "Subir archivos",
+        "hint": "Podrás conectar la carga real después."
+      },
+      "isPublicAddress": {
+        "label": "Mostrar dirección pública",
+        "description": "Expone la dirección exacta en la ficha."
+      },
+      "isFeatured": {
+        "label": "Marcar como destacada",
+        "description": "Prioriza la propiedad en listados."
+      },
+      "acceptsPets": {
+        "label": "Permite mascotas",
+        "description": "Indicador rápido para filtros."
+      },
+      "internalNotes": {
+        "label": "Notas",
+        "placeholder": "Observaciones internas del inmueble."
+      }
+    },
+    "propertyTypes": {
+      "house": "Casa",
+      "apartment": "Departamento",
+      "commercial": "Comercial"
+    },
+    "modalities": {
+      "sale": "Venta",
+      "rent": "Renta",
+      "mixed": "Mixta"
+    },
+    "modalitiesDescriptions": {
+      "sale": "Publica la propiedad solo para venta.",
+      "rent": "Publica la propiedad solo para renta.",
+      "mixed": "Permite ofrecer la propiedad en venta y renta."
+    },
+    "footer": {
+      "dirty": "Cambios sin guardar",
+      "clean": "Sin cambios",
+      "discard": "Descartar",
+      "cancel": "Volver",
+      "save": "Guardar"
+    }
+  },
   "searchPlaceholder": "Buscar propiedades...",
   "viewAriaLabel": "Vista de propiedades",
   "filters": {
