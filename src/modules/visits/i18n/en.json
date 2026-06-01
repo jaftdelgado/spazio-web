@@ -1,0 +1,71 @@
+{
+  "title": "VISITS AGENDA",
+  "actions": {
+    "schedule": "SCHEDULE VISIT",
+    "reschedule": "Reschedule",
+    "confirm": "Confirm",
+    "complete": "Complete"
+  },
+  "filters": {
+    "status": "Status",
+    "statusAll": "All",
+    "dateFrom": "Date From",
+    "dateTo": "Date To",
+    "property": "Property",
+    "propertyAll": "All"
+  },
+  "calendar": {
+    "visitWith": "Visit with {{name}} at {{time}}",
+    "days": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    }
+  },
+  "table": {
+    "title": "VISITS LIST",
+    "columns": {
+      "property": "Property",
+      "client": "Client",
+      "agent": "Agent",
+      "date": "Date",
+      "time": "Time",
+      "status": "Status",
+      "actions": "Actions"
+    }
+  },
+  "status": {
+    "Pending": "Scheduled",
+    "WaitingAgent": "Waiting Agent",
+    "WaitingClient": "Waiting Client",
+    "Confirmed": "Confirmed",
+    "Cancelled": "Cancelled",
+    "Completed": "Completed"
+  },
+  "confirmDialog": {
+    "title": "Confirm Visit",
+    "body": "Are you sure you want to confirm this visit? This action will notify the parties involved.",
+    "cancel": "Cancel",
+    "confirm": "Yes, confirm"
+  },
+  "completeDialog": {
+    "title": "Complete Visit",
+    "body": "Has the visit already taken place? Marking it as completed will close the scheduling flow for this appointment.",
+    "cancel": "Cancel",
+    "confirm": "Yes, complete"
+  },
+  "toast": {
+    "confirmSuccess": "Visit confirmed",
+    "confirmSuccessDescription": "The visit status has been successfully updated.",
+    "confirmError": "Confirmation error",
+    "confirmErrorDescription": "Could not update the visit status.",
+    "completeSuccess": "Visit completed",
+    "completeSuccessDescription": "The visit has successfully finished.",
+    "completeError": "Completion error",
+    "completeErrorDescription": "Could not mark the visit as completed."
+  }
+}

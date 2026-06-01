@@ -40,6 +40,7 @@ type PropertyCardPriceDTO = {
 } | null;
 
 type PropertyCardDTO = {
+  property_id: number;
   property_uuid: string;
   title: string;
   cover_photo_url: string | null;
@@ -181,6 +182,7 @@ const mapPropertyCardPrice = (
 };
 
 const mapPropertyCard = (dto: PropertyCardDTO): PropertyCard => ({
+  propertyId: dto.property_id,
   propertyUuid: dto.property_uuid,
   title: dto.title,
   coverPhotoUrl: dto.cover_photo_url,
