@@ -15,6 +15,7 @@
       "general": "General",
       "location": "Location",
       "pricing": "Pricing",
+      "services": "Services",
       "media": "Media",
       "settings": "Settings",
       "notes": "Notes"
@@ -23,6 +24,7 @@
       "general": "Main property information.",
       "location": "Address and property context.",
       "pricing": "Commercial values for the property.",
+      "services": "Amenities and services available in the property.",
       "media": "Cover and visual references.",
       "settings": "Visibility and publishing preferences.",
       "notes": "Internal registration notes."
@@ -53,6 +55,10 @@
       "pricingDetails": {
         "title": "Pricing",
         "hint": "Main property amounts."
+      },
+      "services": {
+        "title": "Services",
+        "hint": "Choose the amenities available in the property."
       },
       "media": {
         "title": "Media"
@@ -127,6 +133,7 @@
       },
       "rentPrice": {
         "label": "Rent price",
+        "prefix": "Rent",
         "placeholder": "0"
       },
       "maintenanceFee": {
@@ -174,6 +181,44 @@
       "sale": "List the property for sale only.",
       "rent": "List the property for rent only.",
       "mixed": "Allow the property to be offered for both sale and rent."
+    },
+    "rentPeriods": {
+      "nightly": "Nightly",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
+    "pricing": {
+      "tabsAriaLabel": "Available price types",
+      "emptyStateTitle": "Choose a modality first",
+      "emptyStateDescription": "The modality defines whether we will capture sale, rent, or both price types.",
+      "propertyTypeRequiredTitle": "Property type is still missing",
+      "propertyTypeRequiredDescription": "We need the property type to know which rent periods are available.",
+      "loadingTitle": "Loading available periods",
+      "loadingDescription": "We are fetching the allowed rent types for this property.",
+      "noPeriodsTitle": "No rent periods available",
+      "noPeriodsDescription": "We could not find configured rent periods for the selected property type.",
+      "inputHint": "Only the prices you actually fill in will be sent.",
+      "selectorTitle": "Price types",
+      "selectorHint": "Click a row to choose which amount you want to edit.",
+      "registeredTitle": "Registered prices",
+      "registeredHint": "Summary of the amounts captured so far for this property.",
+      "tableAriaLabel": "Registered prices for the property",
+      "tableTypeColumn": "Price type",
+      "tableAmountColumn": "Amount",
+      "tableEmpty": "You have not entered prices for this property yet.",
+      "previewLabel": "Preview",
+      "salePreviewHint": "This amount will be sent as the sale price if you keep a value in this tab.",
+      "rentPreviewHint": "This amount will be sent only for this rent period if you leave a captured value."
+    },
+    "services": {
+      "loading": "Loading available amenities...",
+      "selectedTitle": "Selected",
+      "selectedHint": "Click an amenity to remove it from the property.",
+      "selectedEmpty": "You have not selected amenities yet.",
+      "availableTitle": "Available",
+      "availableHint": "Click an amenity to add it to the property.",
+      "availableEmpty": "There are no more available amenities."
     },
     "footer": {
       "dirty": "Unsaved changes",

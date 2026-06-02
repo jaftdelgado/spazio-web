@@ -2,6 +2,7 @@ export type PropertyCreateSectionId =
   | "general"
   | "location"
   | "pricing"
+  | "services"
   | "media"
   | "settings"
   | "notes";
@@ -22,8 +23,9 @@ export type PropertyCreateFormState = {
   exteriorNumber: string;
   postalCode: string;
   salePrice: string;
-  rentPrice: string;
+  rentPricesByPeriod: Record<string, string>;
   maintenanceFee: string;
+  serviceIds: number[];
   mediaLabel: string;
   isPublicAddress: boolean;
   isFeatured: boolean;
@@ -47,8 +49,9 @@ export const initialPropertyCreateFormState: PropertyCreateFormState = {
   exteriorNumber: "",
   postalCode: "",
   salePrice: "",
-  rentPrice: "",
+  rentPricesByPeriod: {},
   maintenanceFee: "",
+  serviceIds: [],
   mediaLabel: "",
   isPublicAddress: true,
   isFeatured: false,

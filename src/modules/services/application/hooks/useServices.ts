@@ -1,21 +1,12 @@
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
-import { servicesHttpAdapter } from "../../infra/services.http-adapter";
+import { serviceHttpAdapter } from "@services/infra/service.http-adapter";
 
-export function useServices() {
-  const servicesQuery = useQuery({
-    queryKey: ["services"],
-    queryFn: () => servicesHttpAdapter.list(),
+export const useServices = (params?: { q?: string; limit?: number }) => {
+  return useQuery({
+    queryKey: ["services", params?.q ?? "", params?.limit ?? ""],
+    queryFn: () => serviceHttpAdapter.listServices(params),
   });
-
-  const createServicesMutation = useMutation({
-    mutationFn: () => Promise.resolve({}),
-  });
-
-  return {
-    servicesQuery,
-    createServicesMutation,
-  };
-}
+};
