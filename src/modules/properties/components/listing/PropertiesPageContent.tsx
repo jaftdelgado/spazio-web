@@ -115,21 +115,18 @@ export function PropertiesPageContent() {
 
   const rows = React.useMemo<PropertyGridRow[]>(
     () =>
-      (
-        viewMode === "table"
-          ? propertiesQuery.data?.data ?? []
-          : (propertiesInfiniteQuery.data?.pages.flatMap((page) => page.data) ?? [])
+      (viewMode === "table"
+        ? (propertiesQuery.data?.data ?? [])
+        : (propertiesInfiniteQuery.data?.pages.flatMap((page) => page.data) ??
+          [])
       ).map((property) => ({
         id: property.propertyUuid,
         ...property,
       })),
     [propertiesInfiniteQuery.data?.pages, propertiesQuery.data?.data, viewMode],
   );
-  const {
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = propertiesInfiniteQuery;
+  const { fetchNextPage, hasNextPage, isFetchingNextPage } =
+    propertiesInfiniteQuery;
   const propertyTypeOptions = React.useMemo(
     () => propertyTypesQuery.data ?? [],
     [propertyTypesQuery.data],
@@ -152,11 +149,7 @@ export function PropertiesPageContent() {
       (entries) => {
         const entry = entries[0];
 
-        if (
-          entry?.isIntersecting &&
-          hasNextPage &&
-          !isFetchingNextPage
-        ) {
+        if (entry?.isIntersecting && hasNextPage && !isFetchingNextPage) {
           void fetchNextPage();
         }
       },
@@ -170,12 +163,7 @@ export function PropertiesPageContent() {
     return () => {
       observer.disconnect();
     };
-  }, [
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    viewMode,
-  ]);
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage, viewMode]);
 
   const propertyDetailsQueries = useQueries({
     queries:
@@ -270,15 +258,19 @@ export function PropertiesPageContent() {
         <div className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-600">
           {t("states.empty")}
         </div>
-      ) : (viewMode === "table"
-          ? propertiesQuery.isError
-          : propertiesInfiniteQuery.isError) ? (
+      ) : (
+          viewMode === "table"
+            ? propertiesQuery.isError
+            : propertiesInfiniteQuery.isError
+        ) ? (
         <FeedbackState className="min-h-0 flex-1" tone="danger">
           <FeedbackStateHeader>
             <FeedbackStateMedia variant="icon">
               <HugeiconsIcon icon={Alert02Icon} size={24} strokeWidth={1.8} />
             </FeedbackStateMedia>
-            <FeedbackStateTitle>{t("states.loadErrorTitle")}</FeedbackStateTitle>
+            <FeedbackStateTitle>
+              {t("states.loadErrorTitle")}
+            </FeedbackStateTitle>
             <FeedbackStateDescription>
               {viewMode === "table"
                 ? propertiesQuery.error?.message

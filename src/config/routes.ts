@@ -8,6 +8,7 @@ export const ROUTES = {
   admin: {
     root: "/admin",
     properties: "/admin/properties",
+    propertiesCreate: "/admin/properties/new",
     visits: "/admin/visits",
     payments: "/admin/payments",
   },

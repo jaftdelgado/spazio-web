@@ -4,6 +4,191 @@
     "description": "Manage the property inventory from this section.",
     "addProperty": "Add property"
   },
+  "create": {
+    "page": {
+      "title": "New property registration"
+    },
+    "sidebar": {
+      "eyebrow": "Property"
+    },
+    "nav": {
+      "general": "General",
+      "location": "Location",
+      "pricing": "Pricing",
+      "media": "Media",
+      "settings": "Settings",
+      "notes": "Notes"
+    },
+    "sectionDescriptions": {
+      "general": "Main property information.",
+      "location": "Address and property context.",
+      "pricing": "Commercial values for the property.",
+      "media": "Cover and visual references.",
+      "settings": "Visibility and publishing preferences.",
+      "notes": "Internal registration notes."
+    },
+    "sections": {
+      "identity": {
+        "title": "Identity",
+        "hint": "Visible in listings and search results."
+      },
+      "propertyType": {
+        "label": "Property type",
+        "hint": "Select a single type for the property.",
+        "error": "Property types could not be loaded."
+      },
+      "modality": {
+        "label": "Modality",
+        "hint": "Select a single modality for the listing.",
+        "error": "Modalities could not be loaded."
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Short property description."
+      },
+      "locationDetails": {
+        "title": "Location",
+        "hint": "Base address for the property."
+      },
+      "pricingDetails": {
+        "title": "Pricing",
+        "hint": "Main property amounts."
+      },
+      "media": {
+        "title": "Media"
+      },
+      "settings": {
+        "title": "Preferences"
+      },
+      "notes": {
+        "title": "Internal notes"
+      }
+    },
+    "fields": {
+      "coverImage": {
+        "action": "Upload cover",
+        "hint": "PNG or JPG, one main image."
+      },
+      "title": {
+        "label": "Title",
+        "hint": "Commercial name for the property."
+      },
+      "locationMap": {
+        "label": "Map",
+        "hint": "Click or drag the marker to set the exact property location.",
+        "selectionHint": "We will use the user's current location when available; otherwise, the map starts in Mexico City.",
+        "loadingLocation": "Looking up the current location to place the property's starting point.",
+        "coordinatesSelected": "Selected location: latitude {{latitude}}, longitude {{longitude}}."
+      },
+      "country": {
+        "label": "Country",
+        "placeholder": "Select a country",
+        "loading": "Loading countries...",
+        "empty": "No countries available."
+      },
+      "state": {
+        "label": "State",
+        "placeholder": "Select a state",
+        "searchPlaceholder": "Search state...",
+        "loading": "Loading states...",
+        "empty": "No states available."
+      },
+      "municipality": {
+        "label": "Municipality",
+        "placeholder": "Select a municipality",
+        "searchPlaceholder": "Search municipality...",
+        "loading": "Loading municipalities...",
+        "empty": "No municipalities available.",
+        "loadingMore": "Loading more municipalities...",
+        "searching": "Searching for matches in more municipalities..."
+      },
+      "city": {
+        "label": "City"
+      },
+      "neighborhood": {
+        "label": "Neighborhood",
+        "placeholder": "Area or neighborhood"
+      },
+      "street": {
+        "label": "Street",
+        "placeholder": "Street name"
+      },
+      "exteriorNumber": {
+        "label": "Exterior number",
+        "placeholder": "123"
+      },
+      "postalCode": {
+        "label": "Postal code",
+        "placeholder": "00000"
+      },
+      "salePrice": {
+        "label": "Sale price",
+        "placeholder": "0"
+      },
+      "rentPrice": {
+        "label": "Rent price",
+        "placeholder": "0"
+      },
+      "maintenanceFee": {
+        "label": "Maintenance fee",
+        "hint": "Monthly amount if applicable.",
+        "placeholder": "0"
+      },
+      "mediaLabel": {
+        "label": "Internal label",
+        "hint": "Short reference for the team.",
+        "placeholder": "Main facade"
+      },
+      "mediaUpload": {
+        "action": "Upload files",
+        "hint": "You can wire the real upload later."
+      },
+      "isPublicAddress": {
+        "label": "Show public address",
+        "description": "Expose the exact address in the listing."
+      },
+      "isFeatured": {
+        "label": "Mark as featured",
+        "description": "Prioritize the property in listings."
+      },
+      "acceptsPets": {
+        "label": "Allows pets",
+        "description": "Quick indicator for filters."
+      },
+      "internalNotes": {
+        "label": "Notes",
+        "placeholder": "Internal property notes."
+      }
+    },
+    "propertyTypes": {
+      "house": "House",
+      "apartment": "Apartment",
+      "commercial": "Commercial"
+    },
+    "modalities": {
+      "sale": "Sale",
+      "rent": "Rent",
+      "mixed": "Mixed"
+    },
+    "modalitiesDescriptions": {
+      "sale": "List the property for sale only.",
+      "rent": "List the property for rent only.",
+      "mixed": "Allow the property to be offered for both sale and rent."
+    },
+    "footer": {
+      "dirty": "Unsaved changes",
+      "clean": "No changes",
+      "discard": "Discard",
+      "cancel": "Back",
+      "save": "Save"
+    },
+    "cancelDialog": {
+      "title": "Cancel registration",
+      "body": "If you leave now, you will lose the unsaved changes for this property.",
+      "dismiss": "Keep editing",
+      "confirm": "Yes, cancel"
+    }
+  },
   "searchPlaceholder": "Search properties...",
   "viewAriaLabel": "Properties view",
   "filters": {
