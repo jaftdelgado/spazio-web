@@ -19,9 +19,6 @@
       "settings": "Settings",
       "notes": "Notes"
     },
-    "header": {
-      "eyebrow": "Registration · {{section}}"
-    },
     "sectionDescriptions": {
       "general": "Main property information.",
       "location": "Address and property context.",
@@ -82,6 +79,28 @@
         "selectionHint": "We will use the user's current location when available; otherwise, the map starts in Mexico City.",
         "loadingLocation": "Looking up the current location to place the property's starting point.",
         "coordinatesSelected": "Selected location: latitude {{latitude}}, longitude {{longitude}}."
+      },
+      "country": {
+        "label": "Country",
+        "placeholder": "Select a country",
+        "loading": "Loading countries...",
+        "empty": "No countries available."
+      },
+      "state": {
+        "label": "State",
+        "placeholder": "Select a state",
+        "searchPlaceholder": "Search state...",
+        "loading": "Loading states...",
+        "empty": "No states available."
+      },
+      "municipality": {
+        "label": "Municipality",
+        "placeholder": "Select a municipality",
+        "searchPlaceholder": "Search municipality...",
+        "loading": "Loading municipalities...",
+        "empty": "No municipalities available.",
+        "loadingMore": "Loading more municipalities...",
+        "searching": "Searching for matches in more municipalities..."
       },
       "city": {
         "label": "City"
@@ -162,6 +181,12 @@
       "discard": "Discard",
       "cancel": "Back",
       "save": "Save"
+    },
+    "cancelDialog": {
+      "title": "Cancel registration",
+      "body": "If you leave now, you will lose the unsaved changes for this property.",
+      "dismiss": "Keep editing",
+      "confirm": "Yes, cancel"
     }
   },
   "searchPlaceholder": "Search properties...",

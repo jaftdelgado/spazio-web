@@ -19,9 +19,6 @@
       "settings": "Ajustes",
       "notes": "Notas"
     },
-    "header": {
-      "eyebrow": "Registro · {{section}}"
-    },
     "sectionDescriptions": {
       "general": "Información principal del inmueble.",
       "location": "Dirección y contexto de la propiedad.",
@@ -79,6 +76,28 @@
         "selectionHint": "Usaremos tu ubicación actual cuando esté disponible; si no, iniciaremos en Ciudad de México.",
         "loadingLocation": "Buscando tu ubicación actual para colocar el punto inicial del inmueble.",
         "coordinatesSelected": "Ubicación seleccionada: latitud {{latitude}}, longitud {{longitude}}."
+      },
+      "country": {
+        "label": "País",
+        "placeholder": "Selecciona un país",
+        "loading": "Cargando países...",
+        "empty": "No hay países disponibles."
+      },
+      "state": {
+        "label": "Estado",
+        "placeholder": "Selecciona un estado",
+        "searchPlaceholder": "Buscar estado...",
+        "loading": "Cargando estados...",
+        "empty": "No hay estados disponibles."
+      },
+      "municipality": {
+        "label": "Municipio",
+        "placeholder": "Selecciona un municipio",
+        "searchPlaceholder": "Buscar municipio...",
+        "loading": "Cargando municipios...",
+        "empty": "No hay municipios disponibles.",
+        "loadingMore": "Cargando más municipios...",
+        "searching": "Buscando coincidencias en más municipios..."
       },
       "city": {
         "label": "Ciudad"
@@ -159,6 +178,12 @@
       "discard": "Descartar",
       "cancel": "Volver",
       "save": "Guardar"
+    },
+    "cancelDialog": {
+      "title": "Cancelar registro",
+      "body": "Si sales ahora, perderás los cambios no guardados de esta propiedad.",
+      "dismiss": "Seguir editando",
+      "confirm": "Sí, cancelar"
     }
   },
   "searchPlaceholder": "Buscar propiedades...",
