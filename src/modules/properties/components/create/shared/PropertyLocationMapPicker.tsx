@@ -21,6 +21,11 @@ const DEFAULT_CENTER = {
 };
 const SELECTED_LOCATION_ZOOM = 15;
 const MAP_STYLE = "https://tiles.openfreemap.org/styles/bright";
+const TRANSPARENT_IMAGE = {
+  data: new Uint8Array([0, 0, 0, 0]),
+  height: 1,
+  width: 1,
+};
 
 function toCoordinate(value: string) {
   if (value.trim() === "") {
@@ -128,6 +133,21 @@ export function PropertyLocationMapPicker({
           onChange({
             latitude: event.lngLat.lat.toFixed(6),
             longitude: event.lngLat.lng.toFixed(6),
+          });
+        }}
+        onLoad={() => {
+          const map = mapRef.current?.getMap();
+
+          if (!map) {
+            return;
+          }
+
+          map.on("styleimagemissing", (event) => {
+            if (map.hasImage(event.id)) {
+              return;
+            }
+
+            map.addImage(event.id, TRANSPARENT_IMAGE);
           });
         }}
       >

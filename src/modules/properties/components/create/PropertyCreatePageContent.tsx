@@ -2,15 +2,17 @@
 
 import * as React from "react";
 import {
+  Cancel01Icon,
   DollarCircleIcon,
   Home09Icon,
   ImageUploadIcon,
   Location01Icon,
   NoteIcon,
+  SaveIcon,
   Settings02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
-import { Button, Description } from "@heroui/react";
+import { AlertDialog, Button, Description } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
 import { ROUTES } from "@/config/routes";
@@ -51,6 +53,7 @@ export function PropertyCreatePageContent() {
   const router = useRouter();
   const [activeSection, setActiveSection] =
     React.useState<PropertyCreateSectionId>("general");
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = React.useState(false);
   const [form, setForm] = React.useState<PropertyCreateFormState>(
     initialPropertyCreateFormState,
   );
@@ -126,48 +129,76 @@ export function PropertyCreatePageContent() {
           </ul>
         </aside>
 
-        <main className="min-w-0 py-8 pb-32 xl:px-4">
-          <header className="border-b border-slate-200/80 pb-6">
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-slate-500">
-              {t("create.header.eyebrow", {
-                section: activeNav ? t(activeNav.labelKey) : "",
-              })}
+        <main className="min-w-0 py-8 xl:px-4">
+          <header className="flex flex-col gap-4 border-b border-slate-200/80 pb-6 md:flex-row md:items-start md:justify-between">
+            <div>
+              <h1 className="text-2xl font-semibold text-slate-950">
+                {activeNav ? t(activeNav.labelKey) : t("create.page.title")}
+              </h1>
+              <Description className="mt-1 text-sm">
+                {t(`create.sectionDescriptions.${activeSection}`)}
+              </Description>
             </div>
-            <h1 className="mt-1 text-2xl font-semibold text-slate-950">
-              {activeNav ? t(activeNav.labelKey) : t("create.page.title")}
-            </h1>
-            <Description className="mt-1 text-sm">
-              {t(`create.sectionDescriptions.${activeSection}`)}
-            </Description>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                onPress={() => setIsCancelDialogOpen(true)}
+              >
+                {t("create.footer.cancel")}
+              </Button>
+              <Button isDisabled={!isDirty}>
+                <HugeiconsIcon
+                  icon={SaveIcon}
+                  size={16}
+                  strokeWidth={1.8}
+                />
+                <span>{t("create.footer.save")}</span>
+              </Button>
+            </div>
           </header>
 
           {renderActiveSection()}
         </main>
       </div>
 
-      <div className="sticky bottom-0 z-20 mt-8 border-t border-slate-200/80 bg-background/90 backdrop-blur">
-        <div className="flex items-center justify-between gap-3 py-3">
-          <Description className="font-mono text-[10px] uppercase tracking-[0.3em]">
-            {isDirty ? t("create.footer.dirty") : t("create.footer.clean")}
-          </Description>
-          <div className="flex items-center gap-2">
-            <Button
-              isDisabled={!isDirty}
-              variant="ghost"
-              onPress={() => setForm(initialPropertyCreateFormState)}
-            >
-              {t("create.footer.discard")}
-            </Button>
-            <Button
-              variant="secondary"
-              onPress={() => router.push(ROUTES.admin.properties)}
-            >
-              {t("create.footer.cancel")}
-            </Button>
-            <Button isDisabled={!isDirty}>{t("create.footer.save")}</Button>
-          </div>
-        </div>
-      </div>
+      <AlertDialog.Backdrop
+        isOpen={isCancelDialogOpen}
+        onOpenChange={setIsCancelDialogOpen}
+      >
+        <AlertDialog.Container>
+          <AlertDialog.Dialog className="sm:max-w-105">
+            <AlertDialog.CloseTrigger />
+            <AlertDialog.Header>
+              <AlertDialog.Icon status="warning">
+                <HugeiconsIcon
+                  icon={Cancel01Icon}
+                  size={20}
+                  strokeWidth={1.8}
+                />
+              </AlertDialog.Icon>
+              <AlertDialog.Heading>
+                {t("create.cancelDialog.title")}
+              </AlertDialog.Heading>
+            </AlertDialog.Header>
+            <AlertDialog.Body>
+              <p>{t("create.cancelDialog.body")}</p>
+            </AlertDialog.Body>
+            <AlertDialog.Footer>
+              <Button slot="close" variant="tertiary">
+                {t("create.cancelDialog.dismiss")}
+              </Button>
+              <Button
+                slot="close"
+                variant="secondary"
+                onPress={() => router.push(ROUTES.admin.properties)}
+              >
+                {t("create.cancelDialog.confirm")}
+              </Button>
+            </AlertDialog.Footer>
+          </AlertDialog.Dialog>
+        </AlertDialog.Container>
+      </AlertDialog.Backdrop>
     </div>
   );
 }

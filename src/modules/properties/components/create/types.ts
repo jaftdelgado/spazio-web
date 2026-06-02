@@ -11,6 +11,9 @@ export type PropertyCreateFormState = {
   propertyTypeId: number | null;
   modalityId: number | null;
   description: string;
+  countryId: number | null;
+  stateId: number | null;
+  cityId: number | null;
   latitude: string;
   longitude: string;
   city: string;
@@ -33,9 +36,12 @@ export const initialPropertyCreateFormState: PropertyCreateFormState = {
   propertyTypeId: null,
   modalityId: null,
   description: "",
+  countryId: null,
+  stateId: null,
+  cityId: null,
   latitude: "",
   longitude: "",
-  city: "Ciudad de Mexico",
+  city: "",
   neighborhood: "",
   street: "",
   exteriorNumber: "",
