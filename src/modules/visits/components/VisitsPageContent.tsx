@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { PlusSignIcon, ChevronDownIcon, ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { PlusSignIcon, ChevronsDownUpIcon, ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button, Input, Dropdown, Label, toast } from "@heroui/react";
 import { format, addMonths, subMonths } from "date-fns";
@@ -22,10 +22,9 @@ import type { VisitEntity } from "../domain/visits.entity";
 export function VisitsPageContent() {
   const { t } = useVisitsTranslation();
   const { locale } = useAppLocale();
-  const { role } = useAuth(); 
-  const [mounted, setMounted] = React.useState(false);
+  const { role } = useAuth();
   const [currentDate, setCurrentDate] = React.useState(new Date());
-  
+
   // Dialog States
   const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
   const [isCompleteOpen, setIsCompleteOpen] = React.useState(false);
@@ -37,20 +36,25 @@ export function VisitsPageContent() {
 
   const [filterState, setFilterState] = React.useState({
     statusId: "",
-    statusKey: "", 
+    statusKey: "",
     dateFrom: "",
     dateTo: "",
     propertyId: "",
     propertyLabel: "",
   });
 
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
   const isAgent = role === 2;
   const isClient = role === 3;
   const dateLocale = locale === "es" ? es : enUS;
+  const statusLabelByKey = React.useMemo(
+    () =>
+      ({
+        Completed: t("status.Completed"),
+        Confirmed: t("status.Confirmed"),
+        Pending: t("status.Pending"),
+      }) as const,
+    [t],
+  );
 
   const filterParams = React.useMemo(() => {
     const statusIdNum = parseInt(filterState.statusId);
@@ -67,7 +71,7 @@ export function VisitsPageContent() {
 
   const handleConfirmAction = () => {
     if (!selectedVisitUuid) return;
-    
+
     confirmVisit.mutate(selectedVisitUuid, {
       onSuccess: () => {
         toast.success(t("toast.confirmSuccess"), {
@@ -80,13 +84,13 @@ export function VisitsPageContent() {
         toast.danger(t("toast.confirmError"), {
           description: t("toast.confirmErrorDescription"),
         });
-      }
+      },
     });
   };
 
   const handleCompleteAction = () => {
     if (!selectedVisitUuid) return;
-    
+
     completeVisit.mutate(selectedVisitUuid, {
       onSuccess: () => {
         toast.success(t("toast.completeSuccess"), {
@@ -99,7 +103,7 @@ export function VisitsPageContent() {
         toast.danger(t("toast.completeError"), {
           description: t("toast.completeErrorDescription"),
         });
-      }
+      },
     });
   };
 
@@ -115,8 +119,6 @@ export function VisitsPageContent() {
   const handleNextMonth = () => setCurrentDate(prev => addMonths(prev, 1));
   const handleToday = () => setCurrentDate(new Date());
 
-  if (!mounted) return null;
-
   return (
     <div className="flex flex-1 flex-col gap-6 min-h-0">
       {/* 1. Encabezado Principal y Acciones Globales */}
@@ -125,9 +127,8 @@ export function VisitsPageContent() {
           {t("title")}
         </h1>
         {isClient && (
-          <Button 
-            color="primary" 
-            variant="solid" 
+          <Button
+            variant="primary"
             className="font-bold shadow-sm"
             onPress={() => setIsScheduleOpen(true)}
           >
@@ -139,7 +140,7 @@ export function VisitsPageContent() {
 
       {/* 2. Sección de Filtros de Búsqueda */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-        
+
         {/* Filtro 1 - Estado */}
         <div className="flex flex-col gap-1">
           <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t("filters.status")}</Label>
@@ -147,13 +148,17 @@ export function VisitsPageContent() {
             <Dropdown.Trigger>
               <div className="flex h-9 w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer transition-colors outline-none ring-primary-500 focus-visible:ring-2 shadow-sm">
                 <span className="truncate">
-                  {filterState.statusKey ? t(`status.${filterState.statusKey}` as any) : t("filters.statusAll")}
+                  {filterState.statusKey
+                    ? statusLabelByKey[
+                        filterState.statusKey as keyof typeof statusLabelByKey
+                      ] ?? t("filters.statusAll")
+                    : t("filters.statusAll")}
                 </span>
-                <HugeiconsIcon icon={ChevronDownIcon} size={16} className="text-slate-400" />
+                <HugeiconsIcon icon={ChevronsDownUpIcon} size={16} className="text-slate-400" />
               </div>
             </Dropdown.Trigger>
             <Dropdown.Popover className="min-w-48">
-              <Dropdown.Menu 
+              <Dropdown.Menu
                 onAction={(key) => {
                   const k = key.toString();
                   if (k === "all") {
@@ -204,7 +209,7 @@ export function VisitsPageContent() {
             <Dropdown.Trigger>
               <div className="flex h-9 w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer transition-colors outline-none ring-primary-500 focus-visible:ring-2 shadow-sm">
                 <span className="truncate">{filterState.propertyLabel || t("filters.propertyAll")}</span>
-                <HugeiconsIcon icon={ChevronDownIcon} size={16} className="text-slate-400" />
+                <HugeiconsIcon icon={ChevronsDownUpIcon} size={16} className="text-slate-400" />
               </div>
             </Dropdown.Trigger>
             <Dropdown.Popover className="min-w-48">
@@ -227,7 +232,7 @@ export function VisitsPageContent() {
       </div>
 
       {/* 3. Componente de Calendario Mensual */}
-      <div className="flex-1 flex flex-col bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden min-h-[600px]">
+      <div className="flex-1 flex flex-col bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden min-h-150">
         {/* Navegación del Calendario */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
            <div className="flex items-center gap-4">
@@ -285,9 +290,9 @@ export function VisitsPageContent() {
                  <span className="text-sm text-red-400">Ocurrió un problema de red y no pudimos recuperar la lista de visitas.</span>
              </div>
          ) : (
-             <VisitsTable 
-               visits={filteredVisits} 
-               isAgent={isAgent} 
+             <VisitsTable
+               visits={filteredVisits}
+               isAgent={isAgent}
                confirmingUuid={confirmVisit.isPending ? confirmVisit.variables : null}
                completingUuid={completeVisit.isPending ? completeVisit.variables : null}
                onConfirm={(uuid) => {
@@ -310,21 +315,21 @@ export function VisitsPageContent() {
       </div>
 
       {/* Modales de Confirmación */}
-      <VisitConfirmAlertDialog 
+      <VisitConfirmAlertDialog
         isOpen={isConfirmOpen}
         onOpenChange={setIsConfirmOpen}
         onConfirm={handleConfirmAction}
         isLoading={confirmVisit.isPending}
       />
-      
-      <VisitCompleteAlertDialog 
+
+      <VisitCompleteAlertDialog
         isOpen={isCompleteOpen}
         onOpenChange={setIsCompleteOpen}
         onComplete={handleCompleteAction}
         isLoading={completeVisit.isPending}
       />
 
-      <ScheduleVisitModal 
+      <ScheduleVisitModal
         isOpen={isScheduleOpen}
         onOpenChange={setIsScheduleOpen}
         onSuccess={() => {
@@ -334,7 +339,7 @@ export function VisitsPageContent() {
         }}
       />
 
-      <RescheduleVisitModal 
+      <RescheduleVisitModal
         isOpen={isRescheduleOpen}
         onOpenChange={setIsRescheduleOpen}
         visit={selectedVisit}

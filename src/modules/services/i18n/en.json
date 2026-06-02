@@ -1,0 +1,11 @@
+{
+  "labels": {
+    "POOL": "Pool",
+    "GYM": "Gym",
+    "24H_SECURITY": "24h security",
+    "WIFI": "Wifi",
+    "ELEVATOR": "Elevator",
+    "HEATING": "Heating",
+    "BBQ_AREA": "BBQ area"
+  }
+}

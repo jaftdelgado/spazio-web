@@ -8,6 +8,7 @@ import {
   ImageUploadIcon,
   Location01Icon,
   NoteIcon,
+  PackageIcon,
   SaveIcon,
   Settings02Icon,
 } from "@hugeicons/core-free-icons";
@@ -20,7 +21,8 @@ import { GeneralSection } from "@properties/components/create/sections/GeneralSe
 import { LocationSection } from "@properties/components/create/sections/LocationSection";
 import { MediaSection } from "@properties/components/create/sections/MediaSection";
 import { NotesSection } from "@properties/components/create/sections/NotesSection";
-import { PricingSection } from "@properties/components/create/sections/PricingSection";
+import { PricingSection } from "@properties/components/create/sections/pricing";
+import { ServicesSection } from "@properties/components/create/sections/services";
 import { SettingsSection } from "@properties/components/create/sections/SettingsSection";
 import {
   initialPropertyCreateFormState,
@@ -39,6 +41,7 @@ const createNavItems: readonly PropertyCreateNavItem[] = [
   { id: "general", icon: Home09Icon, labelKey: "create.nav.general" },
   { id: "location", icon: Location01Icon, labelKey: "create.nav.location" },
   { id: "pricing", icon: DollarCircleIcon, labelKey: "create.nav.pricing" },
+  { id: "services", icon: PackageIcon, labelKey: "create.nav.services" },
   { id: "media", icon: ImageUploadIcon, labelKey: "create.nav.media" },
   { id: "settings", icon: Settings02Icon, labelKey: "create.nav.settings" },
   { id: "notes", icon: NoteIcon, labelKey: "create.nav.notes" },
@@ -77,6 +80,8 @@ export function PropertyCreatePageContent() {
         return <LocationSection form={form} patchForm={patchForm} />;
       case "pricing":
         return <PricingSection form={form} patchForm={patchForm} />;
+      case "services":
+        return <ServicesSection form={form} patchForm={patchForm} />;
       case "media":
         return <MediaSection form={form} patchForm={patchForm} />;
       case "settings":

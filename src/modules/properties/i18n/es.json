@@ -15,6 +15,7 @@
       "general": "General",
       "location": "Ubicación",
       "pricing": "Precios",
+      "services": "Servicios",
       "media": "Multimedia",
       "settings": "Ajustes",
       "notes": "Notas"
@@ -23,6 +24,7 @@
       "general": "Información principal del inmueble.",
       "location": "Dirección y contexto de la propiedad.",
       "pricing": "Valores comerciales del inmueble.",
+      "services": "Amenidades y servicios disponibles en la propiedad.",
       "media": "Portada y referencias visuales.",
       "settings": "Preferencias de visibilidad y publicación.",
       "notes": "Observaciones internas del registro."
@@ -53,6 +55,10 @@
       "pricingDetails": {
         "title": "Precio",
         "hint": "Montos principales del inmueble."
+      },
+      "services": {
+        "title": "Servicios",
+        "hint": "Selecciona las amenidades con las que cuenta la propiedad."
       },
       "media": {
         "title": "Multimedia"
@@ -124,6 +130,7 @@
       },
       "rentPrice": {
         "label": "Precio de renta",
+        "prefix": "Renta",
         "placeholder": "0"
       },
       "maintenanceFee": {
@@ -171,6 +178,44 @@
       "sale": "Publica la propiedad solo para venta.",
       "rent": "Publica la propiedad solo para renta.",
       "mixed": "Permite ofrecer la propiedad en venta y renta."
+    },
+    "rentPeriods": {
+      "nightly": "Por noche",
+      "weekly": "Semanal",
+      "monthly": "Mensual",
+      "yearly": "Anual"
+    },
+    "pricing": {
+      "tabsAriaLabel": "Tipos de precio disponibles",
+      "emptyStateTitle": "Selecciona primero una modalidad",
+      "emptyStateDescription": "La modalidad define si capturaremos venta, renta o ambos tipos de precio.",
+      "propertyTypeRequiredTitle": "Falta definir el tipo de propiedad",
+      "propertyTypeRequiredDescription": "Necesitamos el tipo de propiedad para saber qué periodos de renta están habilitados.",
+      "loadingTitle": "Cargando periodos disponibles",
+      "loadingDescription": "Estamos consultando los tipos de renta permitidos para esta propiedad.",
+      "noPeriodsTitle": "No hay periodos de renta disponibles",
+      "noPeriodsDescription": "No encontramos periodos configurados para el tipo de propiedad seleccionado.",
+      "inputHint": "Solo se enviarán los precios que realmente captures.",
+      "selectorTitle": "Tipos de precio",
+      "selectorHint": "Haz clic en una fila para elegir el monto que quieres editar.",
+      "registeredTitle": "Precios registrados",
+      "registeredHint": "Resumen de los montos capturados hasta ahora para esta propiedad.",
+      "tableAriaLabel": "Precios registrados para la propiedad",
+      "tableTypeColumn": "Tipo de precio",
+      "tableAmountColumn": "Monto",
+      "tableEmpty": "Aun no has capturado precios para esta propiedad.",
+      "previewLabel": "Vista previa",
+      "salePreviewHint": "Este monto se enviará como precio de venta si mantienes esta pestaña con valor.",
+      "rentPreviewHint": "Este monto se enviará solo para este periodo de renta si dejas un valor capturado."
+    },
+    "services": {
+      "loading": "Cargando amenidades disponibles...",
+      "selectedTitle": "Seleccionados",
+      "selectedHint": "Haz clic en una amenidad para quitarla de la propiedad.",
+      "selectedEmpty": "Aún no has seleccionado amenidades.",
+      "availableTitle": "Disponibles",
+      "availableHint": "Haz clic en una amenidad para agregarla a la propiedad.",
+      "availableEmpty": "No hay más amenidades disponibles."
     },
     "footer": {
       "dirty": "Cambios sin guardar",
