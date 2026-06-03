@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import localFont from "next/font/local";
+import { usePathname } from "next/navigation";
 
 import { Toast } from "@heroui/react";
 
@@ -24,6 +25,9 @@ export default function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const pathname = usePathname();
+  const isAuthRoute = pathname.startsWith("/auth");
+
   return (
     <html
       lang={DEFAULT_LOCALE}
@@ -34,8 +38,14 @@ export default function RootLayout({
         <I18nProvider>
           <AppQueryClientProvider>
             <Toast.Provider placement="bottom" />
-            <Navbar />
-            <PageWrapper>{children}</PageWrapper>
+            {isAuthRoute ? (
+              children
+            ) : (
+              <>
+                <Navbar />
+                <PageWrapper>{children}</PageWrapper>
+              </>
+            )}
           </AppQueryClientProvider>
         </I18nProvider>
       </body>
