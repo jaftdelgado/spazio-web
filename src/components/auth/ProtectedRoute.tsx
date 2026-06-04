@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { useEffect, type ReactNode } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Loading03Icon } from "@hugeicons/core-free-icons";
@@ -21,18 +22,25 @@ export function ProtectedRoute({
   const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const [isRedirecting, setIsRedirecting] = React.useState(false);
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!isAuthenticated) {
+    if (isLoading || isRedirecting) return;
+
+    if (!isAuthenticated) {
+      if (pathname !== redirectTo) {
+        setIsRedirecting(true);
         router.push(redirectTo);
-      } else if (allowedRoles && user && !allowedRoles.includes(user.roleId)) {
+      }
+    } else if (allowedRoles && user && !allowedRoles.includes(user.roleId)) {
+      if (pathname !== "/explore") {
+        setIsRedirecting(true);
         router.push("/explore");
       }
     }
-  }, [isLoading, isAuthenticated, user, allowedRoles, router, redirectTo]);
+  }, [isLoading, isAuthenticated, user, allowedRoles, router, redirectTo, pathname, isRedirecting]);
 
-  if (isLoading) {
+  if (isLoading || isRedirecting) {
     return (
       <div className="flex min-h-svh items-center justify-center">
         <HugeiconsIcon

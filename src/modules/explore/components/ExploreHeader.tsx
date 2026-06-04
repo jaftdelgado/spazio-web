@@ -1,8 +1,9 @@
 "use client";
 
+import * as React from "react";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   Calendar03Icon,
   ComputerPhoneSyncIcon,
@@ -81,7 +82,10 @@ export function ExploreHeader() {
     toast.success(t("auth.shell.menu.logout"), {
       description: "Sesión cerrada correctamente",
     });
-    router.push("/auth/login");
+    // Use replace to avoid state issues and only if not already there
+    if (window.location.pathname !== "/auth/login") {
+      router.replace("/auth/login");
+    }
   };
 
   return (
