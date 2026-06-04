@@ -1,0 +1,146 @@
+{
+  "auth": {
+    "shell": {
+      "tagline": "Gestión inmobiliaria, simplificada.",
+      "localeLabel": "Cambiar idioma",
+      "navigation": {
+        "toLogin": "Iniciar sesión",
+        "toSignUp": "Crear cuenta"
+      },
+      "theme": {
+        "system": "Sistema",
+        "light": "Claro",
+        "dark": "Oscuro"
+      },
+      "discardRegistration": {
+        "title": "¿Descartar registro?",
+        "description": "Tu correo ya fue verificado. Si sales ahora, tendrás que reenviar el código para continuar después.",
+        "cancel": "Seguir aquí",
+        "confirm": "Descartar y salir"
+      },
+      "footer": {
+        "rights": "© 2026 Spazio. Todos los derechos reservados.",
+        "accessibilityLabel": "Opciones de accesibilidad"
+      }
+    },
+    "common": {
+      "emailLabel": "Correo electronico",
+      "emailPlaceholder": "nombre@correo.com",
+      "passwordLabel": "Contrasena",
+      "showPassword": "Mostrar contrasena",
+      "hidePassword": "Ocultar contrasena",
+      "unexpectedError": "Ocurrio un error inesperado",
+      "actions": {
+        "back": "Volver",
+        "continue": "Continuar"
+      }
+    },
+    "login": {
+      "title": "Iniciar sesión",
+      "description": "Ingresa tus credenciales para continuar",
+      "passwordPlaceholder": "Tu contraseña",
+      "submit": "Iniciar sesión",
+      "divider": "o",
+      "signupPrompt": "¿No tienes cuenta?",
+      "signupLink": "Regístrate",
+      "validation": {
+        "emailInvalid": "Correo inválido",
+        "passwordRequired": "Contraseña requerida"
+      }
+    },
+    "signUp": {
+      "email": {
+        "title": "Crea tu cuenta",
+        "description": "Ingresa tu correo electrónico para comenzar. Te enviaremos un código de verificación.",
+        "submit": "Continuar",
+        "validation": {
+          "required": "El correo es requerido",
+          "tooLong": "El correo es demasiado largo",
+          "invalid": "Ingresa un correo electrónico válido",
+          "noSpaces": "El correo no puede contener espacios"
+        }
+      },
+      "otp": {
+        "title": "Verifica tu correo",
+        "descriptionPrefix": "Enviamos un código de 6 dígitos a",
+        "descriptionSuffix": "Revisa también tu carpeta de spam.",
+        "verifying": "Verificando",
+        "actions": {
+          "resending": "Enviando",
+          "resend": "Reenviar",
+          "resendCountdown": "Reenviar {{seconds}}s"
+        }
+      },
+      "profile": {
+        "title": "Cuéntanos sobre ti",
+        "description": "Ingresa tu nombre y datos de contacto. Esta información aparecerá en tu perfil.",
+        "fields": {
+          "firstName": {
+            "label": "Nombre",
+            "placeholder": "Nombre"
+          },
+          "lastName": {
+            "label": "Apellidos",
+            "placeholder": "Apellidos"
+          },
+          "phone": {
+            "label": "Telefono",
+            "placeholder": "Ej. 2281234567"
+          }
+        },
+        "validation": {
+          "firstNameRequired": "El nombre es requerido",
+          "lastNameRequired": "Los apellidos son requeridos",
+          "minLength": "Mínimo 2 caracteres",
+          "maxLength": "Máximo 50 caracteres",
+          "lettersOnly": "Solo se permiten letras",
+          "phoneInvalid": "Ingresa un número de teléfono válido (7-20 dígitos)"
+        }
+      },
+      "password": {
+        "title": "Elige una contraseña",
+        "description": "Crea una contraseña segura de 8 a 32 caracteres con mayúsculas, números y símbolos.",
+        "fields": {
+          "password": {
+            "label": "Contrasena",
+            "placeholder": "Crea una contraseña"
+          },
+          "confirmPassword": {
+            "label": "Confirmar contrasena",
+            "placeholder": "Repite tu contraseña"
+          }
+        },
+        "submit": "Crear cuenta",
+        "validation": {
+          "required": "La contraseña es requerida",
+          "minLength": "Mínimo 8 caracteres",
+          "maxLength": "Máximo 32 caracteres",
+          "uppercase": "Incluye al menos una letra mayúscula",
+          "number": "Incluye al menos un número",
+          "specialCharacter": "Incluye al menos un carácter especial (!@#$...)",
+          "confirmMismatch": "Las contrasenas no coinciden"
+        },
+        "criteria": {
+          "length": "La contraseña debe tener entre 8 y 32 caracteres.",
+          "uppercase": "Incluye al menos una mayúscula.",
+          "number": "Agrega al menos un número.",
+          "specialCharacter": "Usa un símbolo especial (!, @, #, etc.)."
+        }
+      },
+      "result": {
+        "success": {
+          "title": "Tu cuenta ya está lista",
+          "description": "El registro se completó correctamente. Ya puedes iniciar sesión con tu correo y contraseña."
+        },
+        "error": {
+          "title": "No pudimos crear tu cuenta",
+          "defaultMessage": "Ocurrió un problema de conexión o validación. Revisa tus datos e inténtalo de nuevo."
+        },
+        "actions": {
+          "retry": "Intentar de nuevo",
+          "goToLogin": "Ir a inicio de sesion"
+        }
+      }
+    }
+  }
+}

@@ -6,6 +6,8 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
+import { useUsersTranslation } from "@users/i18n/useUsersTranslation";
+
 type PasswordStrengthBarProps = {
   password: string;
 };
@@ -40,21 +42,21 @@ const getPasswordStrength = (password: string) => {
   return score;
 };
 
-const getPasswordCriteria = (password: string) => [
+const getPasswordCriteria = (password: string, t: (key: string) => string) => [
   {
-    label: "La contraseña debe tener entre 8 y 32 caracteres.",
+    label: t("auth.signUp.password.criteria.length"),
     isMet: password.length >= 8 && password.length <= 32,
   },
   {
-    label: "Incluye al menos una mayúscula.",
+    label: t("auth.signUp.password.criteria.uppercase"),
     isMet: /[A-Z]/.test(password),
   },
   {
-    label: "Agrega al menos un número.",
+    label: t("auth.signUp.password.criteria.number"),
     isMet: /[0-9]/.test(password),
   },
   {
-    label: "Usa un símbolo especial (!, @, #, etc.).",
+    label: t("auth.signUp.password.criteria.specialCharacter"),
     isMet: /[^A-Za-z0-9]/.test(password),
   },
 ];
@@ -62,8 +64,9 @@ const getPasswordCriteria = (password: string) => [
 export function PasswordStrengthBar({
   password,
 }: PasswordStrengthBarProps) {
+  const { t } = useUsersTranslation();
   const strength = getPasswordStrength(password);
-  const criteria = getPasswordCriteria(password);
+  const criteria = getPasswordCriteria(password, t);
 
   return (
     <div className="space-y-3">

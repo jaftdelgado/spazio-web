@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
+import { useUsersTranslation } from "@users/i18n/useUsersTranslation";
 import { EmailStep } from "@users/components/sign-up/EmailStep";
 import { OtpStep } from "@users/components/sign-up/OtpStep";
 import { PasswordStep } from "@users/components/sign-up/PasswordStep";
@@ -16,6 +17,7 @@ type RegistrationStatus = "success" | "error";
 const STEPS: Step[] = ["email", "otp", "profile", "password", "result"];
 
 export function SignUpPageContent() {
+  const { t } = useUsersTranslation();
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
   const [verificationToken, setVerificationToken] = useState("");
@@ -28,6 +30,10 @@ export function SignUpPageContent() {
 
   const stepIndex = STEPS.indexOf(step);
   const canReturnToVerification = verificationToken.length === 0;
+  const registrationCompleted =
+    step === "result" && registrationStatus === "success";
+  const shouldConfirmDiscard =
+    verificationToken.length > 0 && !registrationCompleted;
 
   const goToStep = (nextStep: Step) => {
     if (!canReturnToVerification && (nextStep === "email" || nextStep === "otp")) {
@@ -38,7 +44,19 @@ export function SignUpPageContent() {
   };
 
   return (
-    <AuthShell>
+    <AuthShell
+      header={{
+        navHref: "/auth/login",
+        navLabel: t("auth.shell.navigation.toLogin"),
+        discardConfirmation: {
+          enabled: shouldConfirmDiscard,
+          title: t("auth.shell.discardRegistration.title"),
+          description: t("auth.shell.discardRegistration.description"),
+          cancelLabel: t("auth.shell.discardRegistration.cancel"),
+          confirmLabel: t("auth.shell.discardRegistration.confirm"),
+        },
+      }}
+    >
       <div className="mb-7 flex items-center justify-between">
         <span className="text-xs font-medium text-black/45">
           {stepIndex + 1} / {STEPS.length}

@@ -12,26 +12,31 @@ import { Label } from "@/components/ui/label";
 import { SectionHeader } from "@/components/ui/section-header";
 import { HttpError } from "@lib/http/http-errors";
 import { usePreRegister } from "@users/application/hooks/useUsers";
+import { useUsersTranslation } from "@users/i18n/useUsersTranslation";
 
 type EmailStepProps = {
   onSuccess: (email: string) => void;
 };
 
-const emailSchema = z.object({
-  email: z
-    .string()
-    .min(1, "El correo es requerido")
-    .max(254, "El correo es demasiado largo")
-    .email("Ingresa un correo electrónico válido")
-    .refine(
-      (val) => !val.includes(" "),
-      "El correo no puede contener espacios",
-    ),
-});
+const createEmailSchema = (t: (key: string) => string) =>
+  z.object({
+    email: z
+      .string()
+      .min(1, t("auth.signUp.email.validation.required"))
+      .max(254, t("auth.signUp.email.validation.tooLong"))
+      .email(t("auth.signUp.email.validation.invalid"))
+      .refine(
+        (val) => !val.includes(" "),
+        t("auth.signUp.email.validation.noSpaces"),
+      ),
+  });
 
-type EmailFormValues = z.infer<typeof emailSchema>;
+type EmailFormValues = z.infer<ReturnType<typeof createEmailSchema>>;
 
-const getErrorMessage = (error: unknown): string => {
+const getErrorMessage = (
+  error: unknown,
+  fallbackMessage: string,
+): string => {
   if (error instanceof HttpError) {
     const body = error.body as { error?: string } | null;
 
@@ -42,11 +47,13 @@ const getErrorMessage = (error: unknown): string => {
     return error.message;
   }
 
-  return "Ocurrio un error inesperado";
+  return fallbackMessage;
 };
 
 export function EmailStep({ onSuccess }: EmailStepProps) {
+  const { t } = useUsersTranslation();
   const preRegisterMutation = usePreRegister();
+  const emailSchema = createEmailSchema(t);
   const emailForm = useForm<EmailFormValues>({
     resolver: zodResolver(emailSchema),
     defaultValues: {
@@ -60,7 +67,7 @@ export function EmailStep({ onSuccess }: EmailStepProps) {
       onSuccess(values.email);
     } catch (error) {
       emailForm.setError("root", {
-        message: getErrorMessage(error),
+        message: getErrorMessage(error, t("auth.common.unexpectedError")),
       });
     }
   };
@@ -68,17 +75,17 @@ export function EmailStep({ onSuccess }: EmailStepProps) {
   return (
     <form className="space-y-5" onSubmit={emailForm.handleSubmit(submitEmail)}>
       <SectionHeader
-        title="Crea tu cuenta"
-        description="Ingresa tu correo electrónico para comenzar. Te enviaremos un código de verificación."
+        title={t("auth.signUp.email.title")}
+        description={t("auth.signUp.email.description")}
       />
 
       <div className="space-y-2">
-        <Label htmlFor="email">Correo electronico</Label>
+        <Label htmlFor="email">{t("auth.common.emailLabel")}</Label>
         <Input
           id="email"
           type="email"
           autoComplete="email"
-          placeholder="nombre@correo.com"
+          placeholder={t("auth.common.emailPlaceholder")}
           aria-invalid={
             Boolean(emailForm.formState.errors.email) ||
             Boolean(emailForm.formState.errors.root?.message)
@@ -110,7 +117,7 @@ export function EmailStep({ onSuccess }: EmailStepProps) {
             className="animate-spin"
           />
         ) : (
-          "Continuar"
+          t("auth.signUp.email.submit")
         )}
       </Button>
     </form>

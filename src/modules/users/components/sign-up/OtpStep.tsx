@@ -17,6 +17,7 @@ import {
 import { SectionHeader } from "@/components/ui/section-header";
 import { HttpError } from "@lib/http/http-errors";
 import { usePreRegister, useVerifyEmail } from "@users/application/hooks/useUsers";
+import { useUsersTranslation } from "@users/i18n/useUsersTranslation";
 
 type OtpStepProps = {
   email: string;
@@ -24,7 +25,10 @@ type OtpStepProps = {
   onBack: () => void;
 };
 
-const getErrorMessage = (error: unknown): string => {
+const getErrorMessage = (
+  error: unknown,
+  fallbackMessage: string,
+): string => {
   if (error instanceof HttpError) {
     const body = error.body as { error?: string } | null;
 
@@ -35,10 +39,11 @@ const getErrorMessage = (error: unknown): string => {
     return error.message;
   }
 
-  return "Ocurrio un error inesperado";
+  return fallbackMessage;
 };
 
 export function OtpStep({ email, onSuccess, onBack }: OtpStepProps) {
+  const { t } = useUsersTranslation();
   const [otpCode, setOtpCode] = useState("");
   const [otpError, setOtpError] = useState("");
   const [resendSeconds, setResendSeconds] = useState(45);
@@ -70,7 +75,7 @@ export function OtpStep({ email, onSuccess, onBack }: OtpStepProps) {
       onSuccess(result.verificationToken);
     } catch (error) {
       setOtpCode("");
-      setOtpError(getErrorMessage(error));
+      setOtpError(getErrorMessage(error, t("auth.common.unexpectedError")));
     }
   };
 
@@ -86,19 +91,19 @@ export function OtpStep({ email, onSuccess, onBack }: OtpStepProps) {
       setOtpCode("");
       setResendSeconds(45);
     } catch (error) {
-      setOtpError(getErrorMessage(error));
+      setOtpError(getErrorMessage(error, t("auth.common.unexpectedError")));
     }
   };
 
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Verifica tu correo"
+        title={t("auth.signUp.otp.title")}
         description={
           <>
-            Enviamos un código de 6 dígitos a{" "}
-            <span className="font-medium text-black/75">{email}</span>. Revisa
-            también tu carpeta de spam.
+            {t("auth.signUp.otp.descriptionPrefix")}{" "}
+            <span className="font-medium text-black/75">{email}</span>.{" "}
+            {t("auth.signUp.otp.descriptionSuffix")}
           </>
         }
       />
@@ -156,7 +161,7 @@ export function OtpStep({ email, onSuccess, onBack }: OtpStepProps) {
                 size={16}
                 className="animate-spin"
               />
-              Verificando
+              {t("auth.signUp.otp.verifying")}
             </span>
           ) : otpError ? (
             <span className="text-red-600">{otpError}</span>
@@ -172,7 +177,7 @@ export function OtpStep({ email, onSuccess, onBack }: OtpStepProps) {
           onClick={onBack}
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={17} />
-          Volver
+          {t("auth.common.actions.back")}
         </Button>
         <Button
           type="button"
@@ -184,10 +189,12 @@ export function OtpStep({ email, onSuccess, onBack }: OtpStepProps) {
           }}
         >
           {resendMutation.isPending
-            ? "Enviando"
+            ? t("auth.signUp.otp.actions.resending")
             : resendSeconds > 0
-              ? `Reenviar ${resendSeconds}s`
-              : "Reenviar"}
+              ? t("auth.signUp.otp.actions.resendCountdown", {
+                  seconds: resendSeconds,
+                })
+              : t("auth.signUp.otp.actions.resend")}
         </Button>
       </div>
     </div>

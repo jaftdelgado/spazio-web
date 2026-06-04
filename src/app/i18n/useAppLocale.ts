@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -13,14 +14,21 @@ import { persistLocale } from "./i18n";
 export function useAppLocale() {
   const { i18n } = useTranslation();
   const locale = normalizeLocale(i18n.resolvedLanguage ?? DEFAULT_LOCALE);
-
-  return {
-    locale,
-    supportedLocales: SUPPORTED_LOCALES,
-    async changeLocale(nextLocale: AppLocale) {
-      await i18n.changeLanguage(nextLocale);
-      persistLocale(nextLocale);
+  const changeLocale = useCallback(
+    async (nextLocale: AppLocale) => {
       document.documentElement.lang = nextLocale;
+      persistLocale(nextLocale);
+      await i18n.changeLanguage(nextLocale);
     },
-  };
+    [i18n],
+  );
+
+  return useMemo(
+    () => ({
+      locale,
+      supportedLocales: SUPPORTED_LOCALES,
+      changeLocale,
+    }),
+    [changeLocale, locale],
+  );
 }

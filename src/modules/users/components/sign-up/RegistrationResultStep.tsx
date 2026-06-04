@@ -10,6 +10,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 
 import { Button } from "@/components/ui/button";
 import { SectionHeader } from "@/components/ui/section-header";
+import { useUsersTranslation } from "@users/i18n/useUsersTranslation";
 
 type RegistrationResultStepProps = {
   message?: string;
@@ -23,6 +24,7 @@ export function RegistrationResultStep({
   status,
 }: RegistrationResultStepProps) {
   const router = useRouter();
+  const { t } = useUsersTranslation();
   const isSuccess = status === "success";
 
   return (
@@ -44,12 +46,16 @@ export function RegistrationResultStep({
 
         <SectionHeader
           className="mb-0"
-          title={isSuccess ? "Tu cuenta ya está lista" : "No pudimos crear tu cuenta"}
+          title={
+            isSuccess
+              ? t("auth.signUp.result.success.title")
+              : t("auth.signUp.result.error.title")
+          }
           description={
             isSuccess
-              ? "El registro se completó correctamente. Ya puedes iniciar sesión con tu correo y contraseña."
+              ? t("auth.signUp.result.success.description")
               : message ??
-                "Ocurrió un problema de conexión o validación. Revisa tus datos e inténtalo de nuevo."
+                t("auth.signUp.result.error.defaultMessage")
           }
         />
       </div>
@@ -65,7 +71,7 @@ export function RegistrationResultStep({
             onClick={onRetry}
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={17} />
-            Intentar de nuevo
+            {t("auth.signUp.result.actions.retry")}
           </Button>
         )}
 
@@ -74,7 +80,7 @@ export function RegistrationResultStep({
           className="h-10 min-w-32 px-5 text-[15px]"
           onClick={() => router.push("/auth/login")}
         >
-          Ir a inicio de sesion
+          {t("auth.signUp.result.actions.goToLogin")}
         </Button>
       </div>
     </div>

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SectionHeader } from "@/components/ui/section-header";
+import { useUsersTranslation } from "@users/i18n/useUsersTranslation";
 
 type ProfileStepProps = {
   onSuccess: (data: {
@@ -20,31 +21,40 @@ type ProfileStepProps = {
   onBack?: () => void;
 };
 
-const profileSchema = z.object({
-  firstName: z
-    .string()
-    .min(1, "El nombre es requerido")
-    .min(2, "Mínimo 2 caracteres")
-    .max(50, "Máximo 50 caracteres")
-    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s'-]+$/, "Solo se permiten letras"),
-  lastName: z
-    .string()
-    .min(1, "Los apellidos son requeridos")
-    .min(2, "Mínimo 2 caracteres")
-    .max(50, "Máximo 50 caracteres")
-    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s'-]+$/, "Solo se permiten letras"),
-  phone: z
-    .string()
-    .optional()
-    .refine(
-      (val) => !val || /^\+?[\d\s\-().]{7,20}$/.test(val),
-      "Ingresa un número de teléfono válido (7–20 dígitos)",
-    ),
-});
+const createProfileSchema = (t: (key: string) => string) =>
+  z.object({
+    firstName: z
+      .string()
+      .min(1, t("auth.signUp.profile.validation.firstNameRequired"))
+      .min(2, t("auth.signUp.profile.validation.minLength"))
+      .max(50, t("auth.signUp.profile.validation.maxLength"))
+      .regex(
+        /^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s'-]+$/,
+        t("auth.signUp.profile.validation.lettersOnly"),
+      ),
+    lastName: z
+      .string()
+      .min(1, t("auth.signUp.profile.validation.lastNameRequired"))
+      .min(2, t("auth.signUp.profile.validation.minLength"))
+      .max(50, t("auth.signUp.profile.validation.maxLength"))
+      .regex(
+        /^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s'-]+$/,
+        t("auth.signUp.profile.validation.lettersOnly"),
+      ),
+    phone: z
+      .string()
+      .optional()
+      .refine(
+        (val) => !val || /^\+?[\d\s\-().]{7,20}$/.test(val),
+        t("auth.signUp.profile.validation.phoneInvalid"),
+      ),
+  });
 
-type ProfileFormValues = z.infer<typeof profileSchema>;
+type ProfileFormValues = z.infer<ReturnType<typeof createProfileSchema>>;
 
 export function ProfileStep({ onSuccess, onBack }: ProfileStepProps) {
+  const { t } = useUsersTranslation();
+  const profileSchema = createProfileSchema(t);
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -68,17 +78,19 @@ export function ProfileStep({ onSuccess, onBack }: ProfileStepProps) {
       onSubmit={profileForm.handleSubmit(submitProfile)}
     >
       <SectionHeader
-        title="Cuéntanos sobre ti"
-        description="Ingresa tu nombre y datos de contacto. Esta información aparecerá en tu perfil."
+        title={t("auth.signUp.profile.title")}
+        description={t("auth.signUp.profile.description")}
       />
 
       <div className="space-y-2">
-        <Label htmlFor="firstName">Nombre</Label>
+        <Label htmlFor="firstName">
+          {t("auth.signUp.profile.fields.firstName.label")}
+        </Label>
         <Input
           id="firstName"
           type="text"
           autoComplete="given-name"
-          placeholder="Nombre"
+          placeholder={t("auth.signUp.profile.fields.firstName.placeholder")}
           aria-invalid={Boolean(profileForm.formState.errors.firstName)}
           className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
           {...profileForm.register("firstName")}
@@ -91,12 +103,14 @@ export function ProfileStep({ onSuccess, onBack }: ProfileStepProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="lastName">Apellidos</Label>
+        <Label htmlFor="lastName">
+          {t("auth.signUp.profile.fields.lastName.label")}
+        </Label>
         <Input
           id="lastName"
           type="text"
           autoComplete="family-name"
-          placeholder="Apellidos"
+          placeholder={t("auth.signUp.profile.fields.lastName.placeholder")}
           aria-invalid={Boolean(profileForm.formState.errors.lastName)}
           className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
           {...profileForm.register("lastName")}
@@ -109,7 +123,7 @@ export function ProfileStep({ onSuccess, onBack }: ProfileStepProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phone">Telefono</Label>
+        <Label htmlFor="phone">{t("auth.signUp.profile.fields.phone.label")}</Label>
         <div className="relative">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-black/40">
             <HugeiconsIcon
@@ -122,7 +136,7 @@ export function ProfileStep({ onSuccess, onBack }: ProfileStepProps) {
             id="phone"
             type="tel"
             autoComplete="tel"
-            placeholder="Ej. 2281234567"
+            placeholder={t("auth.signUp.profile.fields.phone.placeholder")}
             aria-invalid={Boolean(profileForm.formState.errors.phone)}
             className="h-11 rounded-2xl border-input bg-background pl-10 pr-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
             {...profileForm.register("phone")}
@@ -144,13 +158,13 @@ export function ProfileStep({ onSuccess, onBack }: ProfileStepProps) {
             onClick={onBack}
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={17} />
-            Volver
+            {t("auth.common.actions.back")}
           </Button>
         ) : (
           <div />
         )}
         <Button type="submit" className="h-10 w-full text-[15px]">
-          Continuar
+          {t("auth.common.actions.continue")}
         </Button>
       </div>
     </form>

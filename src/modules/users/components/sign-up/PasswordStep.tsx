@@ -20,6 +20,7 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { HttpError } from "@lib/http/http-errors";
 import { useCompleteRegister } from "@users/application/hooks/useUsers";
 import { PasswordStrengthBar } from "@users/components/sign-up/PasswordStrengthBar";
+import { useUsersTranslation } from "@users/i18n/useUsersTranslation";
 
 type PasswordStepProps = {
   verificationToken: string;
@@ -31,26 +32,33 @@ type PasswordStepProps = {
   onSuccess: () => void;
 };
 
-const passwordSchema = z
-  .object({
-    password: z
-      .string()
-      .min(1, "La contraseña es requerida")
-      .min(8, "Mínimo 8 caracteres")
-      .max(32, "Máximo 32 caracteres")
-      .regex(/[A-Z]/, "Incluye al menos una letra mayúscula")
-      .regex(/[0-9]/, "Incluye al menos un número")
-      .regex(/[^A-Za-z0-9]/, "Incluye al menos un carácter especial (!@#$...)"),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Las contrasenas no coinciden",
-    path: ["confirmPassword"],
-  });
+const createPasswordSchema = (t: (key: string) => string) =>
+  z
+    .object({
+      password: z
+        .string()
+        .min(1, t("auth.signUp.password.validation.required"))
+        .min(8, t("auth.signUp.password.validation.minLength"))
+        .max(32, t("auth.signUp.password.validation.maxLength"))
+        .regex(/[A-Z]/, t("auth.signUp.password.validation.uppercase"))
+        .regex(/[0-9]/, t("auth.signUp.password.validation.number"))
+        .regex(
+          /[^A-Za-z0-9]/,
+          t("auth.signUp.password.validation.specialCharacter"),
+        ),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t("auth.signUp.password.validation.confirmMismatch"),
+      path: ["confirmPassword"],
+    });
 
-type PasswordFormValues = z.infer<typeof passwordSchema>;
+type PasswordFormValues = z.infer<ReturnType<typeof createPasswordSchema>>;
 
-const getErrorMessage = (error: unknown): string => {
+const getErrorMessage = (
+  error: unknown,
+  fallbackMessage: string,
+): string => {
   if (error instanceof HttpError) {
     const body = error.body as { error?: string } | null;
 
@@ -61,7 +69,7 @@ const getErrorMessage = (error: unknown): string => {
     return error.message;
   }
 
-  return "Ocurrio un error inesperado";
+  return fallbackMessage;
 };
 
 export function PasswordStep({
@@ -73,10 +81,12 @@ export function PasswordStep({
   onError,
   onSuccess,
 }: PasswordStepProps) {
+  const { t } = useUsersTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   const completeRegisterMutation = useCompleteRegister();
+  const passwordSchema = createPasswordSchema(t);
   const passwordForm = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordSchema),
     defaultValues: {
@@ -102,7 +112,7 @@ export function PasswordStep({
       });
       onSuccess();
     } catch (error) {
-      onError(getErrorMessage(error));
+      onError(getErrorMessage(error, t("auth.common.unexpectedError")));
     }
   };
 
@@ -131,18 +141,22 @@ export function PasswordStep({
           id={id}
           type={showValue ? "text" : "password"}
           autoComplete={fieldName === "password" ? "new-password" : "off"}
-          placeholder={
+          placeholder={t(
             fieldName === "password"
-              ? "Crea una contraseña"
-              : "Repite tu contraseña"
-          }
+              ? "auth.signUp.password.fields.password.placeholder"
+              : "auth.signUp.password.fields.confirmPassword.placeholder",
+          )}
           aria-invalid={Boolean(error)}
           className="h-11 rounded-2xl border-input bg-background pl-10 pr-10 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
           {...passwordForm.register(fieldName)}
         />
         <button
           type="button"
-          aria-label={showValue ? "Ocultar contrasena" : "Mostrar contrasena"}
+          aria-label={
+            showValue
+              ? t("auth.common.hidePassword")
+              : t("auth.common.showPassword")
+          }
           onClick={onToggle}
           className="absolute right-3.5 top-1/2 -translate-y-1/2 text-black/40 transition-colors hover:text-black/70"
         >
@@ -163,13 +177,13 @@ export function PasswordStep({
       onSubmit={passwordForm.handleSubmit(submitPassword)}
     >
       <SectionHeader
-        title="Elige una contraseña"
-        description="Crea una contraseña segura de 8 a 32 caracteres con mayúsculas, números y símbolos."
+        title={t("auth.signUp.password.title")}
+        description={t("auth.signUp.password.description")}
       />
 
       {renderPasswordInput({
         id: "password",
-        label: "Contrasena",
+        label: t("auth.signUp.password.fields.password.label"),
         fieldName: "password",
         showValue: showPassword,
         onToggle: () => setShowPassword((value) => !value),
@@ -178,7 +192,7 @@ export function PasswordStep({
 
       {renderPasswordInput({
         id: "confirmPassword",
-        label: "Confirmar contrasena",
+        label: t("auth.signUp.password.fields.confirmPassword.label"),
         fieldName: "confirmPassword",
         showValue: showConfirm,
         onToggle: () => setShowConfirm((value) => !value),
@@ -195,7 +209,7 @@ export function PasswordStep({
           onClick={onBack}
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={17} />
-          Volver
+          {t("auth.common.actions.back")}
         </Button>
         <Button
           type="submit"
@@ -209,7 +223,7 @@ export function PasswordStep({
               className="animate-spin"
             />
           ) : (
-            "Crear cuenta"
+            t("auth.signUp.password.submit")
           )}
         </Button>
       </div>
