@@ -13,4 +13,5 @@ export interface VisitsRepository {
   reschedule(visitUuid: string, input: RescheduleVisitInput): Promise<VisitEntity>;
   confirm(visitUuid: string): Promise<void>;
   complete(visitUuid: string): Promise<void>;
+  cancel(visitUuid: string): Promise<void>;
 }

@@ -99,19 +99,19 @@ export function ScheduleVisitModal({ isOpen, onOpenChange, onSuccess }: Schedule
             
             {/* 1. Seleccionar Propiedad */}
             <div className="flex flex-col gap-1.5">
-              <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                 {t("filters.property")}
               </Label>
               <Dropdown>
                 <Dropdown.Trigger>
-                  <div className="flex h-10 w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer transition-colors outline-none ring-primary-500 focus-visible:ring-2 shadow-sm">
+                  <div className="flex h-10 w-full items-center justify-between rounded-lg border border-divider bg-background px-3 py-2 text-sm text-foreground hover:bg-muted/50 cursor-pointer transition-colors outline-none ring-primary-500 focus-visible:ring-2 shadow-sm">
                     <div className="flex items-center gap-2">
-                      <HugeiconsIcon icon={Home01Icon} size={16} className="text-slate-400" />
+                      <HugeiconsIcon icon={Home01Icon} size={16} className="text-muted-foreground" />
                       <span className="truncate">
                         {selectedPropertyTitle || t("filters.propertyAll")}
                       </span>
                     </div>
-                    <HugeiconsIcon icon={Clock01Icon} size={16} className="text-slate-400 rotate-180" />
+                    <HugeiconsIcon icon={Clock01Icon} size={16} className="text-muted-foreground rotate-180" />
                   </div>
                 </Dropdown.Trigger>
                 <Dropdown.Popover className="min-w-64 max-h-60 overflow-y-auto">
@@ -143,7 +143,7 @@ export function ScheduleVisitModal({ isOpen, onOpenChange, onSuccess }: Schedule
 
             {/* 2. Seleccionar Fecha */}
             <div className="flex flex-col gap-1.5">
-              <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+              <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                 {t("filters.dateFrom")}
               </Label>
               <div className="relative">
@@ -158,19 +158,19 @@ export function ScheduleVisitModal({ isOpen, onOpenChange, onSuccess }: Schedule
                   }}
                 />
               </div>
-              <p className="text-[10px] text-slate-400 italic mt-0.5">
+              <p className="text-[10px] text-muted-foreground/60 italic mt-0.5">
                 * Debe agendar con al menos 48 horas de anticipación.
               </p>
             </div>
 
             {/* 3. Seleccionar Horario (Slots) */}
             <div className="flex flex-col gap-2">
-              <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+              <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                 Horarios Disponibles
               </Label>
               
               {!selectedPropertyId || !selectedDate ? (
-                <div className="text-xs text-slate-400 bg-slate-50 p-4 rounded-lg border border-dashed border-slate-200 text-center">
+                <div className="text-xs text-muted-foreground bg-muted/20 p-4 rounded-lg border border-dashed border-divider text-center">
                   Selecciona una propiedad y fecha para ver horarios
                 </div>
               ) : isLoadingSlots ? (
@@ -178,7 +178,7 @@ export function ScheduleVisitModal({ isOpen, onOpenChange, onSuccess }: Schedule
                   {[1, 2, 3, 4, 5, 6].map(i => <Skeleton key={i} className="h-9 rounded-lg" />)}
                 </div>
               ) : slots.length === 0 ? (
-                <div className="text-xs text-red-400 bg-red-50 p-4 rounded-lg border border-red-100 text-center">
+                <div className="text-xs text-danger bg-danger/10 p-4 rounded-lg border border-danger/20 text-center">
                   No hay horarios disponibles para este día
                 </div>
               ) : (
@@ -206,7 +206,7 @@ export function ScheduleVisitModal({ isOpen, onOpenChange, onSuccess }: Schedule
 
           </AlertDialog.Body>
 
-          <AlertDialog.Footer className="bg-slate-50 border-t border-slate-100">
+          <AlertDialog.Footer className="bg-muted/10 border-t border-divider">
             <Button slot="close" variant="tertiary" isDisabled={scheduleVisit.isPending}>
               {t("confirmDialog.cancel")}
             </Button>

@@ -1,6 +1,7 @@
 "use client";
 
 import { auth } from "@lib/auth/auth";
+import { authStorage } from "@lib/auth/auth-storage";
 import { httpClient } from "@lib/http/http-client";
 
 import type { UserRepository } from "@users/domain/users.repository";
@@ -50,9 +51,15 @@ export const usersHttpAdapter = {
       role_id: input.roleId,
     });
 
+    const result = mapRegisterResult(response);
+    
+    // In some cases register might also log you in automatically
+    // If tokens are present in DTO (we should check mapper but assuming it might)
+    // Actually, registration in this backend typically redirects to login
+    
     auth.notifySessionChanged();
 
-    return mapRegisterResult(response);
+    return result;
   },
   async login(input) {
     const response = await httpClient.post<LoginDTO>("/api/v1/users/login", {
@@ -61,24 +68,41 @@ export const usersHttpAdapter = {
     });
     const result = mapLoginResult(response);
 
+    authStorage.setAccessToken(result.accessToken);
+    authStorage.setRefreshToken(result.refreshToken);
+
     auth.notifySessionChanged();
 
     return result;
   },
   async refresh() {
-    const response = await httpClient.post<RefreshDTO>("/api/v1/users/refresh");
+    // For manual token refresh, we might need to send the refresh token in the body
+    // if cookies are not working
+    const refreshToken = authStorage.getRefreshToken();
+    
+    const response = await httpClient.post<RefreshDTO>("/api/v1/users/refresh", {
+      refresh_token: refreshToken
+    });
     const result = mapRefreshResult(response);
+
+    authStorage.setAccessToken(result.accessToken);
+    authStorage.setRefreshToken(result.refreshToken);
 
     auth.notifySessionChanged();
 
     return result;
   },
   async logout() {
-    const response = await httpClient.post<MessageResponse>("/api/v1/users/logout");
-
-    auth.notifySessionChanged();
-
-    return response;
+    try {
+      const response = await httpClient.post<MessageResponse>("/api/v1/users/logout");
+      return response;
+    } catch (error) {
+      // If 401, it means session is already invalid on server, so just proceed
+      return { message: "Logged out locally" };
+    } finally {
+      authStorage.clearTokens();
+      auth.notifySessionChanged();
+    }
   },
   async updateProfile(input) {
     const response = await httpClient.put<UpdateProfileDTO>(
@@ -94,6 +118,9 @@ export const usersHttpAdapter = {
     return mapUpdateProfileResult(response);
   },
   async deleteAccount() {
-    return httpClient.delete<MessageResponse>("/api/v1/users/profile");
+    const response = await httpClient.delete<MessageResponse>("/api/v1/users/profile");
+    authStorage.clearTokens();
+    auth.notifySessionChanged();
+    return response;
   },
 } satisfies UserRepository;

@@ -55,10 +55,18 @@ export function useVisitsMutations() {
     },
   });
 
+  const cancelVisit = useMutation({
+    mutationFn: (visitUuid: string) => visitsHttpAdapter.cancel(visitUuid),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["visits"] });
+    },
+  });
+
   return {
     scheduleVisit,
     rescheduleVisit,
     confirmVisit,
     completeVisit,
+    cancelVisit,
   };
 }
