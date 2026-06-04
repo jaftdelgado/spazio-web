@@ -52,4 +52,8 @@ export const visitsHttpAdapter = {
   complete: async (visitUuid: string) => {
     await httpClient.patch<void>(`/api/v1/visits/${visitUuid}/complete`, {});
   },
+
+  cancel: async (visitUuid: string) => {
+    await httpClient.patch<void>(`/api/v1/visits/${visitUuid}/cancel`, {});
+  },
 } satisfies VisitsRepository;

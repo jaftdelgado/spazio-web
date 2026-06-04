@@ -60,11 +60,16 @@ function LoginForm() {
 
   const submitLogin = async (values: LoginFormValues) => {
     try {
-      await loginMutation.mutateAsync({
+      const result = await loginMutation.mutateAsync({
         email: values.email,
         password: values.password,
       });
-      router.push("/explore");
+
+      if (result.user.roleId === 1 || result.user.roleId === 2) {
+        router.push("/admin");
+      } else {
+        router.push("/explore");
+      }
     } catch (error) {
       loginForm.setError("root", {
         message: getErrorMessage(error, t("auth.common.unexpectedError")),

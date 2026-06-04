@@ -36,10 +36,16 @@ function getInitials(name: string) {
     .join("");
 }
 
+import { useAuth } from "@lib/auth/useAuth";
+import { useLogout } from "@users/application/hooks/useUsers";
+
 export function AdminTopbarUserMenu() {
   const router = useRouter();
   const { t } = useTranslation("app");
-  const initials = getInitials(TOPBAR_USER.name);
+  const { user, role } = useAuth();
+  const logoutMutation = useLogout();
+
+  const initials = getInitials(user?.email || "U");
 
   return (
     <Dropdown>
@@ -49,7 +55,6 @@ export function AdminTopbarUserMenu() {
           className="size-7 cursor-pointer ring-1 ring-white shadow-sm"
           size="sm"
         >
-          <Avatar.Image alt={TOPBAR_USER.name} src={TOPBAR_USER.image} />
           <Avatar.Fallback>{initials}</Avatar.Fallback>
         </Avatar>
       </Dropdown.Trigger>
@@ -58,23 +63,26 @@ export function AdminTopbarUserMenu() {
         <div className="border-b border-slate-200 px-3 py-3">
           <div className="flex items-center gap-3">
             <Avatar color="accent" size="sm" variant="soft">
-              <Avatar.Image alt={TOPBAR_USER.name} src={TOPBAR_USER.image} />
               <Avatar.Fallback>{initials}</Avatar.Fallback>
             </Avatar>
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-slate-950">
-                {TOPBAR_USER.name}
+                {user?.email ?? "Usuario"}
               </p>
               <p className="truncate text-xs text-slate-500">
-                {TOPBAR_USER.email}
+                {role === 1 ? "Administrador" : "Agente"}
               </p>
             </div>
           </div>
         </div>
 
         <Dropdown.Menu
-          onAction={(key) => {
+          onAction={async (key) => {
             if (key === "logout") {
+              await logoutMutation.mutateAsync();
+              toast.success("Sesión cerrada", {
+                description: "Vuelve pronto",
+              });
               router.push(ROUTES.auth.login);
               return;
             }

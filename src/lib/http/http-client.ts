@@ -1,6 +1,7 @@
 "use client";
 
 import { env } from "@/config/env";
+import { authStorage } from "@lib/auth/auth-storage";
 
 import { HttpError } from "./http-errors";
 
@@ -37,6 +38,11 @@ const request = async <T>(
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
+
+  const accessToken = authStorage.getAccessToken();
+  if (accessToken) {
+    headers["Authorization"] = `Bearer ${accessToken}`;
+  }
 
   const url = buildUrl(path);
 

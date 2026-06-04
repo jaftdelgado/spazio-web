@@ -12,6 +12,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 
 import { ROUTES } from "@/config/routes";
+import { useAuth } from "@lib/auth/useAuth";
 
 type TopbarNavItem = {
   href: string;
@@ -21,6 +22,7 @@ type TopbarNavItem = {
     | "adminTopbarNav.items.properties"
     | "adminTopbarNav.items.visits"
     | "adminTopbarNav.items.payments";
+  allowedRoles: number[];
 };
 
 const adminNavItems: readonly TopbarNavItem[] = [
@@ -28,21 +30,25 @@ const adminNavItems: readonly TopbarNavItem[] = [
     href: ROUTES.admin.root,
     icon: Home01Icon,
     labelKey: "adminTopbarNav.items.summary",
+    allowedRoles: [1, 2],
   },
   {
     href: ROUTES.admin.properties,
     icon: Building03Icon,
     labelKey: "adminTopbarNav.items.properties",
+    allowedRoles: [1, 2],
   },
   {
     href: ROUTES.admin.visits,
     icon: Calendar03Icon,
     labelKey: "adminTopbarNav.items.visits",
+    allowedRoles: [1, 2, 3],
   },
   {
     href: ROUTES.admin.payments,
     icon: CreditCardIcon,
     labelKey: "adminTopbarNav.items.payments",
+    allowedRoles: [1, 2, 3],
   },
 ] as const;
 
@@ -62,6 +68,7 @@ export function AdminTopbarNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { t } = useTranslation("app");
+  const { user } = useAuth();
 
   return (
     <nav
@@ -70,6 +77,10 @@ export function AdminTopbarNav() {
     >
       <div className="flex min-w-max items-center gap-2">
         {adminNavItems.map((item) => {
+          if (user && !item.allowedRoles.includes(user.roleId)) {
+            return null;
+          }
+
           const isActive = isNavItemActive(pathname, item.href);
 
           return (

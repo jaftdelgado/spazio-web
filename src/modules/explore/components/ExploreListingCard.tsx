@@ -11,8 +11,12 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import type { ExploreListing } from "@/modules/explore/data/explore-listings";
 import { exploreTypeMeta } from "@/modules/explore/data/explore-listings";
+
+import { useAuth } from "@lib/auth/useAuth";
+import { useRouter } from "next/navigation";
 
 function formatPrice(price: number, mode: ExploreListing["mode"]) {
   const formatter = new Intl.NumberFormat("es-MX", {
@@ -27,8 +31,11 @@ function formatPrice(price: number, mode: ExploreListing["mode"]) {
 }
 
 export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
+  const router = useRouter();
+  const { isAuthenticated, role } = useAuth();
   const typeMeta = exploreTypeMeta[listing.type];
   const modeLabel = listing.mode === "sale" ? "Venta" : "Renta";
+  const isClient = role === 3;
 
   return (
     <Card className="gap-0 overflow-hidden py-0">
@@ -86,24 +93,34 @@ export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
           <Stat icon={RulerIcon} label="m2" value={listing.area} />
         </div>
 
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex items-center justify-between gap-4">
+          <div className="min-w-0 flex-1">
             <p className="text-xs text-muted-foreground">Precio</p>
             <p className="text-base font-medium text-foreground">
               {formatPrice(listing.price, listing.mode)}
             </p>
           </div>
 
-          <div className="flex gap-2 text-xs text-muted-foreground">
-            {listing.parking ? (
-              <span className="rounded-full bg-muted px-2.5 py-1">
-                Parking
-              </span>
-            ) : null}
-            {listing.petFriendly ? (
-              <span className="rounded-full bg-muted px-2.5 py-1">Pets</span>
-            ) : null}
-          </div>
+          <Button 
+            size="sm" 
+            className="h-9 rounded-2xl px-4 text-xs"
+            onClick={() => {
+              if (!isAuthenticated) {
+                router.push("/auth/login");
+              } else if (isClient) {
+                // Here we would open the visit modal or detail
+                router.push(`/explore/${listing.id}`);
+              } else {
+                router.push("/admin/properties");
+              }
+            }}
+          >
+            {!isAuthenticated 
+              ? "Ver mas" 
+              : isClient 
+                ? (listing.mode === "rent" ? "Rentar" : "Comprar") 
+                : "Gestionar"}
+          </Button>
         </div>
       </div>
     </Card>

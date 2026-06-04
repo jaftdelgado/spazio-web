@@ -4,7 +4,8 @@
     "schedule": "AGENDAR VISITA",
     "reschedule": "Reagendar",
     "confirm": "Confirmar",
-    "complete": "Completar"
+    "complete": "Completar",
+    "cancel": "Cancelar"
   },
   "filters": {
     "status": "Estado",
@@ -58,6 +59,12 @@
     "cancel": "Cancelar",
     "confirm": "Sí, completar"
   },
+  "cancelDialog": {
+    "title": "Cancelar Visita",
+    "body": "¿Estás seguro de que deseas cancelar esta visita? Esta acción no se puede deshacer.",
+    "cancel": "No, mantener",
+    "confirm": "Sí, cancelar"
+  },
   "toast": {
     "confirmSuccess": "Visita confirmada",
     "confirmSuccessDescription": "El estado de la visita ha sido actualizado correctamente.",
@@ -66,6 +73,10 @@
     "completeSuccess": "Visita completada",
     "completeSuccessDescription": "La visita ha finalizado con éxito.",
     "completeError": "Error al completar",
-    "completeErrorDescription": "No se pudo marcar la visita como completada."
+    "completeErrorDescription": "No se pudo marcar la visita como completada.",
+    "cancelSuccess": "Visita cancelada",
+    "cancelSuccessDescription": "La visita ha sido cancelada correctamente.",
+    "cancelError": "Error al cancelar",
+    "cancelErrorDescription": "No se pudo cancelar la visita."
   }
 }

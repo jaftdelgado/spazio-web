@@ -9,7 +9,8 @@ import {
   Clock01Icon, 
   Edit01Icon, 
   Tick01Icon,
-  TickDouble01Icon
+  TickDouble01Icon,
+  Cancel01Icon
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@heroui/react";
@@ -20,45 +21,61 @@ import type { VisitEntity } from "../domain/visits.entity";
 interface VisitsTableProps {
   visits: VisitEntity[];
   isAgent: boolean;
+  isAdmin?: boolean;
   onReschedule?: (visitUuid: string) => void;
   onConfirm?: (visitUuid: string) => void;
   onComplete?: (visitUuid: string) => void;
+  onCancel?: (visitUuid: string) => void;
   confirmingUuid?: string | null;
   completingUuid?: string | null;
+  cancellingUuid?: string | null;
 }
 
-export function VisitsTable({ visits, isAgent, onReschedule, onConfirm, onComplete, confirmingUuid, completingUuid }: VisitsTableProps) {
+export function VisitsTable({ 
+  visits, 
+  isAgent, 
+  isAdmin = false,
+  onReschedule, 
+  onConfirm, 
+  onComplete, 
+  onCancel,
+  confirmingUuid, 
+  completingUuid,
+  cancellingUuid
+}: VisitsTableProps) {
   const { t } = useVisitsTranslation();
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Pending": return "bg-yellow-50 text-yellow-700 border-yellow-100";
-      case "Confirmed": return "bg-green-50 text-green-700 border-green-100";
-      case "Cancelled": return "bg-red-50 text-red-700 border-red-100";
-      case "Completed": return "bg-slate-50 text-slate-600 border-slate-100";
-      case "WaitingAgent": return "bg-orange-50 text-orange-700 border-orange-100";
-      case "WaitingClient": return "bg-blue-50 text-blue-700 border-blue-100";
-      default: return "bg-slate-50 text-slate-600 border-slate-100";
+      case "Pending": return "bg-warning/10 text-warning border-warning/20";
+      case "Confirmed": return "bg-success/10 text-success border-success/20";
+      case "Cancelled": return "bg-danger/10 text-danger border-danger/20";
+      case "Completed": return "bg-muted/30 text-muted-foreground border-divider";
+      case "WaitingAgent": return "bg-warning/5 text-warning-500 border-warning/10";
+      case "WaitingClient": return "bg-primary/10 text-primary border-primary/20";
+      default: return "bg-muted/20 text-foreground border-divider";
     }
   };
 
   return (
     <div className="w-full overflow-x-auto">
       <table className="w-full text-sm text-left">
-        <thead className="text-[10px] text-slate-400 uppercase bg-slate-50/50 border-b border-slate-200">
+        <thead className="text-[10px] text-muted-foreground uppercase bg-muted/20 border-b border-divider">
           <tr>
             <th className="px-6 py-4 font-bold tracking-wider">{t("table.columns.property")}</th>
-            <th className="px-6 py-4 font-bold tracking-wider">{isAgent ? t("table.columns.client") : t("table.columns.agent")}</th>
+            {isAdmin && <th className="px-6 py-4 font-bold tracking-wider">{t("table.columns.agent")}</th>}
+            {(isAdmin || isAgent) && <th className="px-6 py-4 font-bold tracking-wider">{t("table.columns.client")}</th>}
+            {!isAdmin && !isAgent && <th className="px-6 py-4 font-bold tracking-wider">{t("table.columns.agent")}</th>}
             <th className="px-6 py-4 font-bold tracking-wider">{t("table.columns.date")}</th>
             <th className="px-6 py-4 font-bold tracking-wider">{t("table.columns.time")}</th>
             <th className="px-6 py-4 font-bold tracking-wider">{t("table.columns.status")}</th>
-            <th className="px-6 py-4 font-bold tracking-wider text-right">{t("table.columns.actions")}</th>
+            {!isAdmin && <th className="px-6 py-4 font-bold tracking-wider text-right">{t("table.columns.actions")}</th>}
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100">
+        <tbody className="divide-y divide-divider">
           {visits.length === 0 ? (
             <tr>
-              <td colSpan={6} className="px-6 py-12 text-center text-slate-400 font-medium italic">
+              <td colSpan={isAdmin ? 7 : 6} className="px-6 py-12 text-center text-muted-foreground font-medium italic">
                 No hay visitas registradas
               </td>
             </tr>
@@ -67,51 +84,72 @@ export function VisitsTable({ visits, isAgent, onReschedule, onConfirm, onComple
               const vDate = new Date(visit.visitDate);
               const isConfirming = confirmingUuid === visit.visitUuid;
               const isCompleting = completingUuid === visit.visitUuid;
-              const isProcessing = isConfirming || isCompleting;
+              const isCancelling = cancellingUuid === visit.visitUuid;
+              const isProcessing = isConfirming || isCompleting || isCancelling;
               
-              // Logic: 
-              // 1. If Pending, both can confirm to move to their respective waiting states.
-              // 2. If WaitingAgent and current user is Agent, they can confirm to move to Confirmed.
-              // 3. If WaitingClient and current user is Client, they can confirm to move to Confirmed.
-              const canConfirm = 
+              const canConfirm = !isAdmin && (
                 visit.status === "Pending" || 
                 (visit.status === "WaitingAgent" && isAgent) ||
-                (visit.status === "WaitingClient" && !isAgent);
+                (visit.status === "WaitingClient" && !isAgent)
+              );
 
-              // 4. If Confirmed and current user is Agent, they can complete the visit.
-              const canComplete = visit.status === "Confirmed" && isAgent;
+              const canComplete = !isAdmin && visit.status === "Confirmed" && isAgent;
 
-              // 5. Reschedule is only allowed if not fully confirmed, completed, or cancelled.
-              const canReschedule = 
+              const canReschedule = !isAdmin && (
                 visit.status === "Pending" || 
                 visit.status === "WaitingAgent" || 
-                visit.status === "WaitingClient";
+                visit.status === "WaitingClient"
+              );
+
+              const canCancel = !isAdmin && (
+                visit.status === "Pending" || 
+                visit.status === "WaitingAgent" || 
+                visit.status === "WaitingClient"
+              );
               
               return (
-                <tr key={visit.visitUuid} className="bg-white hover:bg-slate-50/50 transition-colors group">
+                <tr key={visit.visitUuid} className="bg-transparent hover:bg-muted/10 transition-colors group">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2.5">
-                      <div className="p-2 bg-slate-50 rounded-lg text-slate-400 group-hover:bg-white group-hover:text-primary-500 transition-colors">
+                      <div className="p-2 bg-muted/40 rounded-lg text-muted-foreground group-hover:bg-content1 group-hover:text-primary transition-colors">
                         <HugeiconsIcon icon={Location01Icon} size={18} />
                       </div>
-                      <span className="font-semibold text-slate-700">{visit.propertyTitle || "Sin título"}</span>
+                      <span className="font-semibold text-foreground">{visit.propertyTitle || "Sin título"}</span>
                     </div>
                   </td>
+                  {isAdmin && (
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <HugeiconsIcon icon={UserIcon} size={16} className="text-muted-foreground/60" />
+                        <span>{visit.agentName || "N/A"}</span>
+                      </div>
+                    </td>
+                  )}
+                  {(isAdmin || isAgent) && (
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <HugeiconsIcon icon={UserIcon} size={16} className="text-muted-foreground/60" />
+                        <span>{visit.clientName || "N/A"}</span>
+                      </div>
+                    </td>
+                  )}
+                  {!isAdmin && !isAgent && (
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <HugeiconsIcon icon={UserIcon} size={16} className="text-muted-foreground/60" />
+                        <span>{visit.agentName || "N/A"}</span>
+                      </div>
+                    </td>
+                  )}
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-slate-600">
-                      <HugeiconsIcon icon={UserIcon} size={16} className="text-slate-300" />
-                      <span>{isAgent ? visit.clientName : visit.agentName || "N/A"}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-slate-600">
-                      <HugeiconsIcon icon={Calendar03Icon} size={16} className="text-slate-300" />
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <HugeiconsIcon icon={Calendar03Icon} size={16} className="text-muted-foreground/60" />
                       <span>{format(vDate, "dd/MM/yyyy")}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-slate-600">
-                      <HugeiconsIcon icon={Clock01Icon} size={16} className="text-slate-300" />
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <HugeiconsIcon icon={Clock01Icon} size={16} className="text-muted-foreground/60" />
                       <span>{format(vDate, "HH:mm")}</span>
                     </div>
                   </td>
@@ -120,52 +158,69 @@ export function VisitsTable({ visits, isAgent, onReschedule, onConfirm, onComple
                       {t(`status.${visit.status}` as any) || visit.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-end gap-2">
-                      {canReschedule && (
-                        <Button 
-                          size="sm" 
-                          variant="ghost" 
-                          className="h-8 border-slate-200 text-slate-600 font-medium"
-                          startContent={<HugeiconsIcon icon={Edit01Icon} size={14} />}
-                          onPress={() => onReschedule?.(visit.visitUuid)}
-                          isDisabled={isProcessing}
-                        >
-                          {t("actions.reschedule")}
-                        </Button>
-                      )}
-                      
-                      {canConfirm && (
-                        <Button 
-                          size="sm" 
-                          color="success" 
-                          variant="flat" 
-                          className="h-8 font-bold"
-                          startContent={!isConfirming && <HugeiconsIcon icon={Tick01Icon} size={14} />}
-                          onPress={() => onConfirm?.(visit.visitUuid)}
-                          isLoading={isConfirming}
-                          isDisabled={isProcessing}
-                        >
-                          {t("actions.confirm")}
-                        </Button>
-                      )}
+                  {!isAdmin && (
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-end gap-2">
+                        {canReschedule && (
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="h-8 border-divider text-foreground font-medium"
+                            startContent={<HugeiconsIcon icon={Edit01Icon} size={14} />}
+                            onPress={() => onReschedule?.(visit.visitUuid)}
+                            isDisabled={isProcessing}
+                          >
+                            {t("actions.reschedule")}
+                          </Button>
+                        )}
+                        
+                        {canConfirm && (
+                          <Button 
+                            size="sm" 
+                            color="success" 
+                            variant="flat" 
+                            className="h-8 font-bold"
+                            startContent={!isConfirming && <HugeiconsIcon icon={Tick01Icon} size={14} />}
+                            onPress={() => onConfirm?.(visit.visitUuid)}
+                            isLoading={isConfirming}
+                            isDisabled={isProcessing}
+                          >
+                            {t("actions.confirm")}
+                          </Button>
+                        )}
 
-                      {canComplete && (
-                        <Button 
-                          size="sm" 
-                          color="primary" 
-                          variant="flat" 
-                          className="h-8 font-bold"
-                          startContent={!isCompleting && <HugeiconsIcon icon={TickDouble01Icon} size={14} />}
-                          onPress={() => onComplete?.(visit.visitUuid)}
-                          isLoading={isCompleting}
-                          isDisabled={isProcessing}
-                        >
-                          {t("actions.complete")}
-                        </Button>
-                      )}
-                    </div>
-                  </td>
+                        {canComplete && (
+                          <Button 
+                            size="sm" 
+                            color="primary" 
+                            variant="flat" 
+                            className="h-8 font-bold"
+                            startContent={!isCompleting && <HugeiconsIcon icon={TickDouble01Icon} size={14} />}
+                            onPress={() => onComplete?.(visit.visitUuid)}
+                            isLoading={isCompleting}
+                            isDisabled={isProcessing}
+                          >
+                            {t("actions.complete")}
+                          </Button>
+                        )}
+
+                        {canCancel && (
+                          <Button 
+                            size="sm" 
+                            color="danger" 
+                            variant="flat" 
+                            className="h-8 font-bold"
+                            startContent={!isCancelling && <HugeiconsIcon icon={Cancel01Icon} size={14} />}
+                            onPress={() => onCancel?.(visit.visitUuid)}
+                            isLoading={isCancelling}
+                            isDisabled={isProcessing}
+                          >
+                            {t("actions.cancel")}
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                  )}
                 </tr>
               );
             })

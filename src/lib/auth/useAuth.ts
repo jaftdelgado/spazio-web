@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { httpClient } from "@lib/http/http-client";
+import { authStorage } from "@lib/auth/auth-storage";
+import { HttpError } from "@lib/http/http-errors";
 
 import { AUTH_SESSION_CHANGED_EVENT } from "./auth";
 
@@ -36,9 +38,18 @@ export function useAuth() {
 
   const { data, isLoading } = useQuery({
     queryKey: authSessionQueryKey,
-    queryFn: () => httpClient.get<ProfileResponse>("/api/v1/users/profile"),
+    queryFn: async () => {
+      try {
+        return await httpClient.get<ProfileResponse>("/api/v1/users/profile");
+      } catch (error) {
+        if (error instanceof HttpError && error.status === 401) {
+          authStorage.clearTokens();
+        }
+        throw error;
+      }
+    },
     retry: false,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 1 * 60 * 1000,
   });
 
   const user = data

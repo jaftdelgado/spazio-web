@@ -19,28 +19,29 @@ interface VisitsCalendarProps {
   currentDate: Date;
   visits: VisitEntity[];
   isAgent: boolean;
+  isAdmin?: boolean;
 }
 
-export function VisitsCalendar({ currentDate, visits, isAgent }: VisitsCalendarProps) {
+export function VisitsCalendar({ currentDate, visits, isAgent, isAdmin = false }: VisitsCalendarProps) {
   const { t } = useVisitsTranslation();
 
   // Helper to determine styles based on status
   const getStatusStyles = (status: string) => {
     switch (status) {
       case "Pending":
-        return "bg-yellow-50 border-yellow-200 text-yellow-700";
+        return "bg-warning/20 border-warning/30 text-warning-600 dark:text-warning";
       case "Confirmed":
-        return "bg-green-50 border-green-200 text-green-700";
+        return "bg-success/20 border-success/30 text-success-600 dark:text-success";
       case "Cancelled":
-        return "bg-red-50 border-red-200 text-red-700";
+        return "bg-danger/20 border-danger/30 text-danger-600 dark:text-danger";
       case "Completed":
-        return "bg-slate-50 border-slate-200 text-slate-500";
+        return "bg-muted/40 border-divider text-muted-foreground";
       case "WaitingAgent":
-        return "bg-orange-50 border-orange-200 text-orange-700";
+        return "bg-warning/10 border-warning/20 text-warning-500";
       case "WaitingClient":
-        return "bg-blue-50 border-blue-200 text-blue-700";
+        return "bg-primary/20 border-primary/30 text-primary-600 dark:text-primary";
       default:
-        return "bg-slate-100 border-slate-200 text-slate-700";
+        return "bg-muted/20 border-divider text-foreground";
     }
   };
 
@@ -59,16 +60,16 @@ export function VisitsCalendar({ currentDate, visits, isAgent }: VisitsCalendarP
   return (
     <div className="flex flex-col h-full min-h-[500px]">
       {/* Cabecera de Días */}
-      <div className="grid grid-cols-7 border-b border-slate-200">
+      <div className="grid grid-cols-7 border-b border-divider">
         {weekDays.map((day) => (
-          <div key={day} className="py-2 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          <div key={day} className="py-2 text-center text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
             {day}
           </div>
         ))}
       </div>
 
       {/* Bloques de Días (Grid) */}
-      <div className="grid grid-cols-7 flex-1 border-l border-slate-200">
+      <div className="grid grid-cols-7 flex-1 border-l border-divider">
         {calendarDays.map((day) => {
           const isCurrentMonth = isSameMonth(day, monthStart);
           const isCurrentToday = isToday(day);
@@ -84,19 +85,26 @@ export function VisitsCalendar({ currentDate, visits, isAgent }: VisitsCalendarP
           return (
             <div 
               key={day.toISOString()} 
-              className={`min-h-[110px] border-b border-r border-slate-200 p-2 flex flex-col gap-1 transition-colors ${
-                !isCurrentMonth ? "bg-slate-50/50 opacity-40" : "bg-white hover:bg-slate-50/30"
+              className={`min-h-[110px] border-b border-r border-divider p-2 flex flex-col gap-1 transition-colors ${
+                !isCurrentMonth ? "bg-muted/20 opacity-40" : "bg-content1 hover:bg-muted/10"
               }`}
             >
-              <div className={`text-xs font-bold ${isCurrentToday ? "text-primary-600" : "text-slate-400"}`}>
+              <div className={`text-xs font-bold ${isCurrentToday ? "text-primary" : "text-muted-foreground"}`}>
                 {format(day, "d")}
               </div>
               
               <div className="flex flex-col gap-1 overflow-y-auto mt-1 no-scrollbar">
                 {dayVisits.map((visit) => {
                   const timeStr = format(new Date(visit.visitDate), "HH:mm");
-                  const displayPerson = isAgent ? visit.clientName : visit.agentName;
-                  const eventText = t("calendar.visitWith", { name: displayPerson || "N/A", time: timeStr });
+                  
+                  let displayPerson = "";
+                  if (isAdmin) {
+                    displayPerson = `${visit.agentName || "A"} / ${visit.clientName || "C"}`;
+                  } else {
+                    displayPerson = isAgent ? (visit.clientName || "Cliente") : (visit.agentName || "Agente");
+                  }
+
+                  const eventText = t("calendar.visitWith", { name: displayPerson, time: timeStr });
                   
                   return (
                     <div 

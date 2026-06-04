@@ -1,5 +1,8 @@
+"use client";
+
 import type { ReactNode } from "react";
 
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { SettingsShell } from "@/modules/settings/layouts/SettingsShell";
 
 export default function SettingsLayout({
@@ -7,5 +10,9 @@ export default function SettingsLayout({
 }: {
   children: ReactNode;
 }) {
-  return <SettingsShell>{children}</SettingsShell>;
+  return (
+    <ProtectedRoute>
+      <SettingsShell>{children}</SettingsShell>
+    </ProtectedRoute>
+  );
 }

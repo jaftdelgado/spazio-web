@@ -21,6 +21,14 @@
       "footer": {
         "rights": "© 2026 Spazio. Todos los derechos reservados.",
         "accessibilityLabel": "Opciones de accesibilidad"
+      },
+      "menu": {
+        "profile": "Mi perfil",
+        "visits": "Mis visitas",
+        "payments": "Mis pagos",
+        "settings": "Ajustes",
+        "logout": "Cerrar sesión",
+        "goToPanel": "Ir al panel"
       }
     },
     "common": {
