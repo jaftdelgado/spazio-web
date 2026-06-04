@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { auth } from "@lib/auth/auth";
+import { authSessionQueryKey } from "@lib/auth/useAuth";
 
 import type {
   CompleteRegisterInput,
@@ -12,8 +13,6 @@ import type {
   VerifyEmailInput,
 } from "@users/domain/users.entity";
 import { usersHttpAdapter } from "@users/infra/users.http-adapter";
-
-const usersMeQueryKey = ["users", "me"] as const;
 
 export const usePreRegister = () => {
   return useMutation({
@@ -52,7 +51,7 @@ export const useLogout = () => {
   return useMutation({
     mutationFn: () => usersHttpAdapter.logout(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: usersMeQueryKey });
+      queryClient.invalidateQueries({ queryKey: authSessionQueryKey });
     },
   });
 };
@@ -64,7 +63,7 @@ export const useUpdateProfile = () => {
     mutationFn: (input: UpdateProfileInput) =>
       usersHttpAdapter.updateProfile(input),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: usersMeQueryKey });
+      queryClient.invalidateQueries({ queryKey: authSessionQueryKey });
     },
   });
 };

@@ -28,6 +28,8 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
   const isAuthRoute = pathname.startsWith("/auth");
+  const isExploreRoute = pathname.startsWith("/explore");
+  const isSettingsRoute = pathname.startsWith("/settings");
 
   return (
     <html
@@ -40,7 +42,7 @@ export default function RootLayout({
           <I18nProvider>
             <AppQueryClientProvider>
               <Toast.Provider placement="bottom" />
-              {isAuthRoute ? (
+              {isAuthRoute || isExploreRoute || isSettingsRoute ? (
                 children
               ) : (
                 <>
