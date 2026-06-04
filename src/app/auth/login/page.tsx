@@ -1,5 +1,7 @@
 "use client";
 
+import { LoginPageContent } from "@users/pages/LoginPageContent";
+
 export default function LoginPage() {
-  return <div>Login Page</div>;
+  return <LoginPageContent />;
 }

@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@heroui/react";
+import { ExplorePageContent } from "@/modules/explore/pages/ExplorePageContent";
 
 export default function ExplorePage() {
-  return <Button>My Button</Button>;
+  return <ExplorePageContent />;
 }

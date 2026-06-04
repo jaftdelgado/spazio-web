@@ -1,0 +1,146 @@
+{
+  "auth": {
+    "shell": {
+      "tagline": "Property management, simplified.",
+      "localeLabel": "Change language",
+      "navigation": {
+        "toLogin": "Sign in",
+        "toSignUp": "Create account"
+      },
+      "theme": {
+        "system": "System",
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "discardRegistration": {
+        "title": "Discard registration?",
+        "description": "Your email has already been verified. If you leave now, you will need to resend the code to continue later.",
+        "cancel": "Stay here",
+        "confirm": "Discard and leave"
+      },
+      "footer": {
+        "rights": "© 2026 Spazio. All rights reserved.",
+        "accessibilityLabel": "Accessibility options"
+      }
+    },
+    "common": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "name@email.com",
+      "passwordLabel": "Password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "unexpectedError": "An unexpected error occurred",
+      "actions": {
+        "back": "Back",
+        "continue": "Continue"
+      }
+    },
+    "login": {
+      "title": "Sign in",
+      "description": "Enter your credentials to continue",
+      "passwordPlaceholder": "Your password",
+      "submit": "Sign in",
+      "divider": "or",
+      "signupPrompt": "Don't have an account?",
+      "signupLink": "Sign up",
+      "validation": {
+        "emailInvalid": "Invalid email",
+        "passwordRequired": "Password is required"
+      }
+    },
+    "signUp": {
+      "email": {
+        "title": "Create your account",
+        "description": "Enter your email to get started. We'll send you a verification code.",
+        "submit": "Continue",
+        "validation": {
+          "required": "Email is required",
+          "tooLong": "Email is too long",
+          "invalid": "Enter a valid email address",
+          "noSpaces": "Email cannot contain spaces"
+        }
+      },
+      "otp": {
+        "title": "Verify your email",
+        "descriptionPrefix": "We sent a 6-digit code to",
+        "descriptionSuffix": "Check your spam folder too.",
+        "verifying": "Verifying",
+        "actions": {
+          "resending": "Sending",
+          "resend": "Resend",
+          "resendCountdown": "Resend {{seconds}}s"
+        }
+      },
+      "profile": {
+        "title": "Tell us about yourself",
+        "description": "Enter your name and contact details. This information will appear on your profile.",
+        "fields": {
+          "firstName": {
+            "label": "First name",
+            "placeholder": "First name"
+          },
+          "lastName": {
+            "label": "Last name",
+            "placeholder": "Last name"
+          },
+          "phone": {
+            "label": "Phone",
+            "placeholder": "Ex. 2281234567"
+          }
+        },
+        "validation": {
+          "firstNameRequired": "First name is required",
+          "lastNameRequired": "Last name is required",
+          "minLength": "At least 2 characters",
+          "maxLength": "Up to 50 characters",
+          "lettersOnly": "Only letters are allowed",
+          "phoneInvalid": "Enter a valid phone number (7-20 digits)"
+        }
+      },
+      "password": {
+        "title": "Choose a password",
+        "description": "Create a secure password with 8 to 32 characters, uppercase letters, numbers, and symbols.",
+        "fields": {
+          "password": {
+            "label": "Password",
+            "placeholder": "Create a password"
+          },
+          "confirmPassword": {
+            "label": "Confirm password",
+            "placeholder": "Repeat your password"
+          }
+        },
+        "submit": "Create account",
+        "validation": {
+          "required": "Password is required",
+          "minLength": "At least 8 characters",
+          "maxLength": "Up to 32 characters",
+          "uppercase": "Include at least one uppercase letter",
+          "number": "Include at least one number",
+          "specialCharacter": "Include at least one special character (!@#$...)",
+          "confirmMismatch": "Passwords do not match"
+        },
+        "criteria": {
+          "length": "Password must be 8 to 32 characters long.",
+          "uppercase": "Include at least one uppercase letter.",
+          "number": "Add at least one number.",
+          "specialCharacter": "Use a special symbol (!, @, #, etc.)."
+        }
+      },
+      "result": {
+        "success": {
+          "title": "Your account is ready",
+          "description": "Registration completed successfully. You can now sign in with your email and password."
+        },
+        "error": {
+          "title": "We couldn't create your account",
+          "defaultMessage": "There was a connection or validation issue. Review your details and try again."
+        },
+        "actions": {
+          "retry": "Try again",
+          "goToLogin": "Go to sign in"
+        }
+      }
+    }
+  }
+}

@@ -38,15 +38,12 @@ const request = async <T>(
     "Content-Type": "application/json",
   };
 
-  if (env.NEXT_PUBLIC_DEV_BEARER_TOKEN) {
-    headers["Authorization"] = `Bearer ${env.NEXT_PUBLIC_DEV_BEARER_TOKEN}`;
-  }
-
   const url = buildUrl(path);
 
   const response = await fetch(url, {
     method: options.method,
     headers,
+    credentials: "include",
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
   });
 

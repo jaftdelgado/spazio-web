@@ -1,7 +1,13 @@
+"use client";
+
 export interface PaginatedResponse<T> {
-  // TODO: definir propiedades
+  data: T[];
+  page: number;
+  perPage: number;
+  total: number;
+  totalPages: number;
 }
 
 export interface ApiError {
-  // TODO: definir propiedades
+  error: string;
 }

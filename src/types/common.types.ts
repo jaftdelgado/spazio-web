@@ -1,7 +1,11 @@
+"use client";
+
 export interface CommonOption {
-  // TODO: definir propiedades
+  value: string | number;
+  label: string;
 }
 
 export interface CommonIdentifier {
-  // TODO: definir propiedades
+  id: number;
+  uuid?: string;
 }
