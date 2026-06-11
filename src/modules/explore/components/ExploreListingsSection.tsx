@@ -1,22 +1,29 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import type { ExploreListing } from "@/modules/explore/data/explore-listings";
 import { ExploreListingCard } from "@/modules/explore/components/ExploreListingCard";
+import type { ExploreListing } from "@/modules/explore/data/explore-listings";
 
 type ExploreListingsSectionProps = {
   listings: ExploreListing[];
   onReset: () => void;
   totalCount: number;
+  isLoading?: boolean;
+  isError?: boolean;
+  activeFilterCount?: number;
 };
 
 export function ExploreListingsSection({
   listings,
   onReset,
   totalCount,
+  isLoading = false,
+  isError = false,
+  activeFilterCount = 0,
 }: ExploreListingsSectionProps) {
   const highlightedListings = listings.slice(0, 3);
   const remainingListings = listings.slice(highlightedListings.length);
+  const hasActiveFilters = activeFilterCount > 0;
 
   return (
     <section className="space-y-6">
@@ -26,13 +33,15 @@ export function ExploreListingsSection({
             Propiedades disponibles
           </h2>
           <p className="text-sm text-muted-foreground">
-            Mostrando {listings.length} de {totalCount} espacios.
+            {isLoading
+              ? "Buscando espacios disponibles..."
+              : `Mostrando ${listings.length} de ${totalCount} espacios.`}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <span className="rounded-full border bg-card px-3 py-1 text-xs text-muted-foreground">
-            Publico
+            Público
           </span>
           <span className="rounded-full border bg-card px-3 py-1 text-xs text-muted-foreground">
             Spazio Explore
@@ -40,14 +49,29 @@ export function ExploreListingsSection({
         </div>
       </header>
 
-      {listings.length > 0 ? (
+      {isLoading ? (
+        <div className="rounded-[2rem] border bg-card px-6 py-12 text-center">
+          <p className="text-sm text-muted-foreground">
+            Cargando propiedades disponibles...
+          </p>
+        </div>
+      ) : isError ? (
+        <div className="rounded-[2rem] border border-dashed bg-card px-6 py-12 text-center">
+          <p className="text-sm font-medium text-foreground">
+            No pudimos cargar las propiedades.
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Intenta recargar la página o revisa tu conexión.
+          </p>
+        </div>
+      ) : listings.length > 0 ? (
         <>
           <section className="grid gap-4 lg:grid-cols-3">
             {highlightedListings.map((listing) => (
               <div key={listing.id} className="space-y-3">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium text-foreground">
-                    Seleccion Spazio
+                    Selección Spazio
                   </p>
                   <span className="rounded-full border bg-card px-2.5 py-1 text-[11px] text-muted-foreground">
                     Curada
@@ -67,16 +91,21 @@ export function ExploreListingsSection({
       ) : (
         <div className="rounded-[2rem] border border-dashed bg-card px-6 py-12 text-center">
           <p className="text-sm text-muted-foreground">
-            No encontramos propiedades con esos filtros.
+            {hasActiveFilters
+              ? "No encontramos propiedades con esos filtros."
+              : "No hay propiedades disponibles por ahora."}
           </p>
-          <Button
-            type="button"
-            variant="outline"
-            className="mt-4"
-            onClick={onReset}
-          >
-            Reiniciar filtros
-          </Button>
+
+          {hasActiveFilters ? (
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-4"
+              onClick={onReset}
+            >
+              Reiniciar filtros
+            </Button>
+          ) : null}
         </div>
       )}
     </section>
