@@ -1,7 +1,6 @@
 "use client";
 
 import NumberFlow from "@number-flow/react";
-import { Surface } from "@heroui/react";
 
 function normalizePriceInput(value: string) {
   return value.replace(/\D+/g, "");
@@ -25,11 +24,11 @@ export function AnimatedPriceField({
 
   return (
     <div className="relative">
-      <Surface className="w-full py-3">
+      <div className="w-full rounded-2xl bg-muted/50 px-4 py-3">
         <div
           className={[
             "flex items-baseline gap-1 text-3xl font-semibold [font-variant-numeric:tabular-nums]",
-            numericValue === null ? "text-default-400" : "",
+            numericValue === null ? "text-muted-foreground" : "text-foreground",
           ].join(" ")}
         >
           <span>$</span>
@@ -44,7 +43,7 @@ export function AnimatedPriceField({
             willChange
           />
         </div>
-      </Surface>
+      </div>
       <input
         aria-label={`price input ${suffix}`}
         className="absolute inset-0 h-full w-full cursor-text opacity-0"

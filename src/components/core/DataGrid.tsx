@@ -278,13 +278,13 @@ export function DataGrid<Row extends DataGridRowBase, ColumnId extends string>({
         <div
           ref={tableContainerRef}
           className={cn(
-            "min-h-0 overflow-auto rounded-xl border border-slate-200 bg-white",
+            "min-h-0 overflow-auto rounded-3xl border border-border/70 bg-background/90",
             fillAvailableHeight && "h-full",
             tableContainerClassName,
           )}
         >
           <table className="w-full border-separate border-spacing-0">
-            <thead className="bg-slate-50">
+            <thead className="bg-muted/35">
               <tr>
                 {columns.map((column, columnIndex) => {
                   const width = columnWidths[column.id];
@@ -294,13 +294,13 @@ export function DataGrid<Row extends DataGridRowBase, ColumnId extends string>({
                     <th
                       key={column.id}
                       className={cn(
-                        "relative h-12 border-b border-slate-200 px-3 py-0 text-sm font-medium text-muted",
+                        "relative h-12 border-b border-border/70 px-3 py-0 text-sm font-medium text-muted-foreground",
                         column.sticky === "right" &&
-                          "bg-slate-50 shadow-[-1px_0_0_0_rgba(226,232,240,1)] after:pointer-events-none after:absolute after:inset-0 after:z-0 after:bg-slate-50 after:content-['']",
+                          "bg-muted/35 after:pointer-events-none after:absolute after:inset-0 after:z-0 after:bg-muted/35 after:content-['']",
                         column.sticky === "left" &&
-                          "bg-slate-50 shadow-[1px_0_0_0_rgba(226,232,240,1)]",
+                          "bg-muted/35",
                         column.sticky === "right" &&
-                          "before:pointer-events-none before:absolute before:inset-y-0 before:-left-10 before:z-0 before:w-10 before:bg-linear-to-l before:from-slate-50 before:to-transparent before:opacity-(--sticky-right-mask-opacity) before:transition-opacity before:duration-200",
+                          "before:pointer-events-none before:absolute before:inset-y-0 before:-left-10 before:z-0 before:w-10 before:bg-linear-to-l before:from-muted/35 before:to-transparent before:opacity-(--sticky-right-mask-opacity) before:transition-opacity before:duration-200",
                         getColumnAlignmentClass(column.align),
                         getStickyColumnClass(column.sticky),
                         column.className,
@@ -320,7 +320,7 @@ export function DataGrid<Row extends DataGridRowBase, ColumnId extends string>({
                       {!isLastColumn ? (
                         <div
                           aria-hidden="true"
-                          className="absolute inset-y-0 right-0 z-20 w-2 cursor-col-resize select-none after:absolute after:inset-y-2 after:right-0 after:w-px after:bg-slate-200 after:transition-colors hover:after:bg-slate-300"
+                          className="absolute inset-y-0 right-0 z-20 w-2 cursor-col-resize select-none after:absolute after:inset-y-2 after:right-0 after:w-px after:bg-border after:transition-colors hover:after:bg-ring/50"
                           onPointerDown={(event) =>
                             beginResize(event, column.id)
                           }
@@ -337,7 +337,7 @@ export function DataGrid<Row extends DataGridRowBase, ColumnId extends string>({
                 <tr
                   key={row.id}
                   aria-label={getRowLabel?.(row)}
-                  className="odd:bg-white even:bg-slate-50"
+                  className="odd:bg-background even:bg-muted/20"
                 >
                   {columns.map((column) => {
                     const isEditing =
@@ -352,20 +352,20 @@ export function DataGrid<Row extends DataGridRowBase, ColumnId extends string>({
                       <td
                         key={column.id}
                         className={cn(
-                          "h-12 border-b border-slate-200 px-3 py-0 align-middle text-sm text-foreground",
+                          "h-12 border-b border-border/70 px-3 py-0 align-middle text-sm text-foreground",
                           column.sticky === "right" &&
-                            "shadow-[-1px_0_0_0_rgba(226,232,240,1)] after:pointer-events-none after:absolute after:inset-0 after:z-0 after:content-[''] before:pointer-events-none before:absolute before:inset-y-0 before:-left-10 before:z-0 before:w-10 before:bg-linear-to-l before:opacity-(--sticky-right-mask-opacity) before:transition-opacity before:duration-200",
+                            "after:pointer-events-none after:absolute after:inset-0 after:z-0 after:content-[''] before:pointer-events-none before:absolute before:inset-y-0 before:-left-10 before:z-0 before:w-10 before:bg-linear-to-l before:opacity-(--sticky-right-mask-opacity) before:transition-opacity before:duration-200",
                           column.sticky === "left" &&
-                            "shadow-[1px_0_0_0_rgba(226,232,240,1)]",
+                            "",
                           getColumnAlignmentClass(column.align),
                           getStickyColumnClass(column.sticky),
                           isEditable &&
-                            "cursor-text transition hover:bg-slate-100",
+                            "cursor-text transition hover:bg-muted/35",
                           column.className,
                           column.sticky === "right" || column.sticky === "left"
                             ? rowIndex % 2 === 0
-                              ? "bg-white after:bg-white before:from-white before:to-transparent"
-                              : "bg-slate-50 after:bg-slate-50 before:from-slate-50 before:to-transparent"
+                              ? "bg-background after:bg-background before:from-background before:to-transparent"
+                              : "bg-muted/20 after:bg-muted/20 before:from-muted/20 before:to-transparent"
                             : "",
                         )}
                         onDoubleClick={() => startEditing(row, column.id)}
@@ -379,7 +379,7 @@ export function DataGrid<Row extends DataGridRowBase, ColumnId extends string>({
                           <div className="relative z-10">
                             <input
                               ref={inputRef}
-                              className="h-9 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-0"
+                              className="h-9 w-full rounded-2xl border border-input bg-background px-3 py-2 text-sm outline-none ring-0 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
                               onBlur={commitEdit}
                               onChange={(event) =>
                                 setDraftValue(event.currentTarget.value)
@@ -399,7 +399,7 @@ export function DataGrid<Row extends DataGridRowBase, ColumnId extends string>({
                             />
                           </div>
                         ) : isEmptyValue(cellContent) ? (
-                          <span className="relative z-10 text-slate-400">
+                          <span className="relative z-10 text-muted-foreground">
                             -
                           </span>
                         ) : (
@@ -416,7 +416,7 @@ export function DataGrid<Row extends DataGridRowBase, ColumnId extends string>({
               <tfoot
                 className={cn(
                   stickySummaryFooter &&
-                    "sticky bottom-0 z-10 bg-white shadow-[0_-1px_0_0_rgba(226,232,240,1)]",
+                    "sticky bottom-0 z-10 bg-background",
                 )}
               >
                 <tr>
@@ -427,11 +427,7 @@ export function DataGrid<Row extends DataGridRowBase, ColumnId extends string>({
                       <td
                         key={column.id}
                         className={cn(
-                          "border-t border-slate-200 bg-slate-50 px-3 py-3 text-sm font-medium text-slate-700",
-                          column.sticky === "right" &&
-                            "shadow-[-1px_0_0_0_rgba(226,232,240,1)]",
-                          column.sticky === "left" &&
-                            "shadow-[1px_0_0_0_rgba(226,232,240,1)]",
+                          "border-t border-border/70 bg-muted/35 px-3 py-3 text-sm font-medium text-foreground",
                           getColumnAlignmentClass(column.align),
                           getStickyColumnClass(column.sticky),
                           column.className,

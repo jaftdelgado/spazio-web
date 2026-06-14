@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
+import { Button } from "@/components/ui/button";
 import { PageHeader } from "@components/layout/PageHeader";
 import { ROUTES } from "@/config/routes";
 import { PropertiesPageContent } from "@properties/components/listing/PropertiesPageContent";
@@ -18,7 +18,10 @@ export default function AdminPropertiesPage() {
         title={t("page.title")}
         description={t("page.description")}
         actions={
-          <Button onPress={() => router.push(ROUTES.admin.propertiesCreate)}>
+          <Button
+            className="h-10 rounded-2xl px-4"
+            onClick={() => router.push(ROUTES.admin.propertiesCreate)}
+          >
             {t("page.addProperty")}
           </Button>
         }

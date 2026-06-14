@@ -1,7 +1,5 @@
 "use client";
 
-import { Description, Surface } from "@heroui/react";
-
 import { CreateFormField } from "@properties/components/create/shared/CreateFormPrimitives";
 
 import { AnimatedPriceField } from "./AnimatedPriceField";
@@ -30,21 +28,21 @@ export function PricingEditor({
 }) {
   if (emptyState) {
     return (
-      <Surface className="overflow-hidden rounded-3xl">
+      <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
         <div className="px-5 py-6">
-          <div className="text-sm font-medium text-slate-900">
+          <div className="text-sm font-medium text-foreground">
             {emptyState.title}
           </div>
-          <Description className="mt-1 text-sm leading-relaxed">
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
             {emptyState.description}
-          </Description>
+          </p>
         </div>
-      </Surface>
+      </div>
     );
   }
 
   return (
-    <Surface className="overflow-hidden rounded-3xl px-3 py-3">
+    <div className="overflow-hidden rounded-3xl border border-border bg-card px-3 py-3 shadow-sm">
       <CreateFormField htmlFor={fieldId} hint={hint} label={label}>
         <AnimatedPriceField
           id={fieldId}
@@ -54,6 +52,6 @@ export function PricingEditor({
           onChange={onChange}
         />
       </CreateFormField>
-    </Surface>
+    </div>
   );
 }

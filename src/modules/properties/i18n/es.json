@@ -234,6 +234,7 @@
   "searchPlaceholder": "Buscar propiedades...",
   "viewAriaLabel": "Vista de propiedades",
   "filters": {
+    "all": "Todos",
     "propertyTypeButton": "Tipo",
     "propertyTypeTitle": "Tipos de propiedad"
   },

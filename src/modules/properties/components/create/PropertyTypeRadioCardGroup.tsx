@@ -5,9 +5,10 @@ import Image from "next/image";
 import apartmentIcon from "@catalogs/assets/webp/apartment_icon.webp";
 import commercialIcon from "@catalogs/assets/webp/commercial_icon.webp";
 import houseIcon from "@catalogs/assets/webp/house_icon.webp";
+import { Skeleton } from "@/components/ui/skeleton";
 import { usePropertyTypes } from "@catalogs/application/hooks/useCatalogs";
 import type { PropertyType } from "@catalogs/domain/catalog.entity";
-import { Description, Skeleton } from "@heroui/react";
+import { cn } from "@/lib/utils";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 
 const propertyTypeIconMap = {
@@ -21,10 +22,6 @@ const propertyTypeIconMap = {
   "house.webp": houseIcon,
   "house_icon.webp": houseIcon,
 } as const;
-
-function cn(...values: Array<string | false | null | undefined>) {
-  return values.filter(Boolean).join(" ");
-}
 
 function getPropertyTypeIcon(propertyType: PropertyType) {
   if (!propertyType.icon) {
@@ -94,7 +91,7 @@ export function PropertyTypeRadioCardGroup({
           {Array.from({ length: 3 }).map((_, index) => (
             <div
               key={index}
-              className="flex min-h-28 flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200/80 px-3 py-4"
+              className="flex min-h-28 flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-card px-3 py-4"
             >
               <Skeleton className="size-12 rounded-2xl" />
               <Skeleton className="h-4 w-24 rounded-lg" />
@@ -126,8 +123,8 @@ export function PropertyTypeRadioCardGroup({
                 className={cn(
                   "flex min-h-28 flex-col items-center justify-center gap-3 rounded-2xl border px-3 py-4 text-center transition-colors",
                   isSelected
-                    ? "border-slate-950 bg-slate-950/3 text-foreground"
-                    : "border-slate-200/80 bg-surface shadow-surface text-muted hover:border-slate-300 hover:bg-slate-50",
+                    ? "border-primary bg-primary/10 text-foreground ring-3 ring-primary/15"
+                    : "border-border bg-card text-muted-foreground shadow-sm hover:border-ring/50 hover:bg-muted/50 hover:text-foreground",
                 )}
                 role="radio"
                 type="button"
@@ -140,7 +137,7 @@ export function PropertyTypeRadioCardGroup({
                     src={iconSrc}
                   />
                 ) : (
-                  <div className="size-12 rounded-2xl bg-slate-100" />
+                  <div className="size-12 rounded-2xl bg-muted" />
                 )}
                 <span className="text-sm font-medium leading-tight">
                   {label}
@@ -152,9 +149,9 @@ export function PropertyTypeRadioCardGroup({
       ) : null}
 
       {propertyTypesQuery.isError ? (
-        <Description className="text-xs text-danger">
+        <p className="text-xs text-destructive">
           {t("create.sections.propertyType.error")}
-        </Description>
+        </p>
       ) : null}
     </div>
   );

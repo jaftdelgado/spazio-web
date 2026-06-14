@@ -237,6 +237,7 @@
   "searchPlaceholder": "Search properties...",
   "viewAriaLabel": "Properties view",
   "filters": {
+    "all": "All",
     "propertyTypeButton": "Type",
     "propertyTypeTitle": "Property types"
   },

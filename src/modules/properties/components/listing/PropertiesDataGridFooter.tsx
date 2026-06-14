@@ -1,6 +1,10 @@
 "use client";
 
-import { Pagination } from "@heroui/react";
+import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 
 type PropertiesDataGridFooterProps = {
@@ -52,47 +56,56 @@ export function PropertiesDataGridFooter({
   const pages = getPageNumbers(currentPage, totalPages);
 
   return (
-    <div className="grid w-full grid-cols-[auto_1fr] items-center gap-4 rounded-xl">
-      <Pagination className="min-w-0" size="sm">
-        <Pagination.Content>
-          <Pagination.Item>
-            <Pagination.Previous
-              isDisabled={currentPage === 1}
-              onPress={() => onPageChange(currentPage - 1)}
+    <div className="grid w-full gap-4 md:grid-cols-[auto_1fr] md:items-center">
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          disabled={currentPage === 1}
+          size="icon-sm"
+          type="button"
+          variant="outline"
+          onClick={() => onPageChange(currentPage - 1)}
+        >
+          <HugeiconsIcon icon={ArrowLeft01Icon} size={16} strokeWidth={1.8} />
+        </Button>
+
+        {pages.map((page, index) =>
+          page === "ellipsis" ? (
+            <span
+              key={`ellipsis-${index}`}
+              className="px-2 text-sm text-muted-foreground"
             >
-              <Pagination.PreviousIcon />
-            </Pagination.Previous>
-          </Pagination.Item>
-
-          {pages.map((page, index) =>
-            page === "ellipsis" ? (
-              <Pagination.Item key={`ellipsis-${index}`}>
-                <Pagination.Ellipsis />
-              </Pagination.Item>
-            ) : (
-              <Pagination.Item key={page}>
-                <Pagination.Link
-                  isActive={page === currentPage}
-                  onPress={() => onPageChange(page)}
-                >
-                  {page}
-                </Pagination.Link>
-              </Pagination.Item>
-            ),
-          )}
-
-          <Pagination.Item>
-            <Pagination.Next
-              isDisabled={currentPage === totalPages}
-              onPress={() => onPageChange(currentPage + 1)}
+              ...
+            </span>
+          ) : (
+            <Button
+              key={page}
+              className={cn(
+                "min-w-9 rounded-2xl px-0",
+                page === currentPage &&
+                  "bg-primary text-primary-foreground hover:bg-primary/90",
+              )}
+              size="sm"
+              type="button"
+              variant={page === currentPage ? "default" : "outline"}
+              onClick={() => onPageChange(page)}
             >
-              <Pagination.NextIcon />
-            </Pagination.Next>
-          </Pagination.Item>
-        </Pagination.Content>
-      </Pagination>
+              {page}
+            </Button>
+          ),
+        )}
 
-      <span className="justify-self-end whitespace-nowrap text-sm leading-none text-slate-600">
+        <Button
+          disabled={currentPage === totalPages}
+          size="icon-sm"
+          type="button"
+          variant="outline"
+          onClick={() => onPageChange(currentPage + 1)}
+        >
+          <HugeiconsIcon icon={ArrowRight01Icon} size={16} strokeWidth={1.8} />
+        </Button>
+      </div>
+
+      <span className="justify-self-start whitespace-nowrap text-sm leading-none text-muted-foreground md:justify-self-end">
         {t("footer.showing", {
           visibleRowCount,
           totalCount,

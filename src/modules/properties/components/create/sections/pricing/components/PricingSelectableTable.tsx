@@ -1,9 +1,6 @@
 "use client";
 
-import type { Selection } from "@heroui/react";
-
-import * as React from "react";
-import { Description, Table } from "@heroui/react";
+import { cn } from "@/lib/utils";
 
 export type SelectablePriceRow = {
   id: string;
@@ -38,18 +35,13 @@ export function PricingSelectableTable({
   };
   onSelectionChange: (rowId: string) => void;
 }) {
-  const selectedKeys = React.useMemo<Selection>(
-    () => (selectedRowId ? new Set([selectedRowId]) : new Set()),
-    [selectedRowId],
-  );
-
   return (
     <div className="flex flex-col gap-3">
       <div>
-        <h3 className="text-sm font-medium">{title}</h3>
-        <Description className="mt-1 text-xs leading-relaxed">
+        <h3 className="text-sm font-medium text-foreground">{title}</h3>
+        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
           {hint}
-        </Description>
+        </p>
       </div>
 
       {emptyState ? (
@@ -58,41 +50,48 @@ export function PricingSelectableTable({
           title={emptyState.title}
         />
       ) : (
-        <Table>
-          <Table.ScrollContainer>
-            <Table.Content
-              aria-label={tableAriaLabel}
-              selectedKeys={selectedKeys}
-              selectionMode="single"
-              onSelectionChange={(keys) => {
-                if (keys === "all") {
-                  return;
-                }
+        <div className="overflow-hidden rounded-3xl border border-border/70 bg-background/80">
+          <table aria-label={tableAriaLabel} className="w-full border-separate border-spacing-0">
+            <thead className="bg-muted/30">
+              <tr>
+                <th className="border-b border-border/70 px-4 py-3 text-left text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                  {typeColumnLabel}
+                </th>
+                <th className="border-b border-border/70 px-4 py-3 text-right text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                  {amountColumnLabel}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => {
+                const isSelected = row.id === selectedRowId;
 
-                const firstKey = Array.from(keys)[0];
-
-                if (typeof firstKey === "string") {
-                  onSelectionChange(firstKey);
-                }
-              }}
-            >
-              <Table.Header>
-                <Table.Column isRowHeader>{typeColumnLabel}</Table.Column>
-                <Table.Column>{amountColumnLabel}</Table.Column>
-              </Table.Header>
-              <Table.Body items={rows}>
-                {(row) => (
-                  <Table.Row id={row.id}>
-                    <Table.Cell>{row.label}</Table.Cell>
-                    <Table.Cell>
-                      ${formatPrice(row.amount ?? 0, row.suffix)}
-                    </Table.Cell>
-                  </Table.Row>
-                )}
-              </Table.Body>
-            </Table.Content>
-          </Table.ScrollContainer>
-        </Table>
+                return (
+                  <tr key={row.id}>
+                    <td colSpan={2} className="p-0">
+                      <button
+                        aria-pressed={isSelected}
+                        className={cn(
+                          "grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-b border-border/60 px-4 py-3 text-left text-sm transition-colors last:border-b-0",
+                          isSelected
+                            ? "bg-primary/8 text-foreground"
+                            : "bg-transparent text-foreground hover:bg-muted/30",
+                        )}
+                        type="button"
+                        onClick={() => onSelectionChange(row.id)}
+                      >
+                        <span className="font-medium">{row.label}</span>
+                        <span className="text-right tabular-nums text-muted-foreground">
+                          ${formatPrice(row.amount ?? 0, row.suffix)}
+                        </span>
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
@@ -106,11 +105,11 @@ function SurfaceFallback({
   description: string;
 }) {
   return (
-    <div className="rounded-3xl border border-dashed border-default-200 px-5 py-6">
-      <div className="text-sm font-medium text-slate-900">{title}</div>
-      <Description className="mt-1 text-sm leading-relaxed">
+    <div className="rounded-3xl border border-dashed border-border bg-card px-5 py-6">
+      <div className="text-sm font-medium text-foreground">{title}</div>
+      <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
         {description}
-      </Description>
+      </p>
     </div>
   );
 }

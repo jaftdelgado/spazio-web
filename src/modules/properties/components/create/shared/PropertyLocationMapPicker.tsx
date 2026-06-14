@@ -3,7 +3,6 @@
 import * as React from "react";
 import { MapsLocation01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Description } from "@heroui/react";
 import maplibregl from "maplibre-gl";
 import {
   Map,
@@ -113,7 +112,7 @@ export function PropertyLocationMapPicker({
   }, [selectedCoordinates]);
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
       <Map
         ref={mapRef}
         dragRotate={false}
@@ -167,22 +166,22 @@ export function PropertyLocationMapPicker({
           />
         ) : null}
       </Map>
-      <div className="border-t border-slate-200/80 px-4 py-3">
+      <div className="border-t border-border px-4 py-3">
         <div className="flex items-start gap-2">
           <HugeiconsIcon
-            className="mt-0.5 shrink-0 text-muted"
+            className="mt-0.5 shrink-0 text-muted-foreground"
             icon={MapsLocation01Icon}
             size={16}
             strokeWidth={1.8}
           />
-          <Description className="text-xs leading-relaxed">
+          <p className="text-xs leading-relaxed text-muted-foreground">
             {selectedCoordinates
               ? t("create.fields.locationMap.coordinatesSelected", {
                   latitude: selectedCoordinates.latitude.toFixed(6),
                   longitude: selectedCoordinates.longitude.toFixed(6),
                 })
               : t("create.fields.locationMap.loadingLocation")}
-          </Description>
+          </p>
         </div>
       </div>
     </div>

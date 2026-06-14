@@ -1,7 +1,5 @@
 "use client";
 
-import { Description } from "@heroui/react";
-
 import { useServices } from "@services/application/hooks/useServices";
 import {
   CreateFormSection,
@@ -46,7 +44,9 @@ export function ServicesSection({
       title={t("create.sections.services.title")}
     >
       {servicesQuery.isLoading ? (
-        <Description>{t("create.services.loading")}</Description>
+        <p className="text-sm text-muted-foreground">
+          {t("create.services.loading")}
+        </p>
       ) : (
         <div className="flex flex-col gap-6">
           <ServiceTagGroupSection

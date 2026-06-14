@@ -1,19 +1,20 @@
 "use client";
 
-import type { Key } from "@heroui/react";
-
 import * as React from "react";
 import {
-  Autocomplete,
-  EmptyState,
-  Input,
-  Label,
-  ListBox,
-  ListBoxLoadMoreItem,
-  SearchField,
-  Select,
-} from "@heroui/react";
+  Search01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   useCountries,
   useInfiniteCities,
@@ -98,231 +99,189 @@ export function LocationSection({
       </CreateFormField>
 
       <div className="grid gap-5 md:grid-cols-2">
-        <Select
-          fullWidth
+        <CreateFormField
+          htmlFor="property-country"
           isRequired
-          name="property-country"
-          placeholder={t("create.fields.country.placeholder")}
-          selectedKey={selectedCountryKey}
-          onSelectionChange={(key: Key | null) => {
-            const nextCountryId =
-              typeof key === "string" || typeof key === "number"
-                ? Number(key)
-                : null;
-
-            patchForm({
-              countryId: nextCountryId,
-              stateId: null,
-              cityId: null,
-              city: "",
-            });
-            setStateSearch("");
-            setMunicipalitySearch("");
-          }}
+          label={t("create.fields.country.label")}
         >
-          <Label>{t("create.fields.country.label")}</Label>
-          <Select.Trigger>
-            <Select.Value />
-            <Select.Indicator />
-          </Select.Trigger>
-          <Select.Popover>
-            <ListBox>
+          <Select
+            name="property-country"
+            value={selectedCountryKey ?? undefined}
+            onValueChange={(value) => {
+              patchForm({
+                countryId: Number(value),
+                stateId: null,
+                cityId: null,
+                city: "",
+              });
+              setStateSearch("");
+              setMunicipalitySearch("");
+            }}
+          >
+            <SelectTrigger
+              className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] text-foreground shadow-none"
+              id="property-country"
+            >
+              <SelectValue
+                placeholder={t("create.fields.country.placeholder")}
+              />
+            </SelectTrigger>
+            <SelectContent className="max-h-72 rounded-3xl">
               {countriesQuery.isLoading ? (
-                <ListBox.Item id="countries-loading" isDisabled textValue={t("create.fields.country.loading")}>
+                <SelectItem disabled value="countries-loading">
                   {t("create.fields.country.loading")}
-                </ListBox.Item>
+                </SelectItem>
               ) : countries.length > 0 ? (
                 countries.map((country) => (
-                  <ListBox.Item
+                  <SelectItem
                     key={country.countryId}
-                    id={String(country.countryId)}
-                    textValue={country.name}
+                    value={String(country.countryId)}
                   >
                     {country.name}
-                    <ListBox.ItemIndicator />
-                  </ListBox.Item>
+                  </SelectItem>
                 ))
               ) : (
-                <ListBox.Item id="countries-empty" isDisabled textValue={t("create.fields.country.empty")}>
+                <SelectItem disabled value="countries-empty">
                   {t("create.fields.country.empty")}
-                </ListBox.Item>
+                </SelectItem>
               )}
-            </ListBox>
-          </Select.Popover>
-        </Select>
+            </SelectContent>
+          </Select>
+        </CreateFormField>
 
-        <Autocomplete
-          allowsEmptyCollection
-          fullWidth
+        <CreateFormField
+          htmlFor="property-state"
           isRequired
-          isDisabled={!form.countryId || statesQuery.isLoading}
-          isOpen={isStateOpen}
-          name="property-state"
-          placeholder={t("create.fields.state.placeholder")}
-          selectionMode="single"
-          selectedKey={selectedStateKey}
-          onOpenChange={setIsStateOpen}
-          onSelectionChange={(key: Key | null) => {
-            const nextStateId =
-              typeof key === "string" || typeof key === "number"
-                ? Number(key)
-                : null;
-
-            patchForm({
-              stateId: nextStateId,
-              cityId: null,
-              city: "",
-            });
-            setMunicipalitySearch("");
-          }}
+          label={t("create.fields.state.label")}
         >
-          <Label>{t("create.fields.state.label")}</Label>
-          <Autocomplete.Trigger>
-            <Autocomplete.Value />
-            <Autocomplete.ClearButton />
-            <Autocomplete.Indicator />
-          </Autocomplete.Trigger>
-          <Autocomplete.Popover>
-            <Autocomplete.Filter
-              filter={() => true}
-              inputValue={stateSearch}
-              onInputChange={setStateSearch}
+          <Select
+            disabled={!form.countryId || statesQuery.isLoading}
+            name="property-state"
+            open={isStateOpen}
+            value={selectedStateKey ?? undefined}
+            onOpenChange={setIsStateOpen}
+            onValueChange={(value) => {
+              patchForm({
+                stateId: Number(value),
+                cityId: null,
+                city: "",
+              });
+              setMunicipalitySearch("");
+            }}
+          >
+            <SelectTrigger
+              className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] text-foreground shadow-none"
+              id="property-state"
             >
-              <SearchField
-                autoFocus
-                className="sticky top-0 z-10"
-                name="state-search"
-                variant="secondary"
-              >
-                <SearchField.Group>
-                  <SearchField.SearchIcon />
-                  <SearchField.Input
-                    placeholder={t("create.fields.state.searchPlaceholder")}
-                  />
-                  <SearchField.ClearButton />
-                </SearchField.Group>
-              </SearchField>
-              <ListBox
-                className="max-h-72 overflow-y-auto"
-                renderEmptyState={() => (
-                  <EmptyState>
-                    {statesQuery.isLoading
-                      ? t("create.fields.state.loading")
-                      : t("create.fields.state.empty")}
-                  </EmptyState>
-                )}
-              >
-                {states.map((state) => (
-                  <ListBox.Item
+              <SelectValue placeholder={t("create.fields.state.placeholder")} />
+            </SelectTrigger>
+            <SelectContent className="max-h-80 rounded-3xl">
+              <SelectSearchInput
+                placeholder={t("create.fields.state.searchPlaceholder")}
+                value={stateSearch}
+                onChange={setStateSearch}
+              />
+              {states.length > 0 ? (
+                states.map((state) => (
+                  <SelectItem
                     key={state.stateId}
-                    id={String(state.stateId)}
-                    textValue={state.name}
+                    value={String(state.stateId)}
                   >
                     {state.name}
-                    <ListBox.ItemIndicator />
-                  </ListBox.Item>
-                ))}
-              </ListBox>
-            </Autocomplete.Filter>
-          </Autocomplete.Popover>
-        </Autocomplete>
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectEmptyState>
+                  {statesQuery.isLoading
+                    ? t("create.fields.state.loading")
+                    : t("create.fields.state.empty")}
+                </SelectEmptyState>
+              )}
+            </SelectContent>
+          </Select>
+        </CreateFormField>
 
-        <Autocomplete
-          allowsEmptyCollection
-          fullWidth
+        <CreateFormField
+          htmlFor="property-municipality"
           isRequired
-          isDisabled={!form.stateId || isCitiesPending}
-          isOpen={isMunicipalityOpen}
-          name="property-municipality"
-          placeholder={t("create.fields.municipality.placeholder")}
-          selectionMode="single"
-          selectedKey={selectedCityKey}
-          onOpenChange={setIsMunicipalityOpen}
-          onSelectionChange={(key: Key | null) => {
-            const nextCityId =
-              typeof key === "string" || typeof key === "number"
-                ? Number(key)
-                : null;
-            const selectedCity =
-              cities.find((city) => city.cityId === nextCityId) ?? null;
-
-            patchForm({
-              cityId: nextCityId,
-              city: selectedCity?.name ?? "",
-            });
-            setMunicipalitySearch("");
-          }}
+          label={t("create.fields.municipality.label")}
         >
-          <Label>{t("create.fields.municipality.label")}</Label>
-          <Autocomplete.Trigger>
-            <Autocomplete.Value />
-            <Autocomplete.ClearButton />
-            <Autocomplete.Indicator />
-          </Autocomplete.Trigger>
-          <Autocomplete.Popover>
-            <Autocomplete.Filter
-              filter={() => true}
-              inputValue={municipalitySearch}
-              onInputChange={setMunicipalitySearch}
+          <Select
+            disabled={!form.stateId || isCitiesPending}
+            name="property-municipality"
+            open={isMunicipalityOpen}
+            value={selectedCityKey ?? undefined}
+            onOpenChange={setIsMunicipalityOpen}
+            onValueChange={(value) => {
+              const nextCityId = Number(value);
+              const selectedCity =
+                cities.find((city) => city.cityId === nextCityId) ?? null;
+
+              patchForm({
+                cityId: nextCityId,
+                city: selectedCity?.name ?? "",
+              });
+              setMunicipalitySearch("");
+            }}
+          >
+            <SelectTrigger
+              className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] text-foreground shadow-none"
+              id="property-municipality"
             >
-              <SearchField
-                autoFocus
-                className="sticky top-0 z-10"
-                name="municipality-search"
-                variant="secondary"
-              >
-                <SearchField.Group>
-                  <SearchField.SearchIcon />
-                  <SearchField.Input
-                    placeholder={t("create.fields.municipality.searchPlaceholder")}
-                  />
-                  <SearchField.ClearButton />
-                </SearchField.Group>
-              </SearchField>
-              <ListBox
-                className="max-h-72 overflow-y-auto"
-                renderEmptyState={() => (
-                  <EmptyState>
-                    {isCitiesPending
-                      ? t("create.fields.municipality.loading")
-                      : municipalitySearch.trim() !== "" &&
-                          isFetchingNextPage &&
-                          hasNextPage
-                        ? t("create.fields.municipality.searching")
-                      : t("create.fields.municipality.empty")}
-                  </EmptyState>
-                )}
-              >
-                {cities.map((city) => (
-                  <ListBox.Item
+              <SelectValue
+                placeholder={t("create.fields.municipality.placeholder")}
+              />
+            </SelectTrigger>
+            <SelectContent className="max-h-80 rounded-3xl">
+              <SelectSearchInput
+                placeholder={t("create.fields.municipality.searchPlaceholder")}
+                value={municipalitySearch}
+                onChange={setMunicipalitySearch}
+              />
+              {cities.length > 0 ? (
+                cities.map((city) => (
+                  <SelectItem
                     key={city.cityId}
-                    id={String(city.cityId)}
-                    textValue={city.name}
+                    value={String(city.cityId)}
                   >
                     {city.name}
-                    <ListBox.ItemIndicator />
-                  </ListBox.Item>
-                ))}
-                {hasNextPage ? (
-                  <ListBoxLoadMoreItem
-                    isLoading={isFetchingNextPage}
-                    onLoadMore={fetchNextPage}
-                  >
-                    <div className="px-3 py-2 text-center text-sm text-muted">
-                      {t("create.fields.municipality.loadingMore")}
-                    </div>
-                  </ListBoxLoadMoreItem>
-                ) : null}
-              </ListBox>
-            </Autocomplete.Filter>
-          </Autocomplete.Popover>
-        </Autocomplete>
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectEmptyState>
+                  {isCitiesPending
+                    ? t("create.fields.municipality.loading")
+                    : municipalitySearch.trim() !== "" &&
+                        isFetchingNextPage &&
+                        hasNextPage
+                      ? t("create.fields.municipality.searching")
+                      : t("create.fields.municipality.empty")}
+                </SelectEmptyState>
+              )}
+              {hasNextPage ? (
+                <button
+                  className="mt-1 w-full rounded-2xl px-3 py-2 text-center text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
+                  disabled={isFetchingNextPage}
+                  type="button"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    void fetchNextPage();
+                  }}
+                  onKeyDown={(event) => event.stopPropagation()}
+                >
+                  {t("create.fields.municipality.loadingMore")}
+                </button>
+              ) : null}
+            </SelectContent>
+          </Select>
+        </CreateFormField>
 
         <CreateFormField
           htmlFor="property-neighborhood"
           label={t("create.fields.neighborhood.label")}
         >
           <Input
+            className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
             id="property-neighborhood"
             placeholder={t("create.fields.neighborhood.placeholder")}
             value={form.neighborhood}
@@ -337,6 +296,7 @@ export function LocationSection({
           label={t("create.fields.street.label")}
         >
           <Input
+            className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
             id="property-street"
             placeholder={t("create.fields.street.placeholder")}
             value={form.street}
@@ -349,6 +309,7 @@ export function LocationSection({
           label={t("create.fields.exteriorNumber.label")}
         >
           <Input
+            className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
             id="property-exterior"
             placeholder={t("create.fields.exteriorNumber.placeholder")}
             value={form.exteriorNumber}
@@ -363,6 +324,7 @@ export function LocationSection({
           label={t("create.fields.postalCode.label")}
         >
           <Input
+            className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
             id="property-postal-code"
             placeholder={t("create.fields.postalCode.placeholder")}
             value={form.postalCode}
@@ -371,5 +333,43 @@ export function LocationSection({
         </CreateFormField>
       </div>
     </CreateFormSection>
+  );
+}
+
+function SelectSearchInput({
+  placeholder,
+  value,
+  onChange,
+}: {
+  placeholder: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="sticky top-0 z-10 bg-popover p-1">
+      <div className="relative">
+        <HugeiconsIcon
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+          icon={Search01Icon}
+          size={16}
+          strokeWidth={1.8}
+        />
+        <Input
+          className="h-10 rounded-2xl border-input bg-background pl-9 text-sm shadow-none"
+          placeholder={placeholder}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          onKeyDown={(event) => event.stopPropagation()}
+        />
+      </div>
+    </div>
+  );
+}
+
+function SelectEmptyState({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="px-3 py-6 text-center text-sm text-muted-foreground">
+      {children}
+    </div>
   );
 }

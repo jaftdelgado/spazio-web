@@ -1,7 +1,5 @@
 "use client";
 
-import { TextArea } from "@heroui/react";
-
 import {
   CreateFormField,
   CreateFormSection,
@@ -27,8 +25,8 @@ export function NotesSection({
         htmlFor="property-internal-notes"
         label={t("create.fields.internalNotes.label")}
       >
-        <TextArea
-          fullWidth
+        <textarea
+          className="min-h-44 w-full resize-none rounded-3xl border border-input bg-background px-4 py-3 text-[15px] outline-none transition-[color,box-shadow,border-color] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
           id="property-internal-notes"
           placeholder={t("create.fields.internalNotes.placeholder")}
           rows={8}

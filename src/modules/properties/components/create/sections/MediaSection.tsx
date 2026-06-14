@@ -2,8 +2,9 @@
 
 import { ImageUploadIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button, Description, Input } from "@heroui/react";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   CreateFormField,
   CreateFormSection,
@@ -31,7 +32,7 @@ export function MediaSection({
         label={t("create.fields.mediaLabel.label")}
       >
         <Input
-          fullWidth
+          className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
           id="property-media-label"
           placeholder={t("create.fields.mediaLabel.placeholder")}
           value={form.mediaLabel}
@@ -40,13 +41,13 @@ export function MediaSection({
       </CreateFormField>
 
       <div className="flex items-center gap-3">
-        <Button size="sm" variant="secondary">
+        <Button size="sm" type="button" variant="secondary">
           <HugeiconsIcon icon={ImageUploadIcon} size={16} strokeWidth={1.8} />
           {t("create.fields.mediaUpload.action")}
         </Button>
-        <Description className="text-xs">
+        <p className="text-xs text-muted-foreground">
           {t("create.fields.mediaUpload.hint")}
-        </Description>
+        </p>
       </div>
     </CreateFormSection>
   );

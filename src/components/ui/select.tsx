@@ -3,7 +3,6 @@
 import * as React from "react";
 import {
   ArrowDown01Icon,
-  ArrowUp01Icon,
   CheckmarkCircle02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -35,12 +34,12 @@ function SelectTrigger({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger>) {
   return (
-    <SelectPrimitive.Trigger
-      data-slot="select-trigger"
-      className={cn(
-        "inline-flex h-9 w-full items-center justify-between gap-2 rounded-4xl border border-border bg-background px-3 text-sm whitespace-nowrap shadow-xs outline-none transition-[color,box-shadow,background-color] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50 data-placeholder:text-muted-foreground",
-        className,
-      )}
+      <SelectPrimitive.Trigger
+        data-slot="select-trigger"
+        className={cn(
+          "inline-flex h-9 w-full items-center justify-between gap-2 rounded-4xl border border-border bg-background px-3 text-sm whitespace-nowrap text-foreground shadow-xs outline-none transition-[color,box-shadow,background-color] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50 data-placeholder:text-muted-foreground",
+          className,
+        )}
       {...props}
     >
       {children}
@@ -74,7 +73,6 @@ function SelectContent({
         )}
         {...props}
       >
-        <SelectScrollUpButton />
         <SelectPrimitive.Viewport
           className={cn(
             "p-1",
@@ -84,7 +82,6 @@ function SelectContent({
         >
           {children}
         </SelectPrimitive.Viewport>
-        <SelectScrollDownButton />
       </SelectPrimitive.Content>
     </SelectPrimitive.Portal>
   );
@@ -143,50 +140,12 @@ function SelectSeparator({
   );
 }
 
-function SelectScrollUpButton({
-  className,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.ScrollUpButton>) {
-  return (
-    <SelectPrimitive.ScrollUpButton
-      data-slot="select-scroll-up-button"
-      className={cn(
-        "z-10 flex cursor-default items-center justify-center bg-popover py-1",
-        className,
-      )}
-      {...props}
-    >
-      <HugeiconsIcon icon={ArrowUp01Icon} size={16} />
-    </SelectPrimitive.ScrollUpButton>
-  );
-}
-
-function SelectScrollDownButton({
-  className,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.ScrollDownButton>) {
-  return (
-    <SelectPrimitive.ScrollDownButton
-      data-slot="select-scroll-down-button"
-      className={cn(
-        "z-10 flex cursor-default items-center justify-center bg-popover py-1",
-        className,
-      )}
-      {...props}
-    >
-      <HugeiconsIcon icon={ArrowDown01Icon} size={16} />
-    </SelectPrimitive.ScrollDownButton>
-  );
-}
-
 export {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
   SelectLabel,
-  SelectScrollDownButton,
-  SelectScrollUpButton,
   SelectSeparator,
   SelectTrigger,
   SelectValue,

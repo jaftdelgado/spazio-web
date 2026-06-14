@@ -13,10 +13,21 @@ import {
   Settings02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
-import { AlertDialog, Button, Description } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/config/routes";
+import { cn } from "@/lib/utils";
 import { GeneralSection } from "@properties/components/create/sections/GeneralSection";
 import { LocationSection } from "@properties/components/create/sections/LocationSection";
 import { MediaSection } from "@properties/components/create/sections/MediaSection";
@@ -46,10 +57,6 @@ const createNavItems: readonly PropertyCreateNavItem[] = [
   { id: "settings", icon: Settings02Icon, labelKey: "create.nav.settings" },
   { id: "notes", icon: NoteIcon, labelKey: "create.nav.notes" },
 ] as const;
-
-function cn(...values: Array<string | false | null | undefined>) {
-  return values.filter(Boolean).join(" ");
-}
 
 export function PropertyCreatePageContent() {
   const { t } = usePropertiesTranslation();
@@ -94,13 +101,13 @@ export function PropertyCreatePageContent() {
   }
 
   return (
-    <div className="admin-page-view flex min-h-full flex-col">
-      <div className="grid w-full gap-8 xl:grid-cols-[220px_minmax(0,1fr)]">
-        <aside className="xl:border-r xl:border-slate-200/80 xl:py-8 xl:pr-6">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-slate-500">
+    <div className="admin-page-view flex min-h-full flex-col bg-background text-foreground">
+      <div className="grid w-full gap-8 xl:grid-cols-[230px_minmax(0,1fr)]">
+        <aside className="xl:border-r xl:border-border xl:py-8 xl:pr-6">
+          <div className="text-[11px] font-medium uppercase tracking-[0.24em] text-muted-foreground">
             {t("create.sidebar.eyebrow")}
           </div>
-          <div className="mt-1 truncate text-lg font-semibold text-slate-950">
+          <div className="mt-1 truncate text-lg font-semibold tracking-tight text-foreground">
             {form.title || t("create.page.title")}
           </div>
 
@@ -112,12 +119,12 @@ export function PropertyCreatePageContent() {
                 <li key={id}>
                   <Button
                     className={cn(
-                      "h-9 w-full justify-start rounded-md px-2.5 text-sm",
+                      "h-10 w-full justify-start rounded-2xl px-3 text-sm",
                       isActive
-                        ? "bg-foreground/[0.06] text-foreground"
-                        : "text-muted hover:bg-foreground/[0.03] hover:text-foreground",
+                        ? "bg-primary/10 text-primary hover:bg-primary/15 dark:bg-primary/20"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
                     )}
-                    onPress={() => setActiveSection(id)}
+                    onClick={() => setActiveSection(id)}
                     variant="ghost"
                   >
                     <HugeiconsIcon
@@ -135,24 +142,25 @@ export function PropertyCreatePageContent() {
         </aside>
 
         <main className="min-w-0 py-8 xl:px-4">
-          <header className="flex flex-col gap-4 border-b border-slate-200/80 pb-6 md:flex-row md:items-start md:justify-between">
+          <header className="flex flex-col gap-4 border-b border-border pb-6 md:flex-row md:items-start md:justify-between">
             <div>
-              <h1 className="text-2xl font-semibold text-slate-950">
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground">
                 {activeNav ? t(activeNav.labelKey) : t("create.page.title")}
               </h1>
-              <Description className="mt-1 text-sm">
+              <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
                 {t(`create.sectionDescriptions.${activeSection}`)}
-              </Description>
+              </p>
             </div>
 
             <div className="flex items-center gap-2">
               <Button
-                variant="secondary"
-                onPress={() => setIsCancelDialogOpen(true)}
+                type="button"
+                variant="outline"
+                onClick={() => setIsCancelDialogOpen(true)}
               >
                 {t("create.footer.cancel")}
               </Button>
-              <Button isDisabled={!isDirty}>
+              <Button disabled={!isDirty} type="button">
                 <HugeiconsIcon
                   icon={SaveIcon}
                   size={16}
@@ -167,43 +175,36 @@ export function PropertyCreatePageContent() {
         </main>
       </div>
 
-      <AlertDialog.Backdrop
-        isOpen={isCancelDialogOpen}
+      <AlertDialog
+        open={isCancelDialogOpen}
         onOpenChange={setIsCancelDialogOpen}
       >
-        <AlertDialog.Container>
-          <AlertDialog.Dialog className="sm:max-w-105">
-            <AlertDialog.CloseTrigger />
-            <AlertDialog.Header>
-              <AlertDialog.Icon status="warning">
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="mb-2 flex size-10 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
                 <HugeiconsIcon
                   icon={Cancel01Icon}
                   size={20}
                   strokeWidth={1.8}
                 />
-              </AlertDialog.Icon>
-              <AlertDialog.Heading>
-                {t("create.cancelDialog.title")}
-              </AlertDialog.Heading>
-            </AlertDialog.Header>
-            <AlertDialog.Body>
-              <p>{t("create.cancelDialog.body")}</p>
-            </AlertDialog.Body>
-            <AlertDialog.Footer>
-              <Button slot="close" variant="tertiary">
-                {t("create.cancelDialog.dismiss")}
-              </Button>
-              <Button
-                slot="close"
-                variant="secondary"
-                onPress={() => router.push(ROUTES.admin.properties)}
-              >
-                {t("create.cancelDialog.confirm")}
-              </Button>
-            </AlertDialog.Footer>
-          </AlertDialog.Dialog>
-        </AlertDialog.Container>
-      </AlertDialog.Backdrop>
+            </div>
+            <AlertDialogTitle>{t("create.cancelDialog.title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("create.cancelDialog.body")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              {t("create.cancelDialog.dismiss")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => router.push(ROUTES.admin.properties)}
+            >
+              {t("create.cancelDialog.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -1,9 +1,9 @@
 "use client";
 
-import { Description, Label, Radio, RadioGroup, Skeleton } from "@heroui/react";
-
+import { Skeleton } from "@/components/ui/skeleton";
 import { useModalities } from "@catalogs/application/hooks/useCatalogs";
 import type { Modality } from "@catalogs/domain/catalog.entity";
+import { cn } from "@/lib/utils";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 
 function getModalityTranslationKey(modality: Modality) {
@@ -71,12 +71,11 @@ export function PropertyModalityRadioGroup({
       ) : null}
 
       {!modalitiesQuery.isLoading ? (
-        <RadioGroup
+        <div
           aria-label={t("create.sections.modality.label")}
           id="property-modality-radio-group"
-          orientation="vertical"
-          value={selectedModalityId ? String(selectedModalityId) : undefined}
-          onChange={(value) => onChange(Number(value))}
+          className="grid gap-3"
+          role="radiogroup"
         >
           {modalities.map((modality) => {
             const translationKey = getModalityTranslationKey(modality);
@@ -87,29 +86,51 @@ export function PropertyModalityRadioGroup({
               : modality.name;
 
             return (
-              <Radio
+              <button
                 key={modality.modalityId}
-                value={String(modality.modalityId)}
+                aria-checked={selectedModalityId === modality.modalityId}
+                className={cn(
+                  "flex items-start gap-3 rounded-2xl border px-4 py-3 text-left transition-colors",
+                  selectedModalityId === modality.modalityId
+                    ? "border-primary bg-primary/10 ring-3 ring-primary/15"
+                    : "border-border bg-card hover:bg-muted/50",
+                )}
+                role="radio"
+                type="button"
+                onClick={() => onChange(modality.modalityId)}
               >
-                <Radio.Control>
-                  <Radio.Indicator />
-                </Radio.Control>
-                <Radio.Content>
-                  <Label>{label}</Label>
-                  {descriptionKey ? (
-                    <Description>{t(descriptionKey)}</Description>
+                <span
+                  className={cn(
+                    "mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border",
+                    selectedModalityId === modality.modalityId
+                      ? "border-primary"
+                      : "border-muted-foreground/40",
+                  )}
+                >
+                  {selectedModalityId === modality.modalityId ? (
+                    <span className="size-2 rounded-full bg-primary" />
                   ) : null}
-                </Radio.Content>
-              </Radio>
+                </span>
+                <span className="grid gap-1">
+                  <span className="text-sm font-medium leading-none text-foreground">
+                    {label}
+                  </span>
+                  {descriptionKey ? (
+                    <span className="text-sm leading-5 text-muted-foreground">
+                      {t(descriptionKey)}
+                    </span>
+                  ) : null}
+                </span>
+              </button>
             );
           })}
-        </RadioGroup>
+        </div>
       ) : null}
 
       {modalitiesQuery.isError ? (
-        <Description className="text-xs text-danger">
+        <p className="text-xs text-destructive">
           {t("create.sections.modality.error")}
-        </Description>
+        </p>
       ) : null}
     </div>
   );

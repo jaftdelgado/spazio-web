@@ -2,7 +2,17 @@
 
 import { Delete04Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { AlertDialog, Button, toast } from "@heroui/react";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 
 type PropertyDeleteAlertDialogProps = {
@@ -19,46 +29,31 @@ export function PropertyDeleteAlertDialog({
   const { t } = usePropertiesTranslation();
 
   return (
-    <AlertDialog.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialog.Container>
-        <AlertDialog.Dialog className="sm:max-w-105">
-          <AlertDialog.CloseTrigger />
-          <AlertDialog.Header>
-            <AlertDialog.Icon status="danger">
-              <HugeiconsIcon icon={Delete04Icon} size={20} strokeWidth={1.8} />
-            </AlertDialog.Icon>
-            <AlertDialog.Heading>{t("deleteDialog.title")}</AlertDialog.Heading>
-          </AlertDialog.Header>
-          <AlertDialog.Body>
+    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <div className="mb-2 flex size-10 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
+            <HugeiconsIcon icon={Delete04Icon} size={20} strokeWidth={1.8} />
+          </div>
+          <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
+          <AlertDialogDescription>
             {propertyTitle ? (
-              <p>
+              <>
                 {t("deleteDialog.bodyPrefix")} <strong>{propertyTitle}</strong>{" "}
                 {t("deleteDialog.bodySuffix")}
-              </p>
+              </>
             ) : (
-              <p>{t("deleteDialog.bodyWithoutTitle")}</p>
+              t("deleteDialog.bodyWithoutTitle")
             )}
-          </AlertDialog.Body>
-          <AlertDialog.Footer>
-            <Button slot="close" variant="tertiary">
-              {t("deleteDialog.cancel")}
-            </Button>
-            <Button
-              slot="close"
-              variant="danger"
-              onPress={() => {
-                toast.success(t("deleteDialog.successTitle"), {
-                  description: propertyTitle
-                    ? t("deleteDialog.successDescription", { propertyTitle })
-                    : t("deleteDialog.successDescriptionFallback"),
-                });
-              }}
-            >
-              {t("deleteDialog.confirm")}
-            </Button>
-          </AlertDialog.Footer>
-        </AlertDialog.Dialog>
-      </AlertDialog.Container>
-    </AlertDialog.Backdrop>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{t("deleteDialog.cancel")}</AlertDialogCancel>
+          <AlertDialogAction className="bg-destructive text-white hover:bg-destructive/90">
+            {t("deleteDialog.confirm")}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
