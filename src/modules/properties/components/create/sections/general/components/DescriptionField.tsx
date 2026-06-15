@@ -1,8 +1,7 @@
 "use client";
 
-import {
-  CreateFormField,
-} from "@properties/components/create/shared/CreateFormPrimitives";
+import { Textarea } from "@/components/ui/textarea";
+import { CreateFormField } from "@properties/components/create/shared/CreateFormPrimitives";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 
 type DescriptionFieldProps = {
@@ -12,10 +11,7 @@ type DescriptionFieldProps = {
 
 const DESCRIPTION_CHARACTER_LIMIT = 500;
 
-export function DescriptionField({
-  value,
-  onChange,
-}: DescriptionFieldProps) {
+export function DescriptionField({ value, onChange }: DescriptionFieldProps) {
   const { t } = usePropertiesTranslation();
 
   return (
@@ -23,9 +19,9 @@ export function DescriptionField({
       htmlFor="property-description"
       label={t("create.sections.description.label")}
     >
-      <div className="overflow-hidden rounded-3xl border border-input bg-background focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/30">
-        <textarea
-          className="min-h-36 w-full resize-none bg-transparent px-4 py-3 text-[15px] outline-none placeholder:text-muted-foreground"
+      <div className="overflow-hidden rounded-3xl border border-input focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/30">
+        <Textarea
+          className="min-h-36 rounded-none border-0 bg-transparent px-4 py-3 text-[15px] shadow-none focus-visible:ring-0"
           id="property-description"
           maxLength={DESCRIPTION_CHARACTER_LIMIT}
           placeholder={t("create.sections.description.placeholder")}

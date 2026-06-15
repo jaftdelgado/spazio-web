@@ -21,6 +21,14 @@ import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslat
 import { SelectEmptyState } from "./SelectEmptyState";
 import { SelectSearchInput } from "./SelectSearchInput";
 
+function sanitizePostalCode(value: string) {
+  return value.replace(/\D/g, "").slice(0, 5);
+}
+
+function sanitizeExteriorInterior(value: string) {
+  return value.replace(/[^A-Za-z0-9#-]/g, "").slice(0, 8);
+}
+
 type AddressSubsectionProps = {
   cities: { cityId: number; name: string }[];
   countries: { countryId: number; name: string }[];
@@ -254,24 +262,33 @@ export function AddressSubsection({
 
         <CreateFormField
           htmlFor="property-postal-code"
+          isRequired
           label={t("create.fields.postalCode.label")}
         >
           <Input
             className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
             id="property-postal-code"
+            inputMode="numeric"
+            maxLength={5}
             placeholder={t("create.fields.postalCode.placeholder")}
             value={form.postalCode}
-            onChange={(event) => patchForm({ postalCode: event.target.value })}
+            onChange={(event) =>
+              patchForm({
+                postalCode: sanitizePostalCode(event.target.value),
+              })
+            }
           />
         </CreateFormField>
 
         <CreateFormField
           htmlFor="property-neighborhood"
+          isRequired
           label={t("create.fields.neighborhood.label")}
         >
           <Input
             className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
             id="property-neighborhood"
+            maxLength={60}
             placeholder={t("create.fields.neighborhood.placeholder")}
             value={form.neighborhood}
             onChange={(event) =>
@@ -282,11 +299,13 @@ export function AddressSubsection({
 
         <CreateFormField
           htmlFor="property-street"
+          isRequired
           label={t("create.fields.street.label")}
         >
           <Input
             className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
             id="property-street"
+            maxLength={120}
             placeholder={t("create.fields.street.placeholder")}
             value={form.street}
             onChange={(event) => patchForm({ street: event.target.value })}
@@ -295,15 +314,19 @@ export function AddressSubsection({
 
         <CreateFormField
           htmlFor="property-exterior"
+          isRequired
           label={t("create.fields.exteriorNumber.label")}
         >
           <Input
             className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
             id="property-exterior"
+            maxLength={8}
             placeholder={t("create.fields.exteriorNumber.placeholder")}
             value={form.exteriorNumber}
             onChange={(event) =>
-              patchForm({ exteriorNumber: event.target.value })
+              patchForm({
+                exteriorNumber: sanitizeExteriorInterior(event.target.value),
+              })
             }
           />
         </CreateFormField>
@@ -315,10 +338,13 @@ export function AddressSubsection({
           <Input
             className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
             id="property-interior"
+            maxLength={8}
             placeholder={t("create.fields.interiorNumber.placeholder")}
             value={form.interiorNumber}
             onChange={(event) =>
-              patchForm({ interiorNumber: event.target.value })
+              patchForm({
+                interiorNumber: sanitizeExteriorInterior(event.target.value),
+              })
             }
           />
         </CreateFormField>

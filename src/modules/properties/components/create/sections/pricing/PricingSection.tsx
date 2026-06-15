@@ -16,31 +16,15 @@ import {
   type SelectablePriceRow,
 } from "./components/PricingSelectableTable";
 import { PricingEditor } from "./components/PricingEditor";
+import { resolvePricingMode } from "./pricingSection.schema";
 
 type PriceOption = {
   id: string;
   kind: "sale" | "rent";
   label: string;
   periodId?: number;
+  enabled: boolean;
 };
-
-function resolvePricingMode(modalityName?: string | null) {
-  const normalizedName = modalityName?.trim().toLowerCase() ?? "";
-
-  if (normalizedName === "sale" || normalizedName === "venta") {
-    return "sale";
-  }
-
-  if (normalizedName === "rent" || normalizedName === "renta") {
-    return "rent";
-  }
-
-  if (normalizedName === "mixed" || normalizedName === "mixta") {
-    return "mixed";
-  }
-
-  return null;
-}
 
 export function PricingSection({
   form,
@@ -108,6 +92,7 @@ export function PricingSection({
     if (pricingMode === "sale" || pricingMode === "mixed") {
       options.push({
         id: "sale",
+        enabled: true,
         kind: "sale",
         label: t("create.fields.salePrice.label"),
       });
@@ -117,6 +102,7 @@ export function PricingSection({
       for (const rentPeriod of rentPeriods) {
         options.push({
           id: `rent-${rentPeriod.periodId}`,
+          enabled: form.enabledRentPeriodIds.includes(rentPeriod.periodId),
           kind: "rent",
           label: `${t("create.fields.rentPrice.prefix")} ${rentPeriodLabel(rentPeriod.name).toLowerCase()}`,
           periodId: rentPeriod.periodId,
@@ -125,7 +111,7 @@ export function PricingSection({
     }
 
     return options;
-  }, [pricingMode, rentPeriodLabel, rentPeriods, t]);
+  }, [form.enabledRentPeriodIds, pricingMode, rentPeriodLabel, rentPeriods, t]);
 
   const resolvedPriceOptionId =
     selectedPriceOptionId &&
@@ -136,7 +122,7 @@ export function PricingSection({
   const getPriceSuffix = React.useCallback(
     (option: Pick<PriceOption, "kind" | "label">) =>
       option.kind === "sale"
-        ? " MXN"
+        ? "MXN"
         : ` MXN / ${option.label
             .replace(/^.*?\s/, "")
             .toLowerCase()
@@ -158,7 +144,9 @@ export function PricingSection({
             : ((form.rentPricesByPeriod[String(option.periodId)] ?? "").trim() === ""
                 ? null
                 : Number(form.rentPricesByPeriod[String(option.periodId)])),
+        enabled: option.enabled,
         suffix: getPriceSuffix(option),
+        toggleDisabled: option.kind === "sale",
       })),
     [form.rentPricesByPeriod, form.salePrice, getPriceSuffix, priceOptions],
   );
@@ -166,7 +154,7 @@ export function PricingSection({
   const formatPrice = React.useCallback(
     (amount: number, suffix: string) =>
       new Intl.NumberFormat(numberFlowLocale, {
-        maximumFractionDigits: 0,
+        maximumFractionDigits: 2,
         useGrouping: true,
       }).format(amount) + suffix,
     [numberFlowLocale],
@@ -250,6 +238,23 @@ export function PricingSection({
     [form.rentPricesByPeriod, patchForm, selectedPriceOption],
   );
 
+  const handleTogglePriceOption = React.useCallback(
+    (rowId: string, enabled: boolean) => {
+      const option = priceOptions.find((current) => current.id === rowId);
+
+      if (!option || option.kind !== "rent" || option.periodId === undefined) {
+        return;
+      }
+
+      const nextEnabledPeriodIds = enabled
+        ? Array.from(new Set([...form.enabledRentPeriodIds, option.periodId]))
+        : form.enabledRentPeriodIds.filter((periodId) => periodId !== option.periodId);
+
+      patchForm({ enabledRentPeriodIds: nextEnabledPeriodIds });
+    },
+    [form.enabledRentPeriodIds, patchForm, priceOptions],
+  );
+
   return (
     <>
       <CreateFormSection
@@ -259,14 +264,21 @@ export function PricingSection({
         <PricingEditor
           emptyState={pricingEmptyState ?? undefined}
           fieldId={selectedFieldId}
-          hint={t("create.pricing.inputHint")}
           label={selectedPriceOption?.label ?? t("create.fields.salePrice.label")}
           locale={numberFlowLocale}
+          maxIntegerDigits={selectedPriceOption?.kind === "sale" ? 9 : 8}
+          isNegotiable={form.salePriceIsNegotiable}
+          negotiableDescription={t("create.pricing.negotiableDescription")}
+          negotiableLabel={t("create.pricing.negotiableLabel")}
+          showNegotiable={selectedPriceOption?.kind === "sale"}
           suffix={
-            selectedPriceOption ? getPriceSuffix(selectedPriceOption) : " MXN"
+            selectedPriceOption ? getPriceSuffix(selectedPriceOption).trim() : "MXN"
           }
           value={selectedPriceValue}
           onChange={handleSelectedPriceChange}
+          onNegotiableChange={(salePriceIsNegotiable) =>
+            patchForm({ salePriceIsNegotiable })
+          }
         />
       </CreateFormSection>
 
@@ -275,6 +287,7 @@ export function PricingSection({
         title={t("create.pricing.registeredTitle")}
       >
         <PricingSelectableTable
+          activeColumnLabel={t("create.pricing.tableActiveColumn")}
           amountColumnLabel={t("create.pricing.tableAmountColumn")}
           emptyState={pricingEmptyState ?? undefined}
           formatPrice={formatPrice}
@@ -283,6 +296,7 @@ export function PricingSection({
           tableAriaLabel={t("create.pricing.tableAriaLabel")}
           typeColumnLabel={t("create.pricing.tableTypeColumn")}
           onSelectionChange={setSelectedPriceOptionId}
+          onToggleRow={handleTogglePriceOption}
         />
       </CreateFormSection>
     </>

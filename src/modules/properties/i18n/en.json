@@ -222,17 +222,19 @@
       "loadingDescription": "We are fetching the allowed rent types for this property.",
       "noPeriodsTitle": "No rent periods available",
       "noPeriodsDescription": "We could not find configured rent periods for the selected property type.",
-      "inputHint": "Only the prices you actually fill in will be sent.",
       "selectorTitle": "Price types",
       "selectorHint": "Click a row to choose which amount you want to edit.",
       "registeredTitle": "Registered prices",
       "registeredHint": "Summary of the amounts captured so far for this property.",
       "tableAriaLabel": "Registered prices for the property",
+      "tableActiveColumn": "Active",
       "tableTypeColumn": "Price type",
       "tableAmountColumn": "Amount",
       "tableEmpty": "You have not entered prices for this property yet.",
       "previewLabel": "Preview",
       "editorHint": "Edit the amount for the price type that is currently selected.",
+      "negotiableLabel": "Negotiable price",
+      "negotiableDescription": "Enable this option if the sale price can be negotiated.",
       "salePreviewHint": "This amount will be sent as the sale price if you keep a value in this tab.",
       "rentPreviewHint": "This amount will be sent only for this rent period if you leave a captured value."
     },
@@ -273,10 +275,42 @@
       "errorSize": "Some files exceed the {{maxMb}} MB limit.",
       "errorMax": "You can only add {{max}} photos in total."
     },
+    "validation": {
+      "general": {
+        "titleRequired": "Title is required.",
+        "titleMaxLength": "Title cannot exceed 128 characters.",
+        "propertyTypeRequired": "Select a property type.",
+        "modalityRequired": "Select a modality."
+      },
+      "location": {
+        "countryRequired": "Select a country.",
+        "stateRequired": "Select a state.",
+        "cityRequired": "Select a municipality.",
+        "postalCodeRequired": "Postal code is required.",
+        "postalCodeInvalid": "Postal code must be numeric and cannot exceed 5 digits.",
+        "neighborhoodRequired": "Neighborhood is required.",
+        "neighborhoodMaxLength": "Neighborhood cannot exceed 60 characters.",
+        "streetRequired": "Street is required.",
+        "streetMaxLength": "Street cannot exceed 120 characters.",
+        "exteriorNumberRequired": "Exterior number is required.",
+        "exteriorNumberInvalid": "Exterior number only allows letters, numbers, hyphen, and #, with a maximum of 8 characters.",
+        "interiorNumberInvalid": "Interior number only allows letters, numbers, hyphen, and #, with a maximum of 8 characters.",
+        "lotAreaRequired": "Lot area is required.",
+        "lotAreaInvalid": "Lot area must be a valid numeric value.",
+        "orientationRequired": "Select an orientation."
+      },
+      "pricing": {
+        "salePriceRequired": "Sale price is required.",
+        "rentPeriodRequired": "Enable at least one rent period.",
+        "rentPriceRequired": "All enabled rent periods must have a price."
+      }
+    },
     "footer": {
       "dirty": "Unsaved changes",
       "clean": "No changes",
       "discard": "Discard",
+      "previous": "Previous",
+      "next": "Next",
       "cancel": "Back",
       "save": "Save"
     },
@@ -285,6 +319,12 @@
       "body": "If you leave now, you will lose the unsaved changes for this property.",
       "dismiss": "Keep editing",
       "confirm": "Yes, cancel"
+    },
+    "servicesEmptyDialog": {
+      "title": "Continue without services",
+      "body": "You have not selected amenities or services for this property yet. Showing them on the public listing helps the property look more complete, attractive, and easier for users to compare. You can continue without them if you prefer to add them later.",
+      "dismiss": "Back to services",
+      "confirm": "Continue without services"
     }
   },
   "searchPlaceholder": "Search properties...",

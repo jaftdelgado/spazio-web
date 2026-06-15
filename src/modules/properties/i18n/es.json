@@ -219,17 +219,19 @@
       "loadingDescription": "Estamos consultando los tipos de renta permitidos para esta propiedad.",
       "noPeriodsTitle": "No hay periodos de renta disponibles",
       "noPeriodsDescription": "No encontramos periodos configurados para el tipo de propiedad seleccionado.",
-      "inputHint": "Solo se enviarán los precios que realmente captures.",
       "selectorTitle": "Tipos de precio",
       "selectorHint": "Haz clic en una fila para elegir el monto que quieres editar.",
       "registeredTitle": "Precios registrados",
       "registeredHint": "Resumen de los montos capturados hasta ahora para esta propiedad.",
       "tableAriaLabel": "Precios registrados para la propiedad",
+      "tableActiveColumn": "Activo",
       "tableTypeColumn": "Tipo de precio",
       "tableAmountColumn": "Monto",
       "tableEmpty": "Aun no has capturado precios para esta propiedad.",
       "previewLabel": "Vista previa",
       "editorHint": "Edita el monto del tipo de precio que tengas seleccionado actualmente.",
+      "negotiableLabel": "Precio negociable",
+      "negotiableDescription": "Activa esta opción si el precio de venta puede negociarse.",
       "salePreviewHint": "Este monto se enviará como precio de venta si mantienes esta pestaña con valor.",
       "rentPreviewHint": "Este monto se enviará solo para este periodo de renta si dejas un valor capturado."
     },
@@ -270,10 +272,42 @@
       "errorSize": "Algunos archivos superan el límite de {{maxMb}} MB.",
       "errorMax": "Solo puedes agregar {{max}} fotos en total."
     },
+    "validation": {
+      "general": {
+        "titleRequired": "El título es obligatorio.",
+        "titleMaxLength": "El título no puede exceder 128 caracteres.",
+        "propertyTypeRequired": "Selecciona un tipo de propiedad.",
+        "modalityRequired": "Selecciona una modalidad."
+      },
+      "location": {
+        "countryRequired": "Selecciona un país.",
+        "stateRequired": "Selecciona un estado.",
+        "cityRequired": "Selecciona un municipio.",
+        "postalCodeRequired": "El código postal es obligatorio.",
+        "postalCodeInvalid": "El código postal debe ser numérico y no exceder 5 dígitos.",
+        "neighborhoodRequired": "La colonia es obligatoria.",
+        "neighborhoodMaxLength": "La colonia no puede exceder 60 caracteres.",
+        "streetRequired": "La calle es obligatoria.",
+        "streetMaxLength": "La calle no puede exceder 120 caracteres.",
+        "exteriorNumberRequired": "El número exterior es obligatorio.",
+        "exteriorNumberInvalid": "El número exterior solo permite letras, números, guion y #, con máximo 8 caracteres.",
+        "interiorNumberInvalid": "El número interior solo permite letras, números, guion y #, con máximo 8 caracteres.",
+        "lotAreaRequired": "La superficie de terreno es obligatoria.",
+        "lotAreaInvalid": "La superficie de terreno debe ser un valor numérico válido.",
+        "orientationRequired": "Selecciona una orientación."
+      },
+      "pricing": {
+        "salePriceRequired": "El precio de venta es obligatorio.",
+        "rentPeriodRequired": "Activa al menos un periodo de renta.",
+        "rentPriceRequired": "Todos los periodos de renta activos deben tener precio."
+      }
+    },
     "footer": {
       "dirty": "Cambios sin guardar",
       "clean": "Sin cambios",
       "discard": "Descartar",
+      "previous": "Anterior",
+      "next": "Siguiente",
       "cancel": "Volver",
       "save": "Guardar"
     },
@@ -282,6 +316,12 @@
       "body": "Si sales ahora, perderás los cambios no guardados de esta propiedad.",
       "dismiss": "Seguir editando",
       "confirm": "Sí, cancelar"
+    },
+    "servicesEmptyDialog": {
+      "title": "Continuar sin servicios",
+      "body": "Aún no has seleccionado amenidades o servicios para esta propiedad. Mostrarlos en la vista pública ayuda a que el inmueble se vea más completo, atractivo y fácil de comparar para los usuarios. Puedes continuar sin ellos si prefieres agregarlos después.",
+      "dismiss": "Volver a servicios",
+      "confirm": "Continuar sin servicios"
     }
   },
   "searchPlaceholder": "Buscar propiedades...",

@@ -27,12 +27,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/config/routes";
 import { cn } from "@/lib/utils";
+import { useModalities } from "@catalogs/application/hooks/useCatalogs";
 import { ClausesSection } from "@properties/components/create/sections/clauses/ClausesSection";
 import { GeneralSection } from "@properties/components/create/sections/general/GeneralSection";
 import { LocationSection } from "@properties/components/create/sections/location/LocationSection";
+import { validateLocationSection } from "@properties/components/create/sections/location/locationSection.schema";
 import { MultimediaSection } from "@properties/components/create/sections/multimedia/MultimediaSection";
 import { PricingSection } from "@properties/components/create/sections/pricing";
+import {
+  resolvePricingMode,
+  validatePricingSection,
+} from "@properties/components/create/sections/pricing/pricingSection.schema";
 import { ServicesSection } from "@properties/components/create/sections/services";
+import { validateGeneralSection } from "@properties/components/create/sections/general/generalSection.schema";
 import {
   initialPropertyCreateFormState,
   type PropertyCreateFormState,
@@ -59,12 +66,26 @@ const createNavItems: readonly PropertyCreateNavItem[] = [
   },
 ] as const;
 
+const createSectionOrder: readonly PropertyCreateSectionId[] = [
+  "general",
+  "location",
+  "pricing",
+  "services",
+  "clauses",
+  "multimedia",
+];
+
 export function PropertyCreatePageContent() {
   const { t } = usePropertiesTranslation();
   const router = useRouter();
+  const modalitiesQuery = useModalities();
   const [activeSection, setActiveSection] =
     React.useState<PropertyCreateSectionId>("general");
   const [isCancelDialogOpen, setIsCancelDialogOpen] = React.useState(false);
+  const [isEmptyServicesDialogOpen, setIsEmptyServicesDialogOpen] =
+    React.useState(false);
+  const [hasConfirmedEmptyServices, setHasConfirmedEmptyServices] =
+    React.useState(false);
   const [form, setForm] = React.useState<PropertyCreateFormState>(
     initialPropertyCreateFormState,
   );
@@ -86,11 +107,152 @@ export function PropertyCreatePageContent() {
     () => JSON.stringify(form) !== JSON.stringify(initialPropertyCreateFormState),
     [form],
   );
+  const generalSectionValidation = React.useMemo(
+    () => validateGeneralSection(form, t),
+    [form, t],
+  );
+  const isGeneralSectionComplete = generalSectionValidation.success;
+  const locationSectionValidation = React.useMemo(
+    () => validateLocationSection(form, t),
+    [form, t],
+  );
+  const isLocationSectionComplete = locationSectionValidation.success;
+  const selectedModalityName = React.useMemo(
+    () =>
+      (modalitiesQuery.data ?? []).find(
+        (modality) => modality.modalityId === form.modalityId,
+      )?.name ?? null,
+    [form.modalityId, modalitiesQuery.data],
+  );
+  const pricingMode = React.useMemo(
+    () => resolvePricingMode(selectedModalityName),
+    [selectedModalityName],
+  );
+  const pricingSectionValidation = React.useMemo(
+    () => validatePricingSection(form, pricingMode, t),
+    [form, pricingMode, t],
+  );
+  const isPricingSectionComplete = pricingSectionValidation.success;
+  const hasServicesSelection = form.serviceIds.length > 0;
+
+  React.useEffect(() => {
+    if (hasServicesSelection) {
+      setHasConfirmedEmptyServices(false);
+    }
+  }, [hasServicesSelection]);
+
+  const enabledSections = React.useMemo(() => {
+    const unlocked = new Set<PropertyCreateSectionId>(["general"]);
+
+    if (isGeneralSectionComplete) {
+      unlocked.add("location");
+    }
+
+    if (isGeneralSectionComplete && isLocationSectionComplete) {
+      unlocked.add("pricing");
+    }
+
+    if (
+      isGeneralSectionComplete &&
+      isLocationSectionComplete &&
+      isPricingSectionComplete
+    ) {
+      unlocked.add("services");
+    }
+
+    if (
+      isGeneralSectionComplete &&
+      isLocationSectionComplete &&
+      isPricingSectionComplete &&
+      (hasServicesSelection || hasConfirmedEmptyServices)
+    ) {
+      unlocked.add("clauses");
+    }
+
+    return unlocked;
+  }, [
+    hasServicesSelection,
+    isGeneralSectionComplete,
+    hasConfirmedEmptyServices,
+    isLocationSectionComplete,
+    isPricingSectionComplete,
+  ]);
 
   const activeNav = createNavItems.find((item) => item.id === activeSection);
+  const activeSectionIndex = createSectionOrder.indexOf(activeSection);
+  const previousSection =
+    activeSectionIndex > 0 ? createSectionOrder[activeSectionIndex - 1] : null;
+  const nextSection =
+    activeSectionIndex >= 0 &&
+    activeSectionIndex < createSectionOrder.length - 1
+      ? createSectionOrder[activeSectionIndex + 1]
+      : null;
+  const canGoBack =
+    previousSection !== null && enabledSections.has(previousSection);
+  const canGoNext =
+    activeSection === "general"
+      ? Boolean(nextSection) && isGeneralSectionComplete
+      : activeSection === "location"
+        ? Boolean(nextSection) && isLocationSectionComplete
+        : activeSection === "pricing"
+          ? Boolean(nextSection) && isPricingSectionComplete
+          : activeSection === "services"
+            ? Boolean(nextSection)
+      : false;
 
   function patchForm(patch: Partial<PropertyCreateFormState>) {
     setForm((current) => ({ ...current, ...patch }));
+  }
+
+  function handleSectionChange(sectionId: PropertyCreateSectionId) {
+    if (!enabledSections.has(sectionId)) {
+      return;
+    }
+
+    setActiveSection(sectionId);
+  }
+
+  function handleGoBack() {
+    if (!previousSection || !enabledSections.has(previousSection)) {
+      return;
+    }
+
+    setActiveSection(previousSection);
+  }
+
+  function handleGoNext() {
+    if (!nextSection) {
+      return;
+    }
+
+    if (
+      (activeSection === "general" && isGeneralSectionComplete) ||
+      (activeSection === "location" && isLocationSectionComplete) ||
+      (activeSection === "pricing" && isPricingSectionComplete)
+    ) {
+      setActiveSection(nextSection);
+      return;
+    }
+
+    if (activeSection === "services") {
+      if (hasServicesSelection) {
+        setHasConfirmedEmptyServices(false);
+        setActiveSection(nextSection);
+        return;
+      }
+
+      setIsEmptyServicesDialogOpen(true);
+    }
+  }
+
+  function handleConfirmEmptyServices() {
+    if (!nextSection) {
+      return;
+    }
+
+    setHasConfirmedEmptyServices(true);
+    setIsEmptyServicesDialogOpen(false);
+    setActiveSection(nextSection);
   }
 
   function renderActiveSection() {
@@ -126,6 +288,7 @@ export function PropertyCreatePageContent() {
           <ul className="mt-6 flex flex-col gap-1">
             {createNavItems.map(({ id, icon, labelKey }) => {
               const isActive = id === activeSection;
+              const isEnabled = enabledSections.has(id);
 
               return (
                 <li key={id}>
@@ -134,9 +297,12 @@ export function PropertyCreatePageContent() {
                       "h-10 w-full justify-start rounded-2xl px-3 text-sm",
                       isActive
                         ? "bg-primary/10 text-primary hover:bg-primary/15 dark:bg-primary/20"
+                        : !isEnabled
+                          ? "text-muted-foreground/50"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground",
                     )}
-                    onClick={() => setActiveSection(id)}
+                    disabled={!isEnabled}
+                    onClick={() => handleSectionChange(id)}
                     variant="ghost"
                   >
                     <HugeiconsIcon
@@ -165,6 +331,11 @@ export function PropertyCreatePageContent() {
             </div>
 
             <div className="flex items-center gap-2">
+              {canGoBack ? (
+                <Button type="button" variant="outline" onClick={handleGoBack}>
+                  {t("create.footer.previous")}
+                </Button>
+              ) : null}
               <Button
                 type="button"
                 variant="outline"
@@ -172,13 +343,13 @@ export function PropertyCreatePageContent() {
               >
                 {t("create.footer.cancel")}
               </Button>
-              <Button disabled={!isDirty} type="button">
+              <Button disabled={!canGoNext} type="button" onClick={handleGoNext}>
                 <HugeiconsIcon
                   icon={SaveIcon}
                   size={16}
                   strokeWidth={1.8}
                 />
-                <span>{t("create.footer.save")}</span>
+                <span>{t("create.footer.next")}</span>
               </Button>
             </div>
           </header>
@@ -213,6 +384,37 @@ export function PropertyCreatePageContent() {
               onClick={() => router.push(ROUTES.admin.properties)}
             >
               {t("create.cancelDialog.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={isEmptyServicesDialogOpen}
+        onOpenChange={setIsEmptyServicesDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="mb-2 flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <HugeiconsIcon
+                icon={PackageIcon}
+                size={20}
+                strokeWidth={1.8}
+              />
+            </div>
+            <AlertDialogTitle>
+              {t("create.servicesEmptyDialog.title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("create.servicesEmptyDialog.body")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              {t("create.servicesEmptyDialog.dismiss")}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmEmptyServices}>
+              {t("create.servicesEmptyDialog.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

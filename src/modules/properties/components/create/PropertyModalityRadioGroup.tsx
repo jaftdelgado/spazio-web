@@ -1,9 +1,10 @@
 "use client";
 
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useModalities } from "@catalogs/application/hooks/useCatalogs";
 import type { Modality } from "@catalogs/domain/catalog.entity";
-import { cn } from "@/lib/utils";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 
 function getModalityTranslationKey(modality: Modality) {
@@ -55,9 +56,7 @@ export function PropertyModalityRadioGroup({
 
   return (
     <div className="flex w-full flex-col gap-3">
-      <span className="sr-only">
-        {t("create.sections.modality.label")}
-      </span>
+      <span className="sr-only">{t("create.sections.modality.label")}</span>
 
       {modalitiesQuery.isLoading ? (
         <div className="flex flex-col gap-3">
@@ -71,11 +70,11 @@ export function PropertyModalityRadioGroup({
       ) : null}
 
       {!modalitiesQuery.isLoading ? (
-        <div
+        <RadioGroup
           aria-label={t("create.sections.modality.label")}
-          id="property-modality-radio-group"
-          className="grid gap-3"
-          role="radiogroup"
+          className="grid gap-4"
+          value={selectedModalityId ? String(selectedModalityId) : undefined}
+          onValueChange={(value) => onChange(Number(value))}
         >
           {modalities.map((modality) => {
             const translationKey = getModalityTranslationKey(modality);
@@ -86,32 +85,19 @@ export function PropertyModalityRadioGroup({
               : modality.name;
 
             return (
-              <button
+              <div
                 key={modality.modalityId}
-                aria-checked={selectedModalityId === modality.modalityId}
-                className={cn(
-                  "flex items-start gap-3 rounded-2xl border px-4 py-3 text-left transition-colors",
-                  selectedModalityId === modality.modalityId
-                    ? "border-primary bg-primary/10 ring-3 ring-primary/15"
-                    : "border-border bg-card hover:bg-muted/50",
-                )}
-                role="radio"
-                type="button"
-                onClick={() => onChange(modality.modalityId)}
+                className="flex items-start gap-3"
               >
-                <span
-                  className={cn(
-                    "mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border",
-                    selectedModalityId === modality.modalityId
-                      ? "border-primary"
-                      : "border-muted-foreground/40",
-                  )}
+                <RadioGroupItem
+                  className="mt-0.5"
+                  id={`property-modality-${modality.modalityId}`}
+                  value={String(modality.modalityId)}
+                />
+                <Label
+                  className="grid gap-1 font-normal"
+                  htmlFor={`property-modality-${modality.modalityId}`}
                 >
-                  {selectedModalityId === modality.modalityId ? (
-                    <span className="size-2 rounded-full bg-primary" />
-                  ) : null}
-                </span>
-                <span className="grid gap-1">
                   <span className="text-sm font-medium leading-none text-foreground">
                     {label}
                   </span>
@@ -120,11 +106,11 @@ export function PropertyModalityRadioGroup({
                       {t(descriptionKey)}
                     </span>
                   ) : null}
-                </span>
-              </button>
+                </Label>
+              </div>
             );
           })}
-        </div>
+        </RadioGroup>
       ) : null}
 
       {modalitiesQuery.isError ? (

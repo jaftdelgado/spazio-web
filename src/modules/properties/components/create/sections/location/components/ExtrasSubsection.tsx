@@ -25,6 +25,17 @@ type ExtrasSubsectionProps = {
   patchForm: PatchPropertyCreateForm;
 };
 
+function sanitizeLotArea(value: string) {
+  const sanitized = value.replace(/[^0-9.]/g, "");
+  const [integerPart, ...decimalParts] = sanitized.split(".");
+
+  if (decimalParts.length === 0) {
+    return integerPart;
+  }
+
+  return `${integerPart}.${decimalParts.join("")}`;
+}
+
 export function ExtrasSubsection({
   form,
   orientations,
@@ -42,6 +53,7 @@ export function ExtrasSubsection({
       <div className="grid gap-5 md:grid-cols-2">
         <CreateFormField
           htmlFor="property-lot-area"
+          isRequired
           label={t("create.fields.lotArea.label")}
         >
           <Input
@@ -50,12 +62,15 @@ export function ExtrasSubsection({
             inputMode="decimal"
             placeholder={t("create.fields.lotArea.placeholder")}
             value={form.lotArea}
-            onChange={(event) => patchForm({ lotArea: event.target.value })}
+            onChange={(event) =>
+              patchForm({ lotArea: sanitizeLotArea(event.target.value) })
+            }
           />
         </CreateFormField>
 
         <CreateFormField
           htmlFor="property-orientation"
+          isRequired
           label={t("create.fields.orientation.label")}
         >
           <Select

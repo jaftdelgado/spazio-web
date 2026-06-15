@@ -35,7 +35,9 @@ export type PropertyCreateFormState = {
   lotArea: string;
   orientationId: number | null;
   salePrice: string;
+  salePriceIsNegotiable: boolean;
   rentPricesByPeriod: Record<string, string>;
+  enabledRentPeriodIds: number[];
   maintenanceFee: string;
   serviceIds: number[];
   clauses: ClauseEntry[];
@@ -65,7 +67,9 @@ export const initialPropertyCreateFormState: PropertyCreateFormState = {
   lotArea: "",
   orientationId: null,
   salePrice: "",
+  salePriceIsNegotiable: false,
   rentPricesByPeriod: {},
+  enabledRentPeriodIds: [],
   maintenanceFee: "",
   serviceIds: [],
   clauses: [],

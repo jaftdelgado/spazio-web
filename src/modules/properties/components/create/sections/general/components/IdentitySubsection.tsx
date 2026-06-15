@@ -38,6 +38,7 @@ export function IdentitySubsection({
         <Input
           className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
           id="property-title"
+          maxLength={128}
           placeholder={t("create.fields.title.placeholder")}
           value={form.title}
           onChange={(event) => patchForm({ title: event.target.value })}
