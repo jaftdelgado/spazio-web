@@ -1,8 +1,13 @@
 "use client";
 
 import * as React from "react";
+import { ImageIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
-import { CreateFormSection } from "@properties/components/create/shared/CreateFormPrimitives";
+import {
+  CreateFormSection,
+  CreateFormSubsection,
+} from "@properties/components/create/shared/CreateFormPrimitives";
 import type {
   PatchPropertyCreateForm,
   PhotoEntry,
@@ -176,35 +181,65 @@ export function MultimediaSection({
 
   return (
     <CreateFormSection
-      hint={t("create.sections.multimedia.hint")}
+      hideHeader
       title={t("create.sections.multimedia.title")}
     >
-      <div className="flex flex-col gap-6">
+      <CreateFormSubsection
+        isFirst
+        hint={t("create.multimedia.uploaderHint")}
+        title={t("create.multimedia.uploaderTitle")}
+      >
         <PhotoDropzone
           error={dropError ?? undefined}
           photoCount={form.photos.length}
           onFilesAdded={handleFilesAdded}
         />
+      </CreateFormSubsection>
+
+      <CreateFormSubsection
+        isLast
+        hint={t("create.multimedia.editorHint")}
+        title={t("create.multimedia.editorTitle")}
+      >
         {selectedEntry ? (
-          <PhotoEditPanel
-            entry={selectedEntry}
-            index={selectedIndex}
-            totalPhotos={form.photos.length}
-            onAltTextChange={handleAltTextChange}
-            onLabelChange={handleLabelChange}
-            onRemove={() => handleRemove(selectedIndex)}
-            onSetCover={() => handleSetCover(selectedIndex)}
-          />
-        ) : null}
-        {form.photos.length > 0 ? (
-          <PhotoStrip
-            entries={form.photos}
-            selectedIndex={selectedIndex}
-            onRemove={handleRemove}
-            onSelect={setSelectedIndex}
-          />
-        ) : null}
-      </div>
+          <div className="flex flex-col gap-6">
+            <PhotoEditPanel
+              entry={selectedEntry}
+              index={selectedIndex}
+              totalPhotos={form.photos.length}
+              onAltTextChange={handleAltTextChange}
+              onLabelChange={handleLabelChange}
+              onRemove={() => handleRemove(selectedIndex)}
+              onSetCover={() => handleSetCover(selectedIndex)}
+            />
+            <PhotoStrip
+              entries={form.photos}
+              selectedIndex={selectedIndex}
+              onRemove={handleRemove}
+              onSelect={setSelectedIndex}
+            />
+          </div>
+        ) : (
+          <div className="flex min-h-32 flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-border bg-background/40 px-6 py-8 text-center">
+            <span className="text-muted-foreground">
+              <HugeiconsIcon
+                color="currentColor"
+                icon={ImageIcon}
+                size={22}
+                strokeWidth={1.5}
+              />
+            </span>
+            <div>
+              <p className="text-sm font-medium text-foreground">
+                {t("create.multimedia.editorEmptyTitle")}
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                {t("create.multimedia.editorEmptyHint")}
+              </p>
+            </div>
+          </div>
+        )}
+      </CreateFormSubsection>
     </CreateFormSection>
   );
 }

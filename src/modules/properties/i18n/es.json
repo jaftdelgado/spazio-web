@@ -77,6 +77,20 @@
         "title": "Notas internas"
       }
     },
+    "location": {
+      "map": {
+        "title": "Mapa",
+        "hint": "Selecciona el punto exacto del inmueble sobre el mapa."
+      },
+      "fields": {
+        "title": "Dirección",
+        "hint": "Completa o ajusta los datos base de ubicación del inmueble."
+      },
+      "extras": {
+        "title": "Datos adicionales",
+        "hint": "Captura información complementaria del terreno y la orientación del inmueble."
+      }
+    },
     "fields": {
       "title": {
         "label": "Título",
@@ -86,9 +100,7 @@
       "locationMap": {
         "label": "Mapa",
         "hint": "Haz clic o arrastra el marcador para fijar la ubicación exacta del inmueble.",
-        "selectionHint": "Usaremos tu ubicación actual cuando esté disponible; si no, iniciaremos en Ciudad de México.",
-        "loadingLocation": "Buscando tu ubicación actual para colocar el punto inicial del inmueble.",
-        "coordinatesSelected": "Ubicación seleccionada: latitud {{latitude}}, longitud {{longitude}}."
+        "selectionHint": "Usaremos tu ubicación actual cuando esté disponible; si no, iniciaremos en Ciudad de México."
       },
       "country": {
         "label": "País",
@@ -117,19 +129,33 @@
       },
       "neighborhood": {
         "label": "Colonia",
-        "placeholder": "Zona o colonia"
+        "placeholder": "Ej: Centro, Del Valle Norte o Fraccionamiento Las Palmas"
       },
       "street": {
         "label": "Calle",
-        "placeholder": "Nombre de la calle"
+        "placeholder": "Ej: Av. Insurgentes Sur o Calle Morelos"
       },
       "exteriorNumber": {
         "label": "Número exterior",
-        "placeholder": "123"
+        "placeholder": "Ej: 742, 18-B o S/N"
+      },
+      "interiorNumber": {
+        "label": "Número interior",
+        "placeholder": "Ej: Depto 4B, Torre 2 o Local 7"
       },
       "postalCode": {
         "label": "Código postal",
-        "placeholder": "00000"
+        "placeholder": "Ej: 03100 o 91000"
+      },
+      "lotArea": {
+        "label": "Superficie de terreno",
+        "placeholder": "Ej: 180.5 m2"
+      },
+      "orientation": {
+        "label": "Orientación del inmueble",
+        "placeholder": "Selecciona una orientación",
+        "loading": "Cargando orientaciones...",
+        "empty": "No hay orientaciones disponibles."
       },
       "salePrice": {
         "label": "Precio de venta",
@@ -203,6 +229,7 @@
       "tableAmountColumn": "Monto",
       "tableEmpty": "Aun no has capturado precios para esta propiedad.",
       "previewLabel": "Vista previa",
+      "editorHint": "Edita el monto del tipo de precio que tengas seleccionado actualmente.",
       "salePreviewHint": "Este monto se enviará como precio de venta si mantienes esta pestaña con valor.",
       "rentPreviewHint": "Este monto se enviará solo para este periodo de renta si dejas un valor capturado."
     },
@@ -223,15 +250,17 @@
       "rangePlaceholderMax": "Máx"
     },
     "multimedia": {
+      "uploaderTitle": "Carga de fotos",
+      "uploaderHint": "Agrega nuevas fotos del inmueble desde tu equipo.",
+      "editorTitle": "Gestión de fotos",
+      "editorHint": "Selecciona una foto para editar su portada, etiqueta y texto alternativo.",
+      "editorEmptyTitle": "Aún no hay fotos cargadas",
+      "editorEmptyHint": "Agrega al menos una foto para organizarla y completar sus metadatos.",
       "dropzoneTitle": "Arrastra tus fotos aquí",
       "dropzoneHint": "Formatos: {{extensions}} · Máximo {{maxMb}} MB por archivo",
       "maxReached": "Límite de 10 fotos alcanzado",
-      "uploading": "Subiendo...",
-      "uploadError": "Error al subir",
-      "retry": "Reintentar",
-      "photoCounter": "Foto {{current}} de {{total}}",
       "coverBadge": "Portada",
-      "setCover": "Establecer como portada",
+      "setCover": "Potaa",
       "coverLabel": "Portada",
       "labelField": "Etiqueta",
       "altField": "Texto alternativo",

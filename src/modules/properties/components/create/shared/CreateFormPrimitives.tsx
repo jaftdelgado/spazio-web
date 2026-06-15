@@ -9,24 +9,32 @@ import { cn } from "@/lib/utils";
 export function CreateFormSection({
   title,
   hint,
+  hideHeader = false,
   children,
 }: {
   title: string;
   hint?: string;
+  hideHeader?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <>
       <section className="mt-8 grid gap-x-10 gap-y-6 lg:grid-cols-[190px_minmax(0,1fr)]">
-        <div>
-          <h2 className="text-sm font-medium text-foreground">{title}</h2>
-          {hint ? (
-            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-              {hint}
-            </p>
-          ) : null}
-        </div>
-        <div className="flex flex-col gap-5">{children}</div>
+        {hideHeader ? (
+          <div className="flex flex-col gap-5 lg:col-span-2">{children}</div>
+        ) : (
+          <>
+            <div>
+              <h2 className="text-sm font-medium text-foreground">{title}</h2>
+              {hint ? (
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                  {hint}
+                </p>
+              ) : null}
+            </div>
+            <div className="flex flex-col gap-5">{children}</div>
+          </>
+        )}
       </section>
       <div className="my-10 h-px bg-border" />
     </>
@@ -50,10 +58,7 @@ export function CreateFormField({
 }) {
   return (
     <div className="space-y-2" data-required={isRequired}>
-      <Label
-        className={cn(isLabelHidden && "sr-only")}
-        htmlFor={htmlFor}
-      >
+      <Label className={cn(isLabelHidden && "sr-only")} htmlFor={htmlFor}>
         {label}
         {isRequired ? <span className="text-destructive">*</span> : null}
       </Label>
@@ -61,6 +66,40 @@ export function CreateFormField({
       {hint ? (
         <p className="text-xs leading-relaxed text-muted-foreground">{hint}</p>
       ) : null}
+    </div>
+  );
+}
+
+export function CreateFormSubsection({
+  title,
+  hint,
+  isFirst = false,
+  isLast = false,
+  children,
+}: {
+  title: string;
+  hint?: string;
+  isFirst?: boolean;
+  isLast?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={cn(
+        "grid gap-x-10 gap-y-4 lg:grid-cols-[190px_minmax(0,1fr)]",
+        !isFirst && "border-t border-border pt-6",
+        !isLast && "pb-6",
+      )}
+    >
+      <div>
+        <h3 className="text-sm font-medium text-foreground">{title}</h3>
+        {hint ? (
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+            {hint}
+          </p>
+        ) : null}
+      </div>
+      <div className="flex flex-col gap-5">{children}</div>
     </div>
   );
 }

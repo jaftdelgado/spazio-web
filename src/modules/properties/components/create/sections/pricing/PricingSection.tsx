@@ -251,11 +251,11 @@ export function PricingSection({
   );
 
   return (
-    <CreateFormSection
-      hint={t("create.sections.pricingDetails.hint")}
-      title={t("create.sections.pricingDetails.title")}
-    >
-      <div className="flex flex-col gap-5">
+    <>
+      <CreateFormSection
+        hint={t("create.sections.pricingDetails.hint")}
+        title={t("create.sections.pricingDetails.title")}
+      >
         <PricingEditor
           emptyState={pricingEmptyState ?? undefined}
           fieldId={selectedFieldId}
@@ -268,20 +268,23 @@ export function PricingSection({
           value={selectedPriceValue}
           onChange={handleSelectedPriceChange}
         />
+      </CreateFormSection>
 
+      <CreateFormSection
+        hint={t("create.pricing.registeredHint")}
+        title={t("create.pricing.registeredTitle")}
+      >
         <PricingSelectableTable
           amountColumnLabel={t("create.pricing.tableAmountColumn")}
           emptyState={pricingEmptyState ?? undefined}
           formatPrice={formatPrice}
-          hint={t("create.pricing.selectorHint")}
           rows={selectablePriceRows}
           selectedRowId={resolvedPriceOptionId}
           tableAriaLabel={t("create.pricing.tableAriaLabel")}
-          title={t("create.pricing.selectorTitle")}
           typeColumnLabel={t("create.pricing.tableTypeColumn")}
           onSelectionChange={setSelectedPriceOptionId}
         />
-      </div>
-    </CreateFormSection>
+      </CreateFormSection>
+    </>
   );
 }

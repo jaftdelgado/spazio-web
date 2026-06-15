@@ -30,7 +30,10 @@ export type PropertyCreateFormState = {
   neighborhood: string;
   street: string;
   exteriorNumber: string;
+  interiorNumber: string;
   postalCode: string;
+  lotArea: string;
+  orientationId: number | null;
   salePrice: string;
   rentPricesByPeriod: Record<string, string>;
   maintenanceFee: string;
@@ -57,7 +60,10 @@ export const initialPropertyCreateFormState: PropertyCreateFormState = {
   neighborhood: "",
   street: "",
   exteriorNumber: "",
+  interiorNumber: "",
   postalCode: "",
+  lotArea: "",
+  orientationId: null,
   salePrice: "",
   rentPricesByPeriod: {},
   maintenanceFee: "",

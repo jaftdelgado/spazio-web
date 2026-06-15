@@ -77,6 +77,20 @@
         "title": "Internal notes"
       }
     },
+    "location": {
+      "map": {
+        "title": "Map",
+        "hint": "Select the exact property point on the map."
+      },
+      "fields": {
+        "title": "Address",
+        "hint": "Complete or adjust the property's base location details."
+      },
+      "extras": {
+        "title": "Additional details",
+        "hint": "Capture complementary land information and the property's orientation."
+      }
+    },
     "fields": {
       "coverImage": {
         "action": "Upload cover",
@@ -89,9 +103,7 @@
       "locationMap": {
         "label": "Map",
         "hint": "Click or drag the marker to set the exact property location.",
-        "selectionHint": "We will use the user's current location when available; otherwise, the map starts in Mexico City.",
-        "loadingLocation": "Looking up the current location to place the property's starting point.",
-        "coordinatesSelected": "Selected location: latitude {{latitude}}, longitude {{longitude}}."
+        "selectionHint": "We will use the user's current location when available; otherwise, the map starts in Mexico City."
       },
       "country": {
         "label": "Country",
@@ -120,19 +132,33 @@
       },
       "neighborhood": {
         "label": "Neighborhood",
-        "placeholder": "Area or neighborhood"
+        "placeholder": "Ex: Downtown, Del Valle Norte, or Las Palmas neighborhood"
       },
       "street": {
         "label": "Street",
-        "placeholder": "Street name"
+        "placeholder": "Ex: Insurgentes Sur Ave. or Morelos Street"
       },
       "exteriorNumber": {
         "label": "Exterior number",
-        "placeholder": "123"
+        "placeholder": "Ex: 742, 18-B, or N/A"
+      },
+      "interiorNumber": {
+        "label": "Interior number",
+        "placeholder": "Ex: Apt 4B, Tower 2, or Unit 7"
       },
       "postalCode": {
         "label": "Postal code",
-        "placeholder": "00000"
+        "placeholder": "Ex: 03100 or 91000"
+      },
+      "lotArea": {
+        "label": "Lot area",
+        "placeholder": "Ex: 180.5 m2"
+      },
+      "orientation": {
+        "label": "Property orientation",
+        "placeholder": "Select an orientation",
+        "loading": "Loading orientations...",
+        "empty": "No orientations available."
       },
       "salePrice": {
         "label": "Sale price",
@@ -206,6 +232,7 @@
       "tableAmountColumn": "Amount",
       "tableEmpty": "You have not entered prices for this property yet.",
       "previewLabel": "Preview",
+      "editorHint": "Edit the amount for the price type that is currently selected.",
       "salePreviewHint": "This amount will be sent as the sale price if you keep a value in this tab.",
       "rentPreviewHint": "This amount will be sent only for this rent period if you leave a captured value."
     },
@@ -226,13 +253,15 @@
       "rangePlaceholderMax": "Max"
     },
     "multimedia": {
+      "uploaderTitle": "Photo upload",
+      "uploaderHint": "Add new property photos from your device.",
+      "editorTitle": "Photo management",
+      "editorHint": "Select a photo to edit its cover status, label, and alt text.",
+      "editorEmptyTitle": "No photos uploaded yet",
+      "editorEmptyHint": "Add at least one photo to organize it and complete its metadata.",
       "dropzoneTitle": "Drop your photos here",
       "dropzoneHint": "Formats: {{extensions}} · Max {{maxMb}} MB per file",
       "maxReached": "10 photo limit reached",
-      "uploading": "Uploading...",
-      "uploadError": "Upload failed",
-      "retry": "Retry",
-      "photoCounter": "Photo {{current}} of {{total}}",
       "coverBadge": "Cover",
       "setCover": "Set as cover",
       "coverLabel": "Cover",

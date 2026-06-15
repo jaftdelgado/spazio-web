@@ -1,23 +1,17 @@
 "use client";
 
 import { AnimatePresence } from "framer-motion";
-
-import { Label } from "@/components/ui/label";
 import type { Service } from "@services/domain/service.entity";
 
 import { ServiceTag } from "./ServiceTag";
 
 export function ServiceTagGroupSection({
-  title,
-  hint,
   services,
   emptyText,
   mode,
   onServiceAdd,
   onServiceRemove,
 }: {
-  title: string;
-  hint: string;
   services: Service[];
   emptyText: string;
   mode: "selected" | "available";
@@ -28,7 +22,6 @@ export function ServiceTagGroupSection({
 
   return (
     <div className="space-y-2">
-      <Label>{title}</Label>
       <div className="flex min-h-9 flex-wrap gap-2">
         <AnimatePresence initial={false} mode="popLayout">
           {services.length > 0 ? (
@@ -47,7 +40,6 @@ export function ServiceTagGroupSection({
           )}
         </AnimatePresence>
       </div>
-      <p className="text-xs leading-relaxed text-muted-foreground">{hint}</p>
     </div>
   );
 }

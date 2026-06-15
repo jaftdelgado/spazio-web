@@ -3,6 +3,7 @@
 import { useServices } from "@services/application/hooks/useServices";
 import {
   CreateFormSection,
+  CreateFormSubsection,
 } from "@properties/components/create/shared/CreateFormPrimitives";
 import type {
   PatchPropertyCreateForm,
@@ -40,7 +41,7 @@ export function ServicesSection({
 
   return (
     <CreateFormSection
-      hint={t("create.sections.services.hint")}
+      hideHeader
       title={t("create.sections.services.title")}
     >
       {servicesQuery.isLoading ? (
@@ -48,26 +49,35 @@ export function ServicesSection({
           {t("create.services.loading")}
         </p>
       ) : (
-        <div className="flex flex-col gap-6">
-          <ServiceTagGroupSection
-            emptyText={t("create.services.selectedEmpty")}
+        <>
+          <CreateFormSubsection
+            isFirst
             hint={t("create.services.selectedHint")}
-            mode="selected"
-            services={selectedServices}
             title={t("create.services.selectedTitle")}
-            onServiceAdd={toggleService}
-            onServiceRemove={toggleService}
-          />
-          <ServiceTagGroupSection
-            emptyText={t("create.services.availableEmpty")}
+          >
+            <ServiceTagGroupSection
+              emptyText={t("create.services.selectedEmpty")}
+              mode="selected"
+              services={selectedServices}
+              onServiceAdd={toggleService}
+              onServiceRemove={toggleService}
+            />
+          </CreateFormSubsection>
+
+          <CreateFormSubsection
+            isLast
             hint={t("create.services.availableHint")}
-            mode="available"
-            services={availableServices}
             title={t("create.services.availableTitle")}
-            onServiceAdd={toggleService}
-            onServiceRemove={toggleService}
-          />
-        </div>
+          >
+            <ServiceTagGroupSection
+              emptyText={t("create.services.availableEmpty")}
+              mode="available"
+              services={availableServices}
+              onServiceAdd={toggleService}
+              onServiceRemove={toggleService}
+            />
+          </CreateFormSubsection>
+        </>
       )}
     </CreateFormSection>
   );

@@ -7,7 +7,6 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -20,6 +19,7 @@ import {
   useInfiniteCities,
   useStates,
 } from "@locations/application/hooks/useLocations";
+import { useOrientations } from "@catalogs/application/hooks/useCatalogs";
 import type {
   City,
   Country,
@@ -30,6 +30,7 @@ import { PropertyLocationMapPicker } from "@properties/components/create/shared/
 import {
   CreateFormField,
   CreateFormSection,
+  CreateFormSubsection,
 } from "@properties/components/create/shared/CreateFormPrimitives";
 import type {
   PatchPropertyCreateForm,
@@ -38,21 +39,26 @@ import type {
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 
 type ReverseGeocodeAddress = {
+  borough?: string;
   city?: string;
+  city_district?: string;
   country?: string;
   country_code?: string;
   county?: string;
+  district?: string;
   house_number?: string;
   municipality?: string;
   neighbourhood?: string;
   postcode?: string;
+  quarter?: string;
   region?: string;
   residential?: string;
   road?: string;
   state?: string;
   suburb?: string;
-  town?: string;
+  hamlet?: string;
   village?: string;
+  town?: string;
 };
 
 type ReverseGeocodeResponse = {
@@ -119,7 +125,20 @@ function getCityNameCandidates(address: ReverseGeocodeAddress | undefined) {
 }
 
 function pickNeighborhood(address: ReverseGeocodeAddress | undefined) {
-  return (address?.suburb ?? address?.neighbourhood ?? "").trim();
+  return (
+    address?.quarter ??
+    address?.neighbourhood ??
+    address?.suburb ??
+    address?.city_district ??
+    address?.district ??
+    address?.borough ??
+    address?.hamlet ??
+    ""
+  ).trim();
+}
+
+function pickPostalCode(address: ReverseGeocodeAddress | undefined) {
+  return (address?.postcode ?? "").trim();
 }
 
 function pickStreet(address: ReverseGeocodeAddress | undefined) {
@@ -231,6 +250,7 @@ export function LocationSection({
     React.useDeferredValue(municipalitySearch);
   const mapSelectionRequestIdRef = React.useRef(0);
   const countriesQuery = useCountries();
+  const orientationsQuery = useOrientations();
   const statesQuery = useStates(form.countryId ?? 0, deferredStateSearch);
   const citiesQuery = useInfiniteCities(
     form.stateId ?? 0,
@@ -246,6 +266,7 @@ export function LocationSection({
   } = citiesQuery;
 
   const countries = countriesQuery.data ?? [];
+  const orientations = orientationsQuery.data ?? [];
   const states = statesQuery.data ?? [];
   const pagedCities = React.useMemo(() => {
     const pages = citiesData?.pages ?? [];
@@ -302,7 +323,7 @@ export function LocationSection({
         const nextNeighborhood = pickNeighborhood(address);
         const nextStreet = pickStreet(address);
         const nextExteriorNumber = (address?.house_number ?? "").trim();
-        const nextPostalCode = (address?.postcode ?? "").trim();
+        const nextPostalCode = pickPostalCode(address);
         const nextCityName = pickCityName(address);
         const cityCandidates = getCityNameCandidates(address);
         const countries =
@@ -412,263 +433,356 @@ export function LocationSection({
   );
 
   return (
-    <CreateFormSection
-      hint={t("create.sections.locationDetails.hint")}
-      title={t("create.sections.locationDetails.title")}
-    >
-      <CreateFormField
-        hint={t("create.fields.locationMap.selectionHint")}
-        htmlFor="property-location-map"
-        label={t("create.fields.locationMap.label")}
+    <>
+      <CreateFormSection
+        hideHeader
+        title={t("create.sections.locationDetails.title")}
       >
-        <PropertyLocationMapPicker
-          latitude={form.latitude}
-          longitude={form.longitude}
-          onChange={({ latitude, longitude, source }) => {
-            patchForm({ latitude, longitude });
-
-            if (source === "user") {
-              void syncLocationFromMapSelection(latitude, longitude);
-            }
-          }}
-        />
-      </CreateFormField>
-
-      <div className="grid gap-5 md:grid-cols-2">
-        <CreateFormField
-          htmlFor="property-country"
-          isRequired
-          label={t("create.fields.country.label")}
+        <CreateFormSubsection
+          isFirst
+          hint={t("create.location.map.hint")}
+          title={t("create.location.map.title")}
         >
-          <Select
-            name="property-country"
-            value={selectedCountryKey ?? undefined}
-            onValueChange={(value) => {
-              patchForm({
-                countryId: Number(value),
-                stateId: null,
-                cityId: null,
-                city: "",
-              });
-              setStateSearch("");
-              setMunicipalitySearch("");
-            }}
+          <CreateFormField
+            hint={t("create.fields.locationMap.selectionHint")}
+            htmlFor="property-location-map"
+            label={t("create.fields.locationMap.label")}
           >
-            <SelectTrigger
-              className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] text-foreground shadow-none"
-              id="property-country"
-            >
-              <SelectValue
-                placeholder={t("create.fields.country.placeholder")}
-              />
-            </SelectTrigger>
-            <SelectContent className="max-h-72 rounded-3xl">
-              {countriesQuery.isLoading ? (
-                <SelectItem disabled value="countries-loading">
-                  {t("create.fields.country.loading")}
-                </SelectItem>
-              ) : countries.length > 0 ? (
-                countries.map((country) => (
-                  <SelectItem
-                    key={country.countryId}
-                    value={String(country.countryId)}
-                  >
-                    {country.name}
-                  </SelectItem>
-                ))
-              ) : (
-                <SelectItem disabled value="countries-empty">
-                  {t("create.fields.country.empty")}
-                </SelectItem>
-              )}
-            </SelectContent>
-          </Select>
-        </CreateFormField>
+            <PropertyLocationMapPicker
+              latitude={form.latitude}
+              longitude={form.longitude}
+              onChange={({ latitude, longitude, source }) => {
+                patchForm({ latitude, longitude });
 
-        <CreateFormField
-          htmlFor="property-state"
-          isRequired
-          label={t("create.fields.state.label")}
+                if (source === "user") {
+                  void syncLocationFromMapSelection(latitude, longitude);
+                }
+              }}
+            />
+          </CreateFormField>
+        </CreateFormSubsection>
+
+        <CreateFormSubsection
+          hint={t("create.location.fields.hint")}
+          title={t("create.location.fields.title")}
         >
-          <Select
-            disabled={!form.countryId || statesQuery.isLoading}
-            name="property-state"
-            open={isStateOpen}
-            value={selectedStateKey ?? undefined}
-            onOpenChange={setIsStateOpen}
-            onValueChange={(value) => {
-              patchForm({
-                stateId: Number(value),
-                cityId: null,
-                city: "",
-              });
-              setMunicipalitySearch("");
-            }}
+          <div className="grid gap-5 md:grid-cols-2">
+          <CreateFormField
+            htmlFor="property-country"
+            isRequired
+            label={t("create.fields.country.label")}
           >
-            <SelectTrigger
-              className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] text-foreground shadow-none"
-              id="property-state"
+            <Select
+              name="property-country"
+              value={selectedCountryKey ?? undefined}
+              onValueChange={(value) => {
+                patchForm({
+                  countryId: Number(value),
+                  stateId: null,
+                  cityId: null,
+                  city: "",
+                });
+                setStateSearch("");
+                setMunicipalitySearch("");
+              }}
             >
-              <SelectValue placeholder={t("create.fields.state.placeholder")} />
-            </SelectTrigger>
-            <SelectContent className="max-h-80 rounded-3xl">
-              <SelectSearchInput
-                placeholder={t("create.fields.state.searchPlaceholder")}
-                value={stateSearch}
-                onChange={setStateSearch}
-              />
-              {states.length > 0 ? (
-                states.map((state) => (
-                  <SelectItem
-                    key={state.stateId}
-                    value={String(state.stateId)}
-                  >
-                    {state.name}
+              <SelectTrigger
+                className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] text-foreground shadow-none"
+                id="property-country"
+              >
+                <SelectValue
+                  placeholder={t("create.fields.country.placeholder")}
+                />
+              </SelectTrigger>
+              <SelectContent className="max-h-72 rounded-3xl">
+                {countriesQuery.isLoading ? (
+                  <SelectItem disabled value="countries-loading">
+                    {t("create.fields.country.loading")}
                   </SelectItem>
-                ))
-              ) : (
-                <SelectEmptyState>
-                  {statesQuery.isLoading
-                    ? t("create.fields.state.loading")
-                    : t("create.fields.state.empty")}
-                </SelectEmptyState>
-              )}
-            </SelectContent>
-          </Select>
-        </CreateFormField>
+                ) : countries.length > 0 ? (
+                  countries.map((country) => (
+                    <SelectItem
+                      key={country.countryId}
+                      value={String(country.countryId)}
+                    >
+                      {country.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem disabled value="countries-empty">
+                    {t("create.fields.country.empty")}
+                  </SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+          </CreateFormField>
 
-        <CreateFormField
-          htmlFor="property-municipality"
-          isRequired
-          label={t("create.fields.municipality.label")}
-        >
-          <Select
-            disabled={!form.stateId || isCitiesPending}
-            name="property-municipality"
-            open={isMunicipalityOpen}
-            value={selectedCityKey ?? undefined}
-            onOpenChange={setIsMunicipalityOpen}
-            onValueChange={(value) => {
-              const nextCityId = Number(value);
-              const selectedCity =
-                cities.find((city) => city.cityId === nextCityId) ?? null;
-
-              patchForm({
-                cityId: nextCityId,
-                city: selectedCity?.name ?? "",
-              });
-              setMunicipalitySearch("");
-            }}
+          <CreateFormField
+            htmlFor="property-state"
+            isRequired
+            label={t("create.fields.state.label")}
           >
-            <SelectTrigger
-              className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] text-foreground shadow-none"
-              id="property-municipality"
+            <Select
+              disabled={!form.countryId || statesQuery.isLoading}
+              name="property-state"
+              open={isStateOpen}
+              value={selectedStateKey ?? undefined}
+              onOpenChange={setIsStateOpen}
+              onValueChange={(value) => {
+                patchForm({
+                  stateId: Number(value),
+                  cityId: null,
+                  city: "",
+                });
+                setMunicipalitySearch("");
+              }}
             >
-              <SelectValue
-                placeholder={t("create.fields.municipality.placeholder")}
-              />
-            </SelectTrigger>
-            <SelectContent className="max-h-80 rounded-3xl">
-              <SelectSearchInput
-                placeholder={t("create.fields.municipality.searchPlaceholder")}
-                value={municipalitySearch}
-                onChange={setMunicipalitySearch}
-              />
-              {cities.length > 0 ? (
-                cities.map((city) => (
-                  <SelectItem
-                    key={city.cityId}
-                    value={String(city.cityId)}
+              <SelectTrigger
+                className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] text-foreground shadow-none"
+                id="property-state"
+              >
+                <SelectValue placeholder={t("create.fields.state.placeholder")} />
+              </SelectTrigger>
+              <SelectContent className="max-h-80 rounded-3xl">
+                <SelectSearchInput
+                  placeholder={t("create.fields.state.searchPlaceholder")}
+                  value={stateSearch}
+                  onChange={setStateSearch}
+                />
+                {states.length > 0 ? (
+                  states.map((state) => (
+                    <SelectItem
+                      key={state.stateId}
+                      value={String(state.stateId)}
+                    >
+                      {state.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectEmptyState>
+                    {statesQuery.isLoading
+                      ? t("create.fields.state.loading")
+                      : t("create.fields.state.empty")}
+                  </SelectEmptyState>
+                )}
+              </SelectContent>
+            </Select>
+          </CreateFormField>
+
+          <CreateFormField
+            htmlFor="property-municipality"
+            isRequired
+            label={t("create.fields.municipality.label")}
+          >
+            <Select
+              disabled={!form.stateId || isCitiesPending}
+              name="property-municipality"
+              open={isMunicipalityOpen}
+              value={selectedCityKey ?? undefined}
+              onOpenChange={setIsMunicipalityOpen}
+              onValueChange={(value) => {
+                const nextCityId = Number(value);
+                const selectedCity =
+                  cities.find((city) => city.cityId === nextCityId) ?? null;
+
+                patchForm({
+                  cityId: nextCityId,
+                  city: selectedCity?.name ?? "",
+                });
+                setMunicipalitySearch("");
+              }}
+            >
+              <SelectTrigger
+                className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] text-foreground shadow-none"
+                id="property-municipality"
+              >
+                <SelectValue
+                  placeholder={t("create.fields.municipality.placeholder")}
+                />
+              </SelectTrigger>
+              <SelectContent className="max-h-80 rounded-3xl">
+                <SelectSearchInput
+                  placeholder={t("create.fields.municipality.searchPlaceholder")}
+                  value={municipalitySearch}
+                  onChange={setMunicipalitySearch}
+                />
+                {cities.length > 0 ? (
+                  cities.map((city) => (
+                    <SelectItem
+                      key={city.cityId}
+                      value={String(city.cityId)}
+                    >
+                      {city.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectEmptyState>
+                    {isCitiesPending
+                      ? t("create.fields.municipality.loading")
+                      : municipalitySearch.trim() !== "" &&
+                          isFetchingNextPage &&
+                          hasNextPage
+                        ? t("create.fields.municipality.searching")
+                        : t("create.fields.municipality.empty")}
+                  </SelectEmptyState>
+                )}
+                {hasNextPage ? (
+                  <button
+                    className="mt-1 w-full rounded-2xl px-3 py-2 text-center text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
+                    disabled={isFetchingNextPage}
+                    type="button"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      void fetchNextPage();
+                    }}
+                    onKeyDown={(event) => event.stopPropagation()}
                   >
-                    {city.name}
+                    {t("create.fields.municipality.loadingMore")}
+                  </button>
+                ) : null}
+              </SelectContent>
+            </Select>
+          </CreateFormField>
+
+          <CreateFormField
+            htmlFor="property-postal-code"
+            label={t("create.fields.postalCode.label")}
+          >
+            <Input
+              className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+              id="property-postal-code"
+              placeholder={t("create.fields.postalCode.placeholder")}
+              value={form.postalCode}
+              onChange={(event) => patchForm({ postalCode: event.target.value })}
+            />
+          </CreateFormField>
+
+          <CreateFormField
+            htmlFor="property-neighborhood"
+            label={t("create.fields.neighborhood.label")}
+          >
+            <Input
+              className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+              id="property-neighborhood"
+              placeholder={t("create.fields.neighborhood.placeholder")}
+              value={form.neighborhood}
+              onChange={(event) =>
+                patchForm({ neighborhood: event.target.value })
+              }
+            />
+          </CreateFormField>
+
+          <CreateFormField
+            htmlFor="property-street"
+            label={t("create.fields.street.label")}
+          >
+            <Input
+              className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+              id="property-street"
+              placeholder={t("create.fields.street.placeholder")}
+              value={form.street}
+              onChange={(event) => patchForm({ street: event.target.value })}
+            />
+          </CreateFormField>
+
+          <CreateFormField
+            htmlFor="property-exterior"
+            label={t("create.fields.exteriorNumber.label")}
+          >
+            <Input
+              className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+              id="property-exterior"
+              placeholder={t("create.fields.exteriorNumber.placeholder")}
+              value={form.exteriorNumber}
+              onChange={(event) =>
+                patchForm({ exteriorNumber: event.target.value })
+              }
+            />
+          </CreateFormField>
+
+          <CreateFormField
+            htmlFor="property-interior"
+            label={t("create.fields.interiorNumber.label")}
+          >
+            <Input
+              className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+              id="property-interior"
+              placeholder={t("create.fields.interiorNumber.placeholder")}
+              value={form.interiorNumber}
+              onChange={(event) =>
+                patchForm({ interiorNumber: event.target.value })
+              }
+            />
+          </CreateFormField>
+          </div>
+        </CreateFormSubsection>
+
+        <CreateFormSubsection
+          isLast
+          hint={t("create.location.extras.hint")}
+          title={t("create.location.extras.title")}
+        >
+          <div className="grid gap-5 md:grid-cols-2">
+          <CreateFormField
+            htmlFor="property-lot-area"
+            label={t("create.fields.lotArea.label")}
+          >
+            <Input
+              className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+              id="property-lot-area"
+              inputMode="decimal"
+              placeholder={t("create.fields.lotArea.placeholder")}
+              value={form.lotArea}
+              onChange={(event) => patchForm({ lotArea: event.target.value })}
+            />
+          </CreateFormField>
+
+          <CreateFormField
+            htmlFor="property-orientation"
+            label={t("create.fields.orientation.label")}
+          >
+            <Select
+              value={
+                form.orientationId ? String(form.orientationId) : undefined
+              }
+              onValueChange={(value) =>
+                patchForm({ orientationId: Number(value) })
+              }
+            >
+              <SelectTrigger
+                className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] text-foreground shadow-none"
+                id="property-orientation"
+              >
+                <SelectValue
+                  placeholder={t("create.fields.orientation.placeholder")}
+                />
+              </SelectTrigger>
+              <SelectContent className="max-h-72 rounded-3xl">
+                {orientationsQuery.isLoading ? (
+                  <SelectItem disabled value="orientations-loading">
+                    {t("create.fields.orientation.loading")}
                   </SelectItem>
-                ))
-              ) : (
-                <SelectEmptyState>
-                  {isCitiesPending
-                    ? t("create.fields.municipality.loading")
-                    : municipalitySearch.trim() !== "" &&
-                        isFetchingNextPage &&
-                        hasNextPage
-                      ? t("create.fields.municipality.searching")
-                      : t("create.fields.municipality.empty")}
-                </SelectEmptyState>
-              )}
-              {hasNextPage ? (
-                <button
-                  className="mt-1 w-full rounded-2xl px-3 py-2 text-center text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
-                  disabled={isFetchingNextPage}
-                  type="button"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    void fetchNextPage();
-                  }}
-                  onKeyDown={(event) => event.stopPropagation()}
-                >
-                  {t("create.fields.municipality.loadingMore")}
-                </button>
-              ) : null}
-            </SelectContent>
-          </Select>
-        </CreateFormField>
-
-        <CreateFormField
-          htmlFor="property-neighborhood"
-          label={t("create.fields.neighborhood.label")}
-        >
-          <Input
-            className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
-            id="property-neighborhood"
-            placeholder={t("create.fields.neighborhood.placeholder")}
-            value={form.neighborhood}
-            onChange={(event) =>
-              patchForm({ neighborhood: event.target.value })
-            }
-          />
-        </CreateFormField>
-
-        <CreateFormField
-          htmlFor="property-street"
-          label={t("create.fields.street.label")}
-        >
-          <Input
-            className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
-            id="property-street"
-            placeholder={t("create.fields.street.placeholder")}
-            value={form.street}
-            onChange={(event) => patchForm({ street: event.target.value })}
-          />
-        </CreateFormField>
-
-        <CreateFormField
-          htmlFor="property-exterior"
-          label={t("create.fields.exteriorNumber.label")}
-        >
-          <Input
-            className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
-            id="property-exterior"
-            placeholder={t("create.fields.exteriorNumber.placeholder")}
-            value={form.exteriorNumber}
-            onChange={(event) =>
-              patchForm({ exteriorNumber: event.target.value })
-            }
-          />
-        </CreateFormField>
-
-        <CreateFormField
-          htmlFor="property-postal-code"
-          label={t("create.fields.postalCode.label")}
-        >
-          <Input
-            className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
-            id="property-postal-code"
-            placeholder={t("create.fields.postalCode.placeholder")}
-            value={form.postalCode}
-            onChange={(event) => patchForm({ postalCode: event.target.value })}
-          />
-        </CreateFormField>
-      </div>
-    </CreateFormSection>
+                ) : orientations.length > 0 ? (
+                  orientations.map((orientation) => (
+                    <SelectItem
+                      key={orientation.orientationId}
+                      value={String(orientation.orientationId)}
+                    >
+                      {orientation.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem disabled value="orientations-empty">
+                    {t("create.fields.orientation.empty")}
+                  </SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+          </CreateFormField>
+          </div>
+        </CreateFormSubsection>
+      </CreateFormSection>
+    </>
   );
 }
 

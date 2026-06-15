@@ -24,8 +24,8 @@ export function PricingSelectableTable({
   rows: SelectablePriceRow[];
   selectedRowId: string | null;
   formatPrice: (amount: number, suffix: string) => string;
-  title: string;
-  hint: string;
+  title?: string;
+  hint?: string;
   tableAriaLabel: string;
   typeColumnLabel: string;
   amountColumnLabel: string;
@@ -37,12 +37,18 @@ export function PricingSelectableTable({
 }) {
   return (
     <div className="flex flex-col gap-3">
-      <div>
-        <h3 className="text-sm font-medium text-foreground">{title}</h3>
-        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-          {hint}
-        </p>
-      </div>
+      {title || hint ? (
+        <div>
+          {title ? (
+            <h3 className="text-sm font-medium text-foreground">{title}</h3>
+          ) : null}
+          {hint ? (
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              {hint}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       {emptyState ? (
         <SurfaceFallback
