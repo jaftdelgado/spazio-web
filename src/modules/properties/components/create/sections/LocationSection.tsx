@@ -20,6 +20,12 @@ import {
   useInfiniteCities,
   useStates,
 } from "@locations/application/hooks/useLocations";
+import type {
+  City,
+  Country,
+  State,
+} from "@locations/domain/location.entity";
+import { locationHttpAdapter } from "@locations/infra/location.http-adapter";
 import { PropertyLocationMapPicker } from "@properties/components/create/shared/PropertyLocationMapPicker";
 import {
   CreateFormField,
@@ -30,6 +36,183 @@ import type {
   PropertyCreateFormState,
 } from "@properties/components/create/types";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
+
+type ReverseGeocodeAddress = {
+  city?: string;
+  country?: string;
+  country_code?: string;
+  county?: string;
+  house_number?: string;
+  municipality?: string;
+  neighbourhood?: string;
+  postcode?: string;
+  region?: string;
+  residential?: string;
+  road?: string;
+  state?: string;
+  suburb?: string;
+  town?: string;
+  village?: string;
+};
+
+type ReverseGeocodeResponse = {
+  address?: ReverseGeocodeAddress;
+};
+
+function normalizeLocationText(value: string | null | undefined) {
+  return (value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+function matchesLocationName(candidate: string, target: string) {
+  const normalizedCandidate = normalizeLocationText(candidate);
+  const normalizedTarget = normalizeLocationText(target);
+
+  if (normalizedCandidate === "" || normalizedTarget === "") {
+    return false;
+  }
+
+  return (
+    normalizedCandidate === normalizedTarget ||
+    normalizedCandidate.includes(normalizedTarget) ||
+    normalizedTarget.includes(normalizedCandidate)
+  );
+}
+
+function pickStateName(address: ReverseGeocodeAddress | undefined) {
+  return (
+    address?.state ??
+    address?.region ??
+    address?.county ??
+    ""
+  ).trim();
+}
+
+function pickCityName(address: ReverseGeocodeAddress | undefined) {
+  return (
+    address?.city ??
+    address?.town ??
+    address?.municipality ??
+    address?.village ??
+    address?.county ??
+    ""
+  ).trim();
+}
+
+function getCityNameCandidates(address: ReverseGeocodeAddress | undefined) {
+  return Array.from(
+    new Set(
+      [
+        address?.city,
+        address?.town,
+        address?.municipality,
+        address?.village,
+        address?.county,
+      ]
+        .map((value) => value?.trim() ?? "")
+        .filter((value) => value !== ""),
+    ),
+  );
+}
+
+function pickNeighborhood(address: ReverseGeocodeAddress | undefined) {
+  return (address?.suburb ?? address?.neighbourhood ?? "").trim();
+}
+
+function pickStreet(address: ReverseGeocodeAddress | undefined) {
+  return (
+    address?.road ??
+    address?.residential ??
+    ""
+  ).trim();
+}
+
+function findMatchingCountry(
+  countries: Country[],
+  address: ReverseGeocodeAddress | undefined,
+) {
+  const countryCode = normalizeLocationText(address?.country_code);
+
+  if (countryCode !== "") {
+    const matchedByCode = countries.find(
+      (country) => normalizeLocationText(country.iso2Code) === countryCode,
+    );
+
+    if (matchedByCode) {
+      return matchedByCode;
+    }
+  }
+
+  const countryName = address?.country?.trim() ?? "";
+
+  if (countryName === "") {
+    return null;
+  }
+
+  return (
+    countries.find((country) => matchesLocationName(country.name, countryName)) ??
+    null
+  );
+}
+
+function findMatchingState(
+  states: State[],
+  address: ReverseGeocodeAddress | undefined,
+) {
+  const stateName = pickStateName(address);
+
+  if (stateName === "") {
+    return null;
+  }
+
+  return (
+    states.find((state) => matchesLocationName(state.name, stateName)) ?? null
+  );
+}
+
+function findMatchingCity(cities: City[], address: ReverseGeocodeAddress | undefined) {
+  const cityCandidates = getCityNameCandidates(address);
+
+  for (const candidate of cityCandidates) {
+    const matchedCity =
+      cities.find((city) => matchesLocationName(city.name, candidate)) ?? null;
+
+    if (matchedCity) {
+      return matchedCity;
+    }
+  }
+
+  if (cities.length === 1) {
+    return cities[0] ?? null;
+  }
+
+  return null;
+}
+
+async function reverseGeocodeCoordinates(
+  latitude: string,
+  longitude: string,
+) {
+  const searchParams = new URLSearchParams({
+    addressdetails: "1",
+    format: "jsonv2",
+    lat: latitude,
+    lon: longitude,
+  });
+
+  const response = await fetch(
+    `https://nominatim.openstreetmap.org/reverse?${searchParams.toString()}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Reverse geocoding failed.");
+  }
+
+  return (await response.json()) as ReverseGeocodeResponse;
+}
 
 export function LocationSection({
   form,
@@ -46,6 +229,7 @@ export function LocationSection({
   const deferredStateSearch = React.useDeferredValue(stateSearch);
   const deferredMunicipalitySearch =
     React.useDeferredValue(municipalitySearch);
+  const mapSelectionRequestIdRef = React.useRef(0);
   const countriesQuery = useCountries();
   const statesQuery = useStates(form.countryId ?? 0, deferredStateSearch);
   const citiesQuery = useInfiniteCities(
@@ -63,7 +247,7 @@ export function LocationSection({
 
   const countries = countriesQuery.data ?? [];
   const states = statesQuery.data ?? [];
-  const cities = React.useMemo(() => {
+  const pagedCities = React.useMemo(() => {
     const pages = citiesData?.pages ?? [];
     const cityMap = new Map<number, (typeof pages)[number]["data"][number]>();
 
@@ -75,9 +259,157 @@ export function LocationSection({
 
     return Array.from(cityMap.values());
   }, [citiesData]);
+  const cities = React.useMemo(() => {
+    if (!form.cityId || form.city.trim() === "") {
+      return pagedCities;
+    }
+
+    const hasSelectedCity = pagedCities.some(
+      (city) => city.cityId === form.cityId,
+    );
+
+    if (hasSelectedCity) {
+      return pagedCities;
+    }
+
+    return [
+      {
+        cityId: form.cityId,
+        name: form.city,
+      },
+      ...pagedCities,
+    ];
+  }, [form.city, form.cityId, pagedCities]);
   const selectedCountryKey = form.countryId ? String(form.countryId) : null;
   const selectedStateKey = form.stateId ? String(form.stateId) : null;
   const selectedCityKey = form.cityId ? String(form.cityId) : null;
+
+  const syncLocationFromMapSelection = React.useCallback(
+    async (latitude: string, longitude: string) => {
+      const requestId = ++mapSelectionRequestIdRef.current;
+
+      try {
+        const reverseGeocode = await reverseGeocodeCoordinates(
+          latitude,
+          longitude,
+        );
+
+        if (requestId !== mapSelectionRequestIdRef.current) {
+          return;
+        }
+
+        const address = reverseGeocode.address;
+        const nextNeighborhood = pickNeighborhood(address);
+        const nextStreet = pickStreet(address);
+        const nextExteriorNumber = (address?.house_number ?? "").trim();
+        const nextPostalCode = (address?.postcode ?? "").trim();
+        const nextCityName = pickCityName(address);
+        const cityCandidates = getCityNameCandidates(address);
+        const countries =
+          countriesQuery.data ?? (await locationHttpAdapter.listCountries());
+        const matchedCountry = findMatchingCountry(countries, address);
+
+        if (requestId !== mapSelectionRequestIdRef.current) {
+          return;
+        }
+
+        if (!matchedCountry) {
+          patchForm({
+            city: nextCityName,
+            cityId: null,
+            countryId: null,
+            exteriorNumber: nextExteriorNumber,
+            neighborhood: nextNeighborhood,
+            postalCode: nextPostalCode,
+            stateId: null,
+            street: nextStreet,
+          });
+          setStateSearch("");
+          setMunicipalitySearch("");
+          return;
+        }
+
+        let states = await locationHttpAdapter.listStates(
+          matchedCountry.countryId,
+          pickStateName(address),
+        );
+
+        if (requestId !== mapSelectionRequestIdRef.current) {
+          return;
+        }
+
+        let matchedState = findMatchingState(states, address);
+
+        if (!matchedState) {
+          states = await locationHttpAdapter.listStates(matchedCountry.countryId);
+
+          if (requestId !== mapSelectionRequestIdRef.current) {
+            return;
+          }
+
+          matchedState = findMatchingState(states, address);
+        }
+        let matchedCity: City | null = null;
+
+        if (matchedState) {
+          for (const candidate of cityCandidates) {
+            const cityResult = await locationHttpAdapter.listCities(
+              matchedState.stateId,
+              candidate,
+              1,
+              100,
+            );
+
+            if (requestId !== mapSelectionRequestIdRef.current) {
+              return;
+            }
+
+            matchedCity = findMatchingCity(cityResult.data, address);
+
+            if (matchedCity) {
+              break;
+            }
+          }
+
+          if (!matchedCity) {
+            const cityResult = await locationHttpAdapter.listCities(
+              matchedState.stateId,
+              undefined,
+              1,
+              100,
+            );
+
+            if (requestId !== mapSelectionRequestIdRef.current) {
+              return;
+            }
+
+            matchedCity = findMatchingCity(cityResult.data, address);
+          }
+        }
+
+        patchForm({
+          city: matchedCity?.name ?? nextCityName,
+          cityId: matchedCity?.cityId ?? null,
+          countryId: matchedCountry.countryId,
+          exteriorNumber: nextExteriorNumber,
+          neighborhood: nextNeighborhood,
+          postalCode: nextPostalCode,
+          stateId: matchedState?.stateId ?? null,
+          street: nextStreet,
+        });
+        setStateSearch("");
+        setMunicipalitySearch(matchedCity?.name ?? nextCityName);
+      } catch {
+        if (requestId !== mapSelectionRequestIdRef.current) {
+          return;
+        }
+
+        setStateSearch("");
+        setMunicipalitySearch("");
+      }
+    },
+    [countriesQuery.data, patchForm],
+  );
 
   return (
     <CreateFormSection
@@ -92,9 +424,13 @@ export function LocationSection({
         <PropertyLocationMapPicker
           latitude={form.latitude}
           longitude={form.longitude}
-          onChange={({ latitude, longitude }) =>
-            patchForm({ latitude, longitude })
-          }
+          onChange={({ latitude, longitude, source }) => {
+            patchForm({ latitude, longitude });
+
+            if (source === "user") {
+              void syncLocationFromMapSelection(latitude, longitude);
+            }
+          }}
         />
       </CreateFormField>
 

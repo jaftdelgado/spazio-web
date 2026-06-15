@@ -16,7 +16,8 @@
       "location": "Ubicación",
       "pricing": "Precios",
       "services": "Servicios",
-      "media": "Multimedia",
+      "clauses": "Cláusulas",
+      "multimedia": "Fotos",
       "settings": "Ajustes",
       "notes": "Notas"
     },
@@ -25,7 +26,8 @@
       "location": "Dirección y contexto de la propiedad.",
       "pricing": "Valores comerciales del inmueble.",
       "services": "Amenidades y servicios disponibles en la propiedad.",
-      "media": "Portada y referencias visuales.",
+      "clauses": "Condiciones y restricciones configurables del inmueble.",
+      "multimedia": "Fotos y recursos visuales del inmueble.",
       "settings": "Preferencias de visibilidad y publicación.",
       "notes": "Observaciones internas del registro."
     },
@@ -60,8 +62,13 @@
         "title": "Servicios",
         "hint": "Selecciona las amenidades con las que cuenta la propiedad."
       },
-      "media": {
-        "title": "Multimedia"
+      "clauses": {
+        "title": "Cláusulas",
+        "hint": "Define las condiciones y restricciones del inmueble."
+      },
+      "multimedia": {
+        "title": "Fotos",
+        "hint": "Agrega entre 1 y 10 fotos del inmueble. La primera será la portada por defecto."
       },
       "settings": {
         "title": "Preferencias"
@@ -138,15 +145,6 @@
         "hint": "Monto mensual si aplica.",
         "placeholder": "0"
       },
-      "mediaLabel": {
-        "label": "Etiqueta interna",
-        "hint": "Referencia breve para el equipo.",
-        "placeholder": "Fachada principal"
-      },
-      "mediaUpload": {
-        "action": "Subir archivos",
-        "hint": "Podrás conectar la carga real después."
-      },
       "isPublicAddress": {
         "label": "Mostrar dirección pública",
         "description": "Expone la dirección exacta en la ficha."
@@ -216,6 +214,32 @@
       "availableTitle": "Disponibles",
       "availableHint": "Haz clic en una amenidad para agregarla a la propiedad.",
       "availableEmpty": "No hay más amenidades disponibles."
+    },
+    "clauses": {
+      "loading": "Cargando cláusulas...",
+      "columnClause": "Cláusula",
+      "columnValue": "Valor",
+      "rangePlaceholderMin": "Mín",
+      "rangePlaceholderMax": "Máx"
+    },
+    "multimedia": {
+      "dropzoneTitle": "Arrastra tus fotos aquí",
+      "dropzoneHint": "Formatos: {{extensions}} · Máximo {{maxMb}} MB por archivo",
+      "maxReached": "Límite de 10 fotos alcanzado",
+      "uploading": "Subiendo...",
+      "uploadError": "Error al subir",
+      "retry": "Reintentar",
+      "photoCounter": "Foto {{current}} de {{total}}",
+      "coverBadge": "Portada",
+      "setCover": "Establecer como portada",
+      "coverLabel": "Portada",
+      "labelField": "Etiqueta",
+      "altField": "Texto alternativo",
+      "labelPlaceholder": "Ej: Fachada principal o cocina integral",
+      "altPlaceholder": "Describe brevemente lo que se ve en la foto",
+      "errorType": "Algunos archivos fueron rechazados por formato no permitido.",
+      "errorSize": "Algunos archivos superan el límite de {{maxMb}} MB.",
+      "errorMax": "Solo puedes agregar {{max}} fotos en total."
     },
     "footer": {
       "dirty": "Cambios sin guardar",

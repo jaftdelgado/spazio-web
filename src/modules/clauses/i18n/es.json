@@ -1,0 +1,11 @@
+{
+  "labels": {
+    "PETS_ALLOWED": "Se permiten mascotas",
+    "SMOKING_ALLOWED": "Se permite fumar",
+    "CHILDREN_ALLOWED": "Se permiten niños",
+    "EVENTS_ALLOWED": "Se permiten eventos",
+    "MAX_TENANTS": "Máximo de inquilinos",
+    "MIN_LEASE_MONTHS": "Meses mínimos de contrato",
+    "DEPOSIT_MONTHS": "Meses de depósito"
+  }
+}

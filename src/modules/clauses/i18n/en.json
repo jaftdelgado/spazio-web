@@ -1,0 +1,11 @@
+{
+  "labels": {
+    "PETS_ALLOWED": "Pets allowed",
+    "SMOKING_ALLOWED": "Smoking allowed",
+    "CHILDREN_ALLOWED": "Children allowed",
+    "EVENTS_ALLOWED": "Events allowed",
+    "MAX_TENANTS": "Max tenants",
+    "MIN_LEASE_MONTHS": "Min lease months",
+    "DEPOSIT_MONTHS": "Deposit months"
+  }
+}

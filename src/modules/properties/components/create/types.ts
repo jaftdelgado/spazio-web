@@ -1,11 +1,20 @@
+import type { ClauseEntry } from "@clauses/domain/clause.entity";
+
+export type PhotoEntry = {
+  file: File;
+  previewUrl: string;
+  label: string;
+  altText: string;
+  isCover: boolean;
+};
+
 export type PropertyCreateSectionId =
   | "general"
   | "location"
   | "pricing"
   | "services"
-  | "media"
-  | "settings"
-  | "notes";
+  | "clauses"
+  | "multimedia";
 
 export type PropertyCreateFormState = {
   title: string;
@@ -26,7 +35,8 @@ export type PropertyCreateFormState = {
   rentPricesByPeriod: Record<string, string>;
   maintenanceFee: string;
   serviceIds: number[];
-  mediaLabel: string;
+  clauses: ClauseEntry[];
+  photos: PhotoEntry[];
   isPublicAddress: boolean;
   isFeatured: boolean;
   acceptsPets: boolean;
@@ -52,7 +62,8 @@ export const initialPropertyCreateFormState: PropertyCreateFormState = {
   rentPricesByPeriod: {},
   maintenanceFee: "",
   serviceIds: [],
-  mediaLabel: "",
+  clauses: [],
+  photos: [],
   isPublicAddress: true,
   isFeatured: false,
   acceptsPets: true,

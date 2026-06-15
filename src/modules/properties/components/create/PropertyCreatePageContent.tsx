@@ -10,7 +10,6 @@ import {
   NoteIcon,
   PackageIcon,
   SaveIcon,
-  Settings02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import { useRouter } from "next/navigation";
@@ -28,13 +27,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/config/routes";
 import { cn } from "@/lib/utils";
+import { ClausesSection } from "@properties/components/create/sections/clauses/ClausesSection";
 import { GeneralSection } from "@properties/components/create/sections/GeneralSection";
 import { LocationSection } from "@properties/components/create/sections/LocationSection";
-import { MediaSection } from "@properties/components/create/sections/MediaSection";
-import { NotesSection } from "@properties/components/create/sections/NotesSection";
+import { MultimediaSection } from "@properties/components/create/sections/multimedia/MultimediaSection";
 import { PricingSection } from "@properties/components/create/sections/pricing";
 import { ServicesSection } from "@properties/components/create/sections/services";
-import { SettingsSection } from "@properties/components/create/sections/SettingsSection";
 import {
   initialPropertyCreateFormState,
   type PropertyCreateFormState,
@@ -53,9 +51,12 @@ const createNavItems: readonly PropertyCreateNavItem[] = [
   { id: "location", icon: Location01Icon, labelKey: "create.nav.location" },
   { id: "pricing", icon: DollarCircleIcon, labelKey: "create.nav.pricing" },
   { id: "services", icon: PackageIcon, labelKey: "create.nav.services" },
-  { id: "media", icon: ImageUploadIcon, labelKey: "create.nav.media" },
-  { id: "settings", icon: Settings02Icon, labelKey: "create.nav.settings" },
-  { id: "notes", icon: NoteIcon, labelKey: "create.nav.notes" },
+  { id: "clauses", icon: NoteIcon, labelKey: "create.nav.clauses" },
+  {
+    id: "multimedia",
+    icon: ImageUploadIcon,
+    labelKey: "create.nav.multimedia",
+  },
 ] as const;
 
 export function PropertyCreatePageContent() {
@@ -67,6 +68,19 @@ export function PropertyCreatePageContent() {
   const [form, setForm] = React.useState<PropertyCreateFormState>(
     initialPropertyCreateFormState,
   );
+  const photosRef = React.useRef(form.photos);
+
+  React.useEffect(() => {
+    photosRef.current = form.photos;
+  }, [form.photos]);
+
+  React.useEffect(() => {
+    return () => {
+      photosRef.current.forEach((entry) => {
+        URL.revokeObjectURL(entry.previewUrl);
+      });
+    };
+  }, []);
 
   const isDirty = React.useMemo(
     () => JSON.stringify(form) !== JSON.stringify(initialPropertyCreateFormState),
@@ -89,12 +103,10 @@ export function PropertyCreatePageContent() {
         return <PricingSection form={form} patchForm={patchForm} />;
       case "services":
         return <ServicesSection form={form} patchForm={patchForm} />;
-      case "media":
-        return <MediaSection form={form} patchForm={patchForm} />;
-      case "settings":
-        return <SettingsSection form={form} patchForm={patchForm} />;
-      case "notes":
-        return <NotesSection form={form} patchForm={patchForm} />;
+      case "clauses":
+        return <ClausesSection form={form} patchForm={patchForm} />;
+      case "multimedia":
+        return <MultimediaSection form={form} patchForm={patchForm} />;
       default:
         return null;
     }

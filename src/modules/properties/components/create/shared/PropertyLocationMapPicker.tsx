@@ -43,7 +43,11 @@ export function PropertyLocationMapPicker({
 }: {
   latitude: string;
   longitude: string;
-  onChange: (next: { latitude: string; longitude: string }) => void;
+  onChange: (next: {
+    latitude: string;
+    longitude: string;
+    source: "auto" | "user";
+  }) => void;
 }) {
   const { t } = usePropertiesTranslation();
   const mapRef = React.useRef<MapRef | null>(null);
@@ -74,6 +78,7 @@ export function PropertyLocationMapPicker({
       onChange({
         latitude: DEFAULT_CENTER.latitude.toFixed(6),
         longitude: DEFAULT_CENTER.longitude.toFixed(6),
+        source: "auto",
       });
       return;
     }
@@ -83,12 +88,14 @@ export function PropertyLocationMapPicker({
         onChange({
           latitude: position.coords.latitude.toFixed(6),
           longitude: position.coords.longitude.toFixed(6),
+          source: "auto",
         });
       },
       () => {
         onChange({
           latitude: DEFAULT_CENTER.latitude.toFixed(6),
           longitude: DEFAULT_CENTER.longitude.toFixed(6),
+          source: "auto",
         });
       },
       {
@@ -132,6 +139,7 @@ export function PropertyLocationMapPicker({
           onChange({
             latitude: event.lngLat.lat.toFixed(6),
             longitude: event.lngLat.lng.toFixed(6),
+            source: "user",
           });
         }}
         onLoad={() => {
@@ -161,6 +169,7 @@ export function PropertyLocationMapPicker({
               onChange({
                 latitude: event.lngLat.lat.toFixed(6),
                 longitude: event.lngLat.lng.toFixed(6),
+                source: "user",
               });
             }}
           />

@@ -16,7 +16,8 @@
       "location": "Location",
       "pricing": "Pricing",
       "services": "Services",
-      "media": "Media",
+      "clauses": "Clauses",
+      "multimedia": "Photos",
       "settings": "Settings",
       "notes": "Notes"
     },
@@ -25,7 +26,8 @@
       "location": "Address and property context.",
       "pricing": "Commercial values for the property.",
       "services": "Amenities and services available in the property.",
-      "media": "Cover and visual references.",
+      "clauses": "Configurable property conditions and restrictions.",
+      "multimedia": "Property photos and visual assets.",
       "settings": "Visibility and publishing preferences.",
       "notes": "Internal registration notes."
     },
@@ -60,8 +62,13 @@
         "title": "Services",
         "hint": "Choose the amenities available in the property."
       },
-      "media": {
-        "title": "Media"
+      "clauses": {
+        "title": "Clauses",
+        "hint": "Define the conditions and restrictions for the property."
+      },
+      "multimedia": {
+        "title": "Photos",
+        "hint": "Add between 1 and 10 photos of the property. The first one will be the cover by default."
       },
       "settings": {
         "title": "Preferences"
@@ -141,15 +148,6 @@
         "hint": "Monthly amount if applicable.",
         "placeholder": "0"
       },
-      "mediaLabel": {
-        "label": "Internal label",
-        "hint": "Short reference for the team.",
-        "placeholder": "Main facade"
-      },
-      "mediaUpload": {
-        "action": "Upload files",
-        "hint": "You can wire the real upload later."
-      },
       "isPublicAddress": {
         "label": "Show public address",
         "description": "Expose the exact address in the listing."
@@ -219,6 +217,32 @@
       "availableTitle": "Available",
       "availableHint": "Click an amenity to add it to the property.",
       "availableEmpty": "There are no more available amenities."
+    },
+    "clauses": {
+      "loading": "Loading clauses...",
+      "columnClause": "Clause",
+      "columnValue": "Value",
+      "rangePlaceholderMin": "Min",
+      "rangePlaceholderMax": "Max"
+    },
+    "multimedia": {
+      "dropzoneTitle": "Drop your photos here",
+      "dropzoneHint": "Formats: {{extensions}} · Max {{maxMb}} MB per file",
+      "maxReached": "10 photo limit reached",
+      "uploading": "Uploading...",
+      "uploadError": "Upload failed",
+      "retry": "Retry",
+      "photoCounter": "Photo {{current}} of {{total}}",
+      "coverBadge": "Cover",
+      "setCover": "Set as cover",
+      "coverLabel": "Cover",
+      "labelField": "Label",
+      "altField": "Alt text",
+      "labelPlaceholder": "Ex: Front facade or main kitchen",
+      "altPlaceholder": "Briefly describe what appears in the photo",
+      "errorType": "Some files were rejected due to unsupported format.",
+      "errorSize": "Some files exceed the {{maxMb}} MB limit.",
+      "errorMax": "You can only add {{max}} photos in total."
     },
     "footer": {
       "dirty": "Unsaved changes",
