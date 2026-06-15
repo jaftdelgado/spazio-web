@@ -22,7 +22,11 @@ function parseNumberValue(value: string) {
 
   const parsedValue = Number(value);
 
-  return Number.isNaN(parsedValue) ? null : parsedValue;
+  if (Number.isNaN(parsedValue)) {
+    return null;
+  }
+
+  return Math.max(0, parsedValue);
 }
 
 export function ClauseRow({ clause, entry, onChange }: ClauseRowProps) {
@@ -31,7 +35,7 @@ export function ClauseRow({ clause, entry, onChange }: ClauseRowProps) {
 
   if (clauseValue.type === "boolean") {
     return (
-      <div className="pointer-events-auto flex items-center justify-start bg-transparent">
+      <div className="pointer-events-auto flex items-center justify-start gap-3 bg-transparent">
         <Switch
           checked={clauseValue.value}
           onCheckedChange={(checked) =>
@@ -41,6 +45,11 @@ export function ClauseRow({ clause, entry, onChange }: ClauseRowProps) {
             })
           }
         />
+        <span className="text-sm text-muted-foreground">
+          {clauseValue.value
+            ? t("create.clauses.booleanAllowed")
+            : t("create.clauses.booleanNotAllowed")}
+        </span>
       </div>
     );
   }
@@ -51,6 +60,7 @@ export function ClauseRow({ clause, entry, onChange }: ClauseRowProps) {
         <Input
           className="w-24 bg-transparent focus-visible:ring-0"
           inputMode="numeric"
+          min={0}
           placeholder={t("create.clauses.rangePlaceholderMin")}
           type="number"
           value={clauseValue.min ?? ""}
@@ -61,11 +71,21 @@ export function ClauseRow({ clause, entry, onChange }: ClauseRowProps) {
               max: clauseValue.max,
             })
           }
+          onBlur={() => {
+            if (clauseValue.min === null) {
+              onChange(clause.clauseId, {
+                type: "range",
+                min: 0,
+                max: clauseValue.max ?? 0,
+              });
+            }
+          }}
         />
         <span className="text-muted-foreground text-xs">-</span>
         <Input
           className="w-24 bg-transparent focus-visible:ring-0"
           inputMode="numeric"
+          min={0}
           placeholder={t("create.clauses.rangePlaceholderMax")}
           type="number"
           value={clauseValue.max ?? ""}
@@ -76,6 +96,15 @@ export function ClauseRow({ clause, entry, onChange }: ClauseRowProps) {
               max: parseNumberValue(event.target.value),
             })
           }
+          onBlur={() => {
+            if (clauseValue.max === null) {
+              onChange(clause.clauseId, {
+                type: "range",
+                min: clauseValue.min ?? 0,
+                max: 0,
+              });
+            }
+          }}
         />
       </div>
     );
@@ -86,6 +115,7 @@ export function ClauseRow({ clause, entry, onChange }: ClauseRowProps) {
       <Input
         className="w-24 bg-transparent focus-visible:ring-0"
         inputMode="numeric"
+        min={0}
         type="number"
         value={clauseValue.type === "integer" ? (clauseValue.value ?? "") : ""}
         onChange={(event) =>
@@ -94,6 +124,14 @@ export function ClauseRow({ clause, entry, onChange }: ClauseRowProps) {
             value: parseNumberValue(event.target.value),
           })
         }
+        onBlur={() => {
+          if (clauseValue.type === "integer" && clauseValue.value === null) {
+            onChange(clause.clauseId, {
+              type: "integer",
+              value: 0,
+            });
+          }
+        }}
       />
     </div>
   );

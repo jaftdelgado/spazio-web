@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import {
+  Alert02Icon,
+  Building03Icon,
   Cancel01Icon,
   DollarCircleIcon,
   Home09Icon,
@@ -12,6 +14,7 @@ import {
   SaveIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
+import { toast } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
 import {
@@ -26,9 +29,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/config/routes";
+import { HttpError } from "@lib/http/http-errors";
 import { cn } from "@/lib/utils";
-import { useModalities } from "@catalogs/application/hooks/useCatalogs";
+import { useModalities, usePropertyTypes } from "@catalogs/application/hooks/useCatalogs";
+import { useCreateProperty } from "@properties/application/post/hooks/useCreateProperty";
 import { ClausesSection } from "@properties/components/create/sections/clauses/ClausesSection";
+import { PropertyDetailsSection } from "@properties/components/create/sections/details/PropertyDetailsSection";
 import { GeneralSection } from "@properties/components/create/sections/general/GeneralSection";
 import { LocationSection } from "@properties/components/create/sections/location/LocationSection";
 import { validateLocationSection } from "@properties/components/create/sections/location/locationSection.schema";
@@ -38,14 +44,22 @@ import {
   resolvePricingMode,
   validatePricingSection,
 } from "@properties/components/create/sections/pricing/pricingSection.schema";
+import { validatePropertyDetailsSection } from "@properties/components/create/sections/details/propertyDetailsSection.schema";
 import { ServicesSection } from "@properties/components/create/sections/services";
+import {
+  resolvePropertyTypeKind,
+  type PropertyTypeKind,
+} from "@properties/components/create/propertyTypeKind";
 import { validateGeneralSection } from "@properties/components/create/sections/general/generalSection.schema";
 import {
   initialPropertyCreateFormState,
+  type PhotoEntry,
   type PropertyCreateFormState,
   type PropertyCreateSectionId,
 } from "@properties/components/create/types";
+import type { CreatePropertyInput } from "@properties/domain/property.entity";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
+import { uploadHttpAdapter } from "@uploads/infra/upload.http-adapter";
 
 type PropertyCreateNavItem = {
   id: PropertyCreateSectionId;
@@ -55,36 +69,184 @@ type PropertyCreateNavItem = {
 
 const createNavItems: readonly PropertyCreateNavItem[] = [
   { id: "general", icon: Home09Icon, labelKey: "create.nav.general" },
-  { id: "location", icon: Location01Icon, labelKey: "create.nav.location" },
-  { id: "pricing", icon: DollarCircleIcon, labelKey: "create.nav.pricing" },
-  { id: "services", icon: PackageIcon, labelKey: "create.nav.services" },
-  { id: "clauses", icon: NoteIcon, labelKey: "create.nav.clauses" },
+  { id: "details", icon: Building03Icon, labelKey: "create.nav.details" },
   {
     id: "multimedia",
     icon: ImageUploadIcon,
     labelKey: "create.nav.multimedia",
   },
+  { id: "location", icon: Location01Icon, labelKey: "create.nav.location" },
+  { id: "pricing", icon: DollarCircleIcon, labelKey: "create.nav.pricing" },
+  { id: "services", icon: PackageIcon, labelKey: "create.nav.services" },
+  { id: "clauses", icon: NoteIcon, labelKey: "create.nav.clauses" },
 ] as const;
 
 const createSectionOrder: readonly PropertyCreateSectionId[] = [
   "general",
+  "details",
+  "multimedia",
   "location",
   "pricing",
   "services",
   "clauses",
-  "multimedia",
 ];
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof HttpError) {
+    if (error.status === 401 || error.status === 403) {
+      return "Tu sesion ya no permite registrar propiedades. Vuelve a iniciar sesion e intentalo de nuevo.";
+    }
+
+    if (error.status === 404) {
+      return "No encontramos la propiedad recien creada para terminar de subir las fotos. Intentalo nuevamente.";
+    }
+
+    if (error.status >= 500) {
+      return "Tuvimos un problema al guardar la propiedad. Intentalo de nuevo en unos minutos.";
+    }
+
+    const body = error.body as { error?: string } | null;
+    if (body?.error && body.error.trim() !== "") {
+      return body.error;
+    }
+
+    return "No pudimos completar el registro con la informacion capturada. Revisa los datos e intentalo otra vez.";
+  }
+
+  if (error instanceof TypeError) {
+    return "Parece que la conexion se interrumpio. Revisa tu internet e intentalo nuevamente.";
+  }
+
+  if (error instanceof Error) {
+    return "Ocurrio un problema al completar el registro. Intentalo nuevamente.";
+  }
+
+  return "Ocurrio un problema inesperado al completar el registro.";
+}
+
+function mapClausesForCreateInput(form: PropertyCreateFormState) {
+  return form.clauses.map((entry) => {
+    if (entry.value.type === "boolean") {
+      return {
+        clauseId: entry.clauseId,
+        booleanValue: entry.value.value,
+      };
+    }
+
+    if (entry.value.type === "range") {
+      return {
+        clauseId: entry.clauseId,
+        minValue: entry.value.min ?? 0,
+        maxValue: entry.value.max ?? 0,
+      };
+    }
+
+    return {
+      clauseId: entry.clauseId,
+      integerValue: entry.value.value ?? 0,
+    };
+  });
+}
+
+function buildCreatePropertyInput(
+  form: PropertyCreateFormState,
+  propertyTypeKind: PropertyTypeKind,
+  pricingMode: ReturnType<typeof resolvePricingMode>,
+): CreatePropertyInput {
+  return {
+    title: form.title.trim(),
+    description: form.description.trim(),
+    propertyTypeId: form.propertyTypeId ?? 0,
+    modalityId: form.modalityId ?? 0,
+    lotArea: Number(form.lotArea),
+    isFeatured: form.isFeatured,
+    location: {
+      cityId: form.cityId ?? 0,
+      neighborhood: form.neighborhood.trim(),
+      street: form.street.trim(),
+      exteriorNumber: form.exteriorNumber.trim(),
+      interiorNumber:
+        form.interiorNumber.trim() === "" ? undefined : form.interiorNumber.trim(),
+      postalCode: form.postalCode.trim(),
+      latitude: Number(form.latitude),
+      longitude: Number(form.longitude),
+      isPublicAddress: form.isPublicAddress,
+    },
+    residential:
+      propertyTypeKind === "residential"
+        ? {
+            bedrooms: Number(form.bedrooms),
+            bathrooms: Number(form.bathrooms),
+            beds: Number(form.beds),
+            floors: Number(form.floors),
+            parkingSpots: Number(form.parkingSpots),
+            builtArea: Number(form.builtArea),
+            constructionYear: Number(form.constructionYear),
+            orientationId: form.orientationId ?? 0,
+            isFurnished: form.isFurnished,
+          }
+        : undefined,
+    commercial:
+      propertyTypeKind === "commercial"
+        ? {
+            ceilingHeight: Number(form.ceilingHeight),
+            loadingDocks: Number(form.loadingDocks),
+            internalOffices: Number(form.internalOffices),
+            threePhasePower: form.threePhasePower,
+            landUse: form.landUse.trim(),
+          }
+        : undefined,
+    salePrice:
+      pricingMode === "sale" || pricingMode === "mixed"
+        ? {
+            salePrice: Number(form.salePrice),
+            currency: "MXN",
+            isNegotiable: form.salePriceIsNegotiable,
+          }
+        : undefined,
+    rentPrices:
+      pricingMode === "rent" || pricingMode === "mixed"
+        ? form.enabledRentPeriodIds.map((periodId) => ({
+            periodId,
+            rentPrice: Number(form.rentPricesByPeriod[String(periodId)] ?? "0"),
+            deposit: Number(form.rentDepositsByPeriod[String(periodId)] ?? "0"),
+            currency: "MXN",
+            isNegotiable: false,
+          }))
+        : undefined,
+    services: form.serviceIds.length > 0 ? form.serviceIds : undefined,
+    clauses: form.clauses.length > 0 ? mapClausesForCreateInput(form) : undefined,
+  };
+}
+
+async function uploadPropertyPhotos(propertyUuid: string, photos: PhotoEntry[]) {
+  for (const [index, photo] of photos.entries()) {
+    await uploadHttpAdapter.uploadPropertyPhoto({
+      propertyUuid,
+      file: photo.file,
+      label: photo.label,
+      altText: photo.altText,
+      sortOrder: index,
+      isCover: photo.isCover,
+    });
+  }
+}
 
 export function PropertyCreatePageContent() {
   const { t } = usePropertiesTranslation();
   const router = useRouter();
+  const createPropertyMutation = useCreateProperty();
   const modalitiesQuery = useModalities();
   const [activeSection, setActiveSection] =
     React.useState<PropertyCreateSectionId>("general");
   const [isCancelDialogOpen, setIsCancelDialogOpen] = React.useState(false);
   const [isEmptyServicesDialogOpen, setIsEmptyServicesDialogOpen] =
     React.useState(false);
+  const [isEmptyClausesDialogOpen, setIsEmptyClausesDialogOpen] =
+    React.useState(false);
   const [hasConfirmedEmptyServices, setHasConfirmedEmptyServices] =
+    React.useState(false);
+  const [hasConfirmedEmptyClauses, setHasConfirmedEmptyClauses] =
     React.useState(false);
   const [form, setForm] = React.useState<PropertyCreateFormState>(
     initialPropertyCreateFormState,
@@ -112,6 +274,7 @@ export function PropertyCreatePageContent() {
     [form, t],
   );
   const isGeneralSectionComplete = generalSectionValidation.success;
+  const isMultimediaSectionComplete = form.photos.length > 0;
   const locationSectionValidation = React.useMemo(
     () => validateLocationSection(form, t),
     [form, t],
@@ -128,12 +291,31 @@ export function PropertyCreatePageContent() {
     () => resolvePricingMode(selectedModalityName),
     [selectedModalityName],
   );
+  const propertyTypesQuery = usePropertyTypes();
+  const selectedPropertyTypeOption = React.useMemo(
+    () =>
+      (propertyTypesQuery.data ?? []).find(
+        (propertyType) => propertyType.propertyTypeId === form.propertyTypeId,
+      ) ?? null,
+    [form.propertyTypeId, propertyTypesQuery.data],
+  );
+  const propertyTypeKind = React.useMemo(
+    () => resolvePropertyTypeKind(selectedPropertyTypeOption),
+    [selectedPropertyTypeOption],
+  );
+  const propertyDetailsSectionValidation = React.useMemo(
+    () => validatePropertyDetailsSection(form, propertyTypeKind, t),
+    [form, propertyTypeKind, t],
+  );
+  const isPropertyDetailsSectionComplete =
+    form.propertyTypeId !== null && propertyDetailsSectionValidation.success;
   const pricingSectionValidation = React.useMemo(
     () => validatePricingSection(form, pricingMode, t),
     [form, pricingMode, t],
   );
   const isPricingSectionComplete = pricingSectionValidation.success;
   const hasServicesSelection = form.serviceIds.length > 0;
+  const hasClausesSelection = form.clauses.length > 0;
 
   React.useEffect(() => {
     if (hasServicesSelection) {
@@ -141,19 +323,44 @@ export function PropertyCreatePageContent() {
     }
   }, [hasServicesSelection]);
 
+  React.useEffect(() => {
+    if (hasClausesSelection) {
+      setHasConfirmedEmptyClauses(false);
+    }
+  }, [hasClausesSelection]);
+
   const enabledSections = React.useMemo(() => {
     const unlocked = new Set<PropertyCreateSectionId>(["general"]);
 
     if (isGeneralSectionComplete) {
+      unlocked.add("details");
+    }
+
+    if (isGeneralSectionComplete && isPropertyDetailsSectionComplete) {
+      unlocked.add("multimedia");
+    }
+
+    if (
+      isGeneralSectionComplete &&
+      isPropertyDetailsSectionComplete &&
+      isMultimediaSectionComplete
+    ) {
       unlocked.add("location");
     }
 
-    if (isGeneralSectionComplete && isLocationSectionComplete) {
+    if (
+      isGeneralSectionComplete &&
+      isPropertyDetailsSectionComplete &&
+      isMultimediaSectionComplete &&
+      isLocationSectionComplete
+    ) {
       unlocked.add("pricing");
     }
 
     if (
       isGeneralSectionComplete &&
+      isPropertyDetailsSectionComplete &&
+      isMultimediaSectionComplete &&
       isLocationSectionComplete &&
       isPricingSectionComplete
     ) {
@@ -162,6 +369,8 @@ export function PropertyCreatePageContent() {
 
     if (
       isGeneralSectionComplete &&
+      isPropertyDetailsSectionComplete &&
+      isMultimediaSectionComplete &&
       isLocationSectionComplete &&
       isPricingSectionComplete &&
       (hasServicesSelection || hasConfirmedEmptyServices)
@@ -169,12 +378,28 @@ export function PropertyCreatePageContent() {
       unlocked.add("clauses");
     }
 
+    if (
+      isGeneralSectionComplete &&
+      isPropertyDetailsSectionComplete &&
+      isMultimediaSectionComplete &&
+      isLocationSectionComplete &&
+      isPricingSectionComplete &&
+      (hasServicesSelection || hasConfirmedEmptyServices) &&
+      (hasClausesSelection || hasConfirmedEmptyClauses)
+    ) {
+      unlocked.add("multimedia");
+    }
+
     return unlocked;
   }, [
+    hasClausesSelection,
     hasServicesSelection,
+    hasConfirmedEmptyClauses,
     isGeneralSectionComplete,
     hasConfirmedEmptyServices,
     isLocationSectionComplete,
+    isMultimediaSectionComplete,
+    isPropertyDetailsSectionComplete,
     isPricingSectionComplete,
   ]);
 
@@ -192,12 +417,18 @@ export function PropertyCreatePageContent() {
   const canGoNext =
     activeSection === "general"
       ? Boolean(nextSection) && isGeneralSectionComplete
+      : activeSection === "details"
+        ? Boolean(nextSection) && isPropertyDetailsSectionComplete
+      : activeSection === "multimedia"
+        ? Boolean(nextSection) && isMultimediaSectionComplete
       : activeSection === "location"
         ? Boolean(nextSection) && isLocationSectionComplete
         : activeSection === "pricing"
           ? Boolean(nextSection) && isPricingSectionComplete
           : activeSection === "services"
             ? Boolean(nextSection)
+            : activeSection === "clauses"
+              ? true
       : false;
 
   function patchForm(patch: Partial<PropertyCreateFormState>) {
@@ -213,6 +444,10 @@ export function PropertyCreatePageContent() {
   }
 
   function handleGoBack() {
+    if (createPropertyMutation.isPending) {
+      return;
+    }
+
     if (!previousSection || !enabledSections.has(previousSection)) {
       return;
     }
@@ -220,13 +455,40 @@ export function PropertyCreatePageContent() {
     setActiveSection(previousSection);
   }
 
+  async function handleSubmit() {
+    try {
+      const payload = buildCreatePropertyInput(form, propertyTypeKind, pricingMode);
+      const result = await createPropertyMutation.mutateAsync(payload);
+
+      if (form.photos.length > 0) {
+        await uploadPropertyPhotos(result.propertyUuid, form.photos);
+      }
+
+      toast.success(t("create.toast.successTitle"), {
+        description: t("create.toast.successDescription"),
+      });
+      router.push(ROUTES.admin.properties);
+    } catch (error) {
+      toast.danger(t("create.toast.errorTitle"), {
+        description: getErrorMessage(error),
+      });
+    }
+  }
+
   function handleGoNext() {
+    if (createPropertyMutation.isPending) {
+      return;
+    }
+
     if (!nextSection) {
+      void handleSubmit();
       return;
     }
 
     if (
       (activeSection === "general" && isGeneralSectionComplete) ||
+      (activeSection === "details" && isPropertyDetailsSectionComplete) ||
+      (activeSection === "multimedia" && isMultimediaSectionComplete) ||
       (activeSection === "location" && isLocationSectionComplete) ||
       (activeSection === "pricing" && isPricingSectionComplete)
     ) {
@@ -242,6 +504,17 @@ export function PropertyCreatePageContent() {
       }
 
       setIsEmptyServicesDialogOpen(true);
+      return;
+    }
+
+    if (activeSection === "clauses") {
+      if (hasClausesSelection) {
+        setHasConfirmedEmptyClauses(false);
+        setActiveSection(nextSection);
+        return;
+      }
+
+      setIsEmptyClausesDialogOpen(true);
     }
   }
 
@@ -255,10 +528,28 @@ export function PropertyCreatePageContent() {
     setActiveSection(nextSection);
   }
 
+  function handleConfirmEmptyClauses() {
+    if (!nextSection) {
+      return;
+    }
+
+    setHasConfirmedEmptyClauses(true);
+    setIsEmptyClausesDialogOpen(false);
+    setActiveSection(nextSection);
+  }
+
   function renderActiveSection() {
     switch (activeSection) {
       case "general":
         return <GeneralSection form={form} patchForm={patchForm} />;
+      case "details":
+        return (
+          <PropertyDetailsSection
+            form={form}
+            propertyTypeKind={propertyTypeKind}
+            patchForm={patchForm}
+          />
+        );
       case "location":
         return <LocationSection form={form} patchForm={patchForm} />;
       case "pricing":
@@ -339,17 +630,24 @@ export function PropertyCreatePageContent() {
               <Button
                 type="button"
                 variant="outline"
+                disabled={createPropertyMutation.isPending}
                 onClick={() => setIsCancelDialogOpen(true)}
               >
                 {t("create.footer.cancel")}
               </Button>
-              <Button disabled={!canGoNext} type="button" onClick={handleGoNext}>
+              <Button
+                disabled={!canGoNext || createPropertyMutation.isPending}
+                type="button"
+                onClick={handleGoNext}
+              >
                 <HugeiconsIcon
                   icon={SaveIcon}
                   size={16}
                   strokeWidth={1.8}
                 />
-                <span>{t("create.footer.next")}</span>
+                <span>
+                  {nextSection ? t("create.footer.next") : t("create.footer.save")}
+                </span>
               </Button>
             </div>
           </header>
@@ -415,6 +713,37 @@ export function PropertyCreatePageContent() {
             </AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmEmptyServices}>
               {t("create.servicesEmptyDialog.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={isEmptyClausesDialogOpen}
+        onOpenChange={setIsEmptyClausesDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="mb-2 flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <HugeiconsIcon
+                icon={NoteIcon}
+                size={20}
+                strokeWidth={1.8}
+              />
+            </div>
+            <AlertDialogTitle>
+              {t("create.clausesEmptyDialog.title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("create.clausesEmptyDialog.body")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              {t("create.clausesEmptyDialog.dismiss")}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmEmptyClauses}>
+              {t("create.clausesEmptyDialog.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

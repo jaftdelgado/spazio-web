@@ -23,6 +23,18 @@ function isFilledPrice(value: string) {
   return Number.isFinite(numericValue) && numericValue > 0;
 }
 
+function isNonNegativeAmount(value: string) {
+  const trimmed = value.trim();
+
+  if (trimmed === "") {
+    return false;
+  }
+
+  const numericValue = Number(trimmed);
+
+  return Number.isFinite(numericValue) && numericValue >= 0;
+}
+
 export function resolvePricingMode(modalityName?: string | null): PricingMode {
   const normalizedName = modalityName?.trim().toLowerCase() ?? "";
 
@@ -48,12 +60,13 @@ export function createPricingSectionSchema(
   return z
     .object({
       enabledRentPeriodIds: z.array(z.number().int().positive()),
+      rentDepositsByPeriod: z.record(z.string(), z.string()),
       rentPricesByPeriod: z.record(z.string(), z.string()),
       salePrice: z.string(),
     })
     .superRefine((value, ctx) => {
       if (pricingMode === "sale" || pricingMode === "mixed") {
-        if (!isFilledPrice(value.salePrice)) {
+        if (!isNonNegativeAmount(value.salePrice)) {
           ctx.addIssue({
             code: "custom",
             message: t("create.validation.pricing.salePriceRequired"),
@@ -75,12 +88,21 @@ export function createPricingSectionSchema(
         for (const periodId of value.enabledRentPeriodIds) {
           const periodKey = String(periodId);
           const periodPrice = value.rentPricesByPeriod[periodKey] ?? "";
+          const deposit = value.rentDepositsByPeriod[periodKey] ?? "";
 
           if (!isFilledPrice(periodPrice)) {
             ctx.addIssue({
               code: "custom",
               message: t("create.validation.pricing.rentPriceRequired"),
               path: ["rentPricesByPeriod", periodKey],
+            });
+          }
+
+          if (!isNonNegativeAmount(deposit)) {
+            ctx.addIssue({
+              code: "custom",
+              message: t("create.validation.pricing.depositRequired"),
+              path: ["rentDepositsByPeriod", periodKey],
             });
           }
         }
@@ -95,6 +117,7 @@ export function validatePricingSection(
 ) {
   return createPricingSectionSchema(pricingMode, t).safeParse({
     enabledRentPeriodIds: form.enabledRentPeriodIds,
+    rentDepositsByPeriod: form.rentDepositsByPeriod,
     rentPricesByPeriod: form.rentPricesByPeriod,
     salePrice: form.salePrice,
   });

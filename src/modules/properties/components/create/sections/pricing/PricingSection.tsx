@@ -205,10 +205,17 @@ export function PricingSection({
       : selectedPriceOption
         ? (form.rentPricesByPeriod[String(selectedPriceOption.periodId)] ?? "")
         : "";
+  const selectedDepositValue =
+    selectedPriceOption?.kind === "rent" && selectedPriceOption.periodId !== undefined
+      ? (form.rentDepositsByPeriod[String(selectedPriceOption.periodId)] ?? "")
+      : "";
 
   const selectedFieldId = selectedPriceOption
     ? `property-price-${selectedPriceOption.id}`
     : "property-price";
+  const selectedDepositFieldId = selectedPriceOption?.kind === "rent"
+    ? `property-deposit-${selectedPriceOption.id}`
+    : "property-deposit";
 
   const handleSelectedPriceChange = React.useCallback(
     (nextValue: string) => {
@@ -238,6 +245,33 @@ export function PricingSection({
     [form.rentPricesByPeriod, patchForm, selectedPriceOption],
   );
 
+  const handleSelectedDepositChange = React.useCallback(
+    (nextValue: string) => {
+      if (
+        !selectedPriceOption ||
+        selectedPriceOption.kind !== "rent" ||
+        selectedPriceOption.periodId === undefined
+      ) {
+        return;
+      }
+
+      const periodKey = String(selectedPriceOption.periodId);
+      const nextRentDepositsByPeriod = {
+        ...form.rentDepositsByPeriod,
+        [periodKey]: nextValue,
+      };
+
+      if (nextValue.trim() === "") {
+        delete nextRentDepositsByPeriod[periodKey];
+      }
+
+      patchForm({
+        rentDepositsByPeriod: nextRentDepositsByPeriod,
+      });
+    },
+    [form.rentDepositsByPeriod, patchForm, selectedPriceOption],
+  );
+
   const handleTogglePriceOption = React.useCallback(
     (rowId: string, enabled: boolean) => {
       const option = priceOptions.find((current) => current.id === rowId);
@@ -250,9 +284,21 @@ export function PricingSection({
         ? Array.from(new Set([...form.enabledRentPeriodIds, option.periodId]))
         : form.enabledRentPeriodIds.filter((periodId) => periodId !== option.periodId);
 
-      patchForm({ enabledRentPeriodIds: nextEnabledPeriodIds });
+      const nextRentPricesByPeriod = { ...form.rentPricesByPeriod };
+      const nextRentDepositsByPeriod = { ...form.rentDepositsByPeriod };
+
+      if (!enabled) {
+        delete nextRentPricesByPeriod[String(option.periodId)];
+        delete nextRentDepositsByPeriod[String(option.periodId)];
+      }
+
+      patchForm({
+        enabledRentPeriodIds: nextEnabledPeriodIds,
+        rentDepositsByPeriod: nextRentDepositsByPeriod,
+        rentPricesByPeriod: nextRentPricesByPeriod,
+      });
     },
-    [form.enabledRentPeriodIds, patchForm, priceOptions],
+    [form.enabledRentPeriodIds, form.rentDepositsByPeriod, form.rentPricesByPeriod, patchForm, priceOptions],
   );
 
   return (
@@ -265,6 +311,18 @@ export function PricingSection({
           emptyState={pricingEmptyState ?? undefined}
           fieldId={selectedFieldId}
           label={selectedPriceOption?.label ?? t("create.fields.salePrice.label")}
+          secondaryFieldId={
+            selectedPriceOption?.kind === "rent" ? selectedDepositFieldId : undefined
+          }
+          secondaryLabel={
+            selectedPriceOption?.kind === "rent"
+              ? t("create.fields.deposit.label")
+              : undefined
+          }
+          secondarySuffix={
+            selectedPriceOption?.kind === "rent" ? "MXN" : undefined
+          }
+          secondaryValue={selectedDepositValue}
           locale={numberFlowLocale}
           maxIntegerDigits={selectedPriceOption?.kind === "sale" ? 9 : 8}
           isNegotiable={form.salePriceIsNegotiable}
@@ -276,6 +334,7 @@ export function PricingSection({
           }
           value={selectedPriceValue}
           onChange={handleSelectedPriceChange}
+          onSecondaryChange={handleSelectedDepositChange}
           onNegotiableChange={(salePriceIsNegotiable) =>
             patchForm({ salePriceIsNegotiable })
           }

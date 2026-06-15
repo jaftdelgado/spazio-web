@@ -13,6 +13,7 @@
     },
     "nav": {
       "general": "General",
+      "details": "Details",
       "location": "Location",
       "pricing": "Pricing",
       "services": "Services",
@@ -23,6 +24,7 @@
     },
     "sectionDescriptions": {
       "general": "Main property information.",
+      "details": "Type-specific property characteristics.",
       "location": "Address and property context.",
       "pricing": "Commercial values for the property.",
       "services": "Amenities and services available in the property.",
@@ -53,6 +55,10 @@
       "locationDetails": {
         "title": "Location",
         "hint": "Base address for the property."
+      },
+      "propertyDetails": {
+        "title": "Characteristics",
+        "hint": "Complete the required attributes according to the selected property type."
       },
       "pricingDetails": {
         "title": "Pricing",
@@ -88,7 +94,28 @@
       },
       "extras": {
         "title": "Additional details",
-        "hint": "Capture complementary land information and the property's orientation."
+        "hint": "Capture complementary location information.",
+        "description": "Lot area is now captured inside the property details section so the main property measurements stay together."
+      }
+    },
+    "details": {
+      "unselected": {
+        "title": "Select a property type first",
+        "description": "We need to know whether the property is residential, commercial, or another type to show the proper fields."
+      },
+      "other": {
+        "title": "This type does not require a specific block",
+        "description": "You can continue without capturing residential or commercial attributes for this property type."
+      },
+      "residential": {
+        "title": "Residential details",
+        "hint": "Complete the layout and physical conditions of the residential property.",
+        "badge": "Residential"
+      },
+      "commercial": {
+        "title": "Commercial details",
+        "hint": "Complete the operational and technical setup of the commercial property.",
+        "badge": "Commercial"
       }
     },
     "fields": {
@@ -154,11 +181,63 @@
         "label": "Lot area",
         "placeholder": "Ex: 180.5 m2"
       },
+      "bedrooms": {
+        "label": "Bedrooms",
+        "placeholder": "Ex: 3"
+      },
+      "bathrooms": {
+        "label": "Bathrooms",
+        "placeholder": "Ex: 2"
+      },
+      "beds": {
+        "label": "Beds",
+        "placeholder": "Ex: 3"
+      },
+      "floors": {
+        "label": "Floors",
+        "placeholder": "Ex: 2"
+      },
+      "parkingSpots": {
+        "label": "Parking spots",
+        "placeholder": "Ex: 2"
+      },
+      "builtArea": {
+        "label": "Built area",
+        "placeholder": "Ex: 145.5 m2"
+      },
+      "constructionYear": {
+        "label": "Construction year",
+        "placeholder": "Ex: 2018"
+      },
       "orientation": {
         "label": "Property orientation",
         "placeholder": "Select an orientation",
         "loading": "Loading orientations...",
         "empty": "No orientations available."
+      },
+      "isFurnished": {
+        "label": "Furnished",
+        "description": "Indicates whether the property is delivered with furniture."
+      },
+      "ceilingHeight": {
+        "label": "Ceiling height",
+        "placeholder": "Ex: 4.5 m"
+      },
+      "loadingDocks": {
+        "label": "Loading docks",
+        "placeholder": "Ex: 2"
+      },
+      "internalOffices": {
+        "label": "Internal offices",
+        "placeholder": "Ex: 4"
+      },
+      "threePhasePower": {
+        "label": "Three-phase power",
+        "description": "Enable if the property has a three-phase electrical installation."
+      },
+      "landUse": {
+        "label": "Land use",
+        "placeholder": "Ex: Commercial, mixed-use, or light industrial"
       },
       "salePrice": {
         "label": "Sale price",
@@ -167,6 +246,10 @@
       "rentPrice": {
         "label": "Rent price",
         "prefix": "Rent",
+        "placeholder": "0"
+      },
+      "deposit": {
+        "label": "Deposit",
         "placeholder": "0"
       },
       "maintenanceFee": {
@@ -248,11 +331,24 @@
       "availableEmpty": "There are no more available amenities."
     },
     "clauses": {
+      "add": "Add",
+      "addAriaLabel": "Add clause {{clause}}",
+      "availableHint": "Clauses you can enable for this property.",
+      "availableTitle": "Available",
+      "booleanAllowed": "Allowed",
+      "booleanNotAllowed": "Not allowed",
+      "columnAction": "Action",
       "loading": "Loading clauses...",
       "columnClause": "Clause",
+      "columnDescription": "Description",
       "columnValue": "Value",
+      "descriptionTooltipAriaLabel": "View description for {{clause}}",
+      "remove": "Remove",
+      "removeAriaLabel": "Remove clause {{clause}}",
       "rangePlaceholderMin": "Min",
-      "rangePlaceholderMax": "Max"
+      "rangePlaceholderMax": "Max",
+      "selectedHint": "Active clauses and their current value.",
+      "selectedTitle": "Selected"
     },
     "multimedia": {
       "uploaderTitle": "Photo upload",
@@ -286,6 +382,8 @@
         "countryRequired": "Select a country.",
         "stateRequired": "Select a state.",
         "cityRequired": "Select a municipality.",
+        "latitudeInvalid": "Select a valid latitude coordinate on the map.",
+        "longitudeInvalid": "Select a valid longitude coordinate on the map.",
         "postalCodeRequired": "Postal code is required.",
         "postalCodeInvalid": "Postal code must be numeric and cannot exceed 5 digits.",
         "neighborhoodRequired": "Neighborhood is required.",
@@ -296,13 +394,41 @@
         "exteriorNumberInvalid": "Exterior number only allows letters, numbers, hyphen, and #, with a maximum of 8 characters.",
         "interiorNumberInvalid": "Interior number only allows letters, numbers, hyphen, and #, with a maximum of 8 characters.",
         "lotAreaRequired": "Lot area is required.",
-        "lotAreaInvalid": "Lot area must be a valid numeric value.",
-        "orientationRequired": "Select an orientation."
+        "lotAreaInvalid": "Lot area must be a valid numeric value."
+      },
+      "details": {
+        "lotAreaRequired": "Lot area is required.",
+        "lotAreaInvalid": "Lot area must be a number greater than 0 with up to 2 decimals.",
+        "bedroomsRequired": "Bedrooms are required.",
+        "bedroomsInvalid": "Bedrooms must be a whole number greater than or equal to 0.",
+        "bathroomsRequired": "Bathrooms are required.",
+        "bathroomsInvalid": "Bathrooms must be a whole number greater than or equal to 0.",
+        "bedsRequired": "Beds are required.",
+        "bedsInvalid": "Beds must be a whole number greater than or equal to 0.",
+        "floorsRequired": "Floors are required.",
+        "floorsInvalid": "Floors must be a whole number greater than or equal to 0.",
+        "parkingSpotsRequired": "Parking spots are required.",
+        "parkingSpotsInvalid": "Parking spots must be a whole number greater than or equal to 0.",
+        "builtAreaRequired": "Built area is required.",
+        "builtAreaInvalid": "Built area must be a number greater than 0 with up to 2 decimals.",
+        "builtAreaExceedsLotArea": "Built area cannot exceed lot area.",
+        "constructionYearRequired": "Construction year is required.",
+        "constructionYearInvalid": "Construction year must be a whole number greater than 0.",
+        "orientationRequired": "Select an orientation.",
+        "ceilingHeightRequired": "Ceiling height is required.",
+        "ceilingHeightInvalid": "Ceiling height must be a number greater than 0 with up to 2 decimals.",
+        "loadingDocksRequired": "Loading docks are required.",
+        "loadingDocksInvalid": "Loading docks must be a whole number greater than or equal to 0.",
+        "internalOfficesRequired": "Internal offices are required.",
+        "internalOfficesInvalid": "Internal offices must be a whole number greater than or equal to 0.",
+        "landUseRequired": "Land use is required.",
+        "landUseMaxLength": "Land use cannot exceed 100 characters."
       },
       "pricing": {
         "salePriceRequired": "Sale price is required.",
         "rentPeriodRequired": "Enable at least one rent period.",
-        "rentPriceRequired": "All enabled rent periods must have a price."
+        "rentPriceRequired": "All enabled rent periods must have a price.",
+        "depositRequired": "All enabled rent periods must have a deposit, even if it is 0."
       }
     },
     "footer": {
@@ -325,6 +451,17 @@
       "body": "You have not selected amenities or services for this property yet. Showing them on the public listing helps the property look more complete, attractive, and easier for users to compare. You can continue without them if you prefer to add them later.",
       "dismiss": "Back to services",
       "confirm": "Continue without services"
+    },
+    "clausesEmptyDialog": {
+      "title": "Continue without clauses",
+      "body": "You have not enabled any clauses for this property. You can continue and configure them later if needed.",
+      "dismiss": "Back to clauses",
+      "confirm": "Continue without clauses"
+    },
+    "toast": {
+      "successTitle": "Property registered",
+      "successDescription": "The registration is complete and the photos were uploaded successfully.",
+      "errorTitle": "We could not complete the registration"
     }
   },
   "searchPlaceholder": "Search properties...",
@@ -354,9 +491,13 @@
   },
   "states": {
     "empty": "There are no properties to display.",
+    "emptyTitle": "There are no registered properties yet",
+    "emptyDescription": "Once you register the first property, it will appear here so you can manage it.",
+    "emptySelectionTitle": "No types selected",
+    "emptySelectionDescription": "Select at least one property type to see results in this view.",
     "loading": "Loading properties...",
     "loadingRowLabel": "Loading property",
-    "loadErrorTitle": "Properties could not be loaded.",
+    "loadErrorTitle": "We could not load the properties",
     "retry": "Retry"
   },
   "grid": {

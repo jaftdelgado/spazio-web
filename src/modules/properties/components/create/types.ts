@@ -10,6 +10,7 @@ export type PhotoEntry = {
 
 export type PropertyCreateSectionId =
   | "general"
+  | "details"
   | "location"
   | "pricing"
   | "services"
@@ -33,10 +34,24 @@ export type PropertyCreateFormState = {
   interiorNumber: string;
   postalCode: string;
   lotArea: string;
+  bedrooms: string;
+  bathrooms: string;
+  beds: string;
+  floors: string;
+  parkingSpots: string;
+  builtArea: string;
+  constructionYear: string;
   orientationId: number | null;
+  isFurnished: boolean;
+  ceilingHeight: string;
+  loadingDocks: string;
+  internalOffices: string;
+  threePhasePower: boolean;
+  landUse: string;
   salePrice: string;
   salePriceIsNegotiable: boolean;
   rentPricesByPeriod: Record<string, string>;
+  rentDepositsByPeriod: Record<string, string>;
   enabledRentPeriodIds: number[];
   maintenanceFee: string;
   serviceIds: number[];
@@ -65,10 +80,24 @@ export const initialPropertyCreateFormState: PropertyCreateFormState = {
   interiorNumber: "",
   postalCode: "",
   lotArea: "",
+  bedrooms: "",
+  bathrooms: "",
+  beds: "",
+  floors: "",
+  parkingSpots: "",
+  builtArea: "",
+  constructionYear: "",
   orientationId: null,
+  isFurnished: false,
+  ceilingHeight: "",
+  loadingDocks: "",
+  internalOffices: "",
+  threePhasePower: false,
+  landUse: "",
   salePrice: "",
   salePriceIsNegotiable: false,
   rentPricesByPeriod: {},
+  rentDepositsByPeriod: {},
   enabledRentPeriodIds: [],
   maintenanceFee: "",
   serviceIds: [],

@@ -13,6 +13,7 @@
     },
     "nav": {
       "general": "General",
+      "details": "Detalles",
       "location": "Ubicación",
       "pricing": "Precios",
       "services": "Servicios",
@@ -23,6 +24,7 @@
     },
     "sectionDescriptions": {
       "general": "Información principal del inmueble.",
+      "details": "Características específicas según el tipo de propiedad.",
       "location": "Dirección y contexto de la propiedad.",
       "pricing": "Valores comerciales del inmueble.",
       "services": "Amenidades y servicios disponibles en la propiedad.",
@@ -53,6 +55,10 @@
       "locationDetails": {
         "title": "Ubicación",
         "hint": "Dirección base del inmueble."
+      },
+      "propertyDetails": {
+        "title": "Características",
+        "hint": "Completa los atributos requeridos según el tipo de propiedad."
       },
       "pricingDetails": {
         "title": "Precio",
@@ -88,7 +94,28 @@
       },
       "extras": {
         "title": "Datos adicionales",
-        "hint": "Captura información complementaria del terreno y la orientación del inmueble."
+        "hint": "Captura información complementaria de la ubicación.",
+        "description": "La superficie del terreno ahora se captura dentro de la sección de detalles de la propiedad para mantener juntas las métricas del inmueble."
+      }
+    },
+    "details": {
+      "unselected": {
+        "title": "Selecciona primero un tipo de propiedad",
+        "description": "Necesitamos saber si el inmueble es residencial, comercial u otro para mostrar los campos correspondientes."
+      },
+      "other": {
+        "title": "Este tipo no requiere bloque específico",
+        "description": "Puedes continuar con el registro sin capturar atributos residenciales o comerciales para este tipo de propiedad."
+      },
+      "residential": {
+        "title": "Datos residenciales",
+        "hint": "Completa la distribución y condiciones físicas del inmueble residencial.",
+        "badge": "Residencial"
+      },
+      "commercial": {
+        "title": "Datos comerciales",
+        "hint": "Completa la configuración operativa y técnica del inmueble comercial.",
+        "badge": "Comercial"
       }
     },
     "fields": {
@@ -151,11 +178,63 @@
         "label": "Superficie de terreno",
         "placeholder": "Ej: 180.5 m2"
       },
+      "bedrooms": {
+        "label": "Recámaras",
+        "placeholder": "Ej: 3"
+      },
+      "bathrooms": {
+        "label": "Baños",
+        "placeholder": "Ej: 2"
+      },
+      "beds": {
+        "label": "Camas",
+        "placeholder": "Ej: 3"
+      },
+      "floors": {
+        "label": "Niveles",
+        "placeholder": "Ej: 2"
+      },
+      "parkingSpots": {
+        "label": "Cajones de estacionamiento",
+        "placeholder": "Ej: 2"
+      },
+      "builtArea": {
+        "label": "Superficie construida",
+        "placeholder": "Ej: 145.5 m2"
+      },
+      "constructionYear": {
+        "label": "Año de construcción",
+        "placeholder": "Ej: 2018"
+      },
       "orientation": {
         "label": "Orientación del inmueble",
         "placeholder": "Selecciona una orientación",
         "loading": "Cargando orientaciones...",
         "empty": "No hay orientaciones disponibles."
+      },
+      "isFurnished": {
+        "label": "Amueblada",
+        "description": "Indica si la propiedad se entrega con mobiliario."
+      },
+      "ceilingHeight": {
+        "label": "Altura libre",
+        "placeholder": "Ej: 4.5 m"
+      },
+      "loadingDocks": {
+        "label": "Andenes de carga",
+        "placeholder": "Ej: 2"
+      },
+      "internalOffices": {
+        "label": "Oficinas internas",
+        "placeholder": "Ej: 4"
+      },
+      "threePhasePower": {
+        "label": "Energía trifásica",
+        "description": "Activa esta opción si el inmueble cuenta con instalación trifásica."
+      },
+      "landUse": {
+        "label": "Uso de suelo",
+        "placeholder": "Ej: Comercial, mixto o industrial ligero"
       },
       "salePrice": {
         "label": "Precio de venta",
@@ -164,6 +243,10 @@
       "rentPrice": {
         "label": "Precio de renta",
         "prefix": "Renta",
+        "placeholder": "0"
+      },
+      "deposit": {
+        "label": "Depósito",
         "placeholder": "0"
       },
       "maintenanceFee": {
@@ -245,11 +328,24 @@
       "availableEmpty": "No hay más amenidades disponibles."
     },
     "clauses": {
+      "add": "Agregar",
+      "addAriaLabel": "Agregar cláusula {{clause}}",
+      "availableHint": "Cláusulas que puedes activar para esta propiedad.",
+      "availableTitle": "Disponibles",
+      "booleanAllowed": "Permitido",
+      "booleanNotAllowed": "No permitido",
+      "columnAction": "Acción",
       "loading": "Cargando cláusulas...",
       "columnClause": "Cláusula",
+      "columnDescription": "Descripción",
       "columnValue": "Valor",
+      "descriptionTooltipAriaLabel": "Ver descripción de {{clause}}",
+      "remove": "Quitar",
+      "removeAriaLabel": "Quitar cláusula {{clause}}",
       "rangePlaceholderMin": "Mín",
-      "rangePlaceholderMax": "Máx"
+      "rangePlaceholderMax": "Máx",
+      "selectedHint": "Cláusulas activas y su valor actual.",
+      "selectedTitle": "Seleccionadas"
     },
     "multimedia": {
       "uploaderTitle": "Carga de fotos",
@@ -283,6 +379,8 @@
         "countryRequired": "Selecciona un país.",
         "stateRequired": "Selecciona un estado.",
         "cityRequired": "Selecciona un municipio.",
+        "latitudeInvalid": "Selecciona una coordenada válida en el mapa para la latitud.",
+        "longitudeInvalid": "Selecciona una coordenada válida en el mapa para la longitud.",
         "postalCodeRequired": "El código postal es obligatorio.",
         "postalCodeInvalid": "El código postal debe ser numérico y no exceder 5 dígitos.",
         "neighborhoodRequired": "La colonia es obligatoria.",
@@ -293,13 +391,41 @@
         "exteriorNumberInvalid": "El número exterior solo permite letras, números, guion y #, con máximo 8 caracteres.",
         "interiorNumberInvalid": "El número interior solo permite letras, números, guion y #, con máximo 8 caracteres.",
         "lotAreaRequired": "La superficie de terreno es obligatoria.",
-        "lotAreaInvalid": "La superficie de terreno debe ser un valor numérico válido.",
-        "orientationRequired": "Selecciona una orientación."
+        "lotAreaInvalid": "La superficie de terreno debe ser un valor numérico válido."
+      },
+      "details": {
+        "lotAreaRequired": "La superficie de terreno es obligatoria.",
+        "lotAreaInvalid": "La superficie de terreno debe ser un número mayor a 0 con hasta 2 decimales.",
+        "bedroomsRequired": "Las recámaras son obligatorias.",
+        "bedroomsInvalid": "Las recámaras deben ser un número entero igual o mayor a 0.",
+        "bathroomsRequired": "Los baños son obligatorios.",
+        "bathroomsInvalid": "Los baños deben ser un número entero igual o mayor a 0.",
+        "bedsRequired": "Las camas son obligatorias.",
+        "bedsInvalid": "Las camas deben ser un número entero igual o mayor a 0.",
+        "floorsRequired": "Los niveles son obligatorios.",
+        "floorsInvalid": "Los niveles deben ser un número entero igual o mayor a 0.",
+        "parkingSpotsRequired": "Los cajones de estacionamiento son obligatorios.",
+        "parkingSpotsInvalid": "Los cajones de estacionamiento deben ser un número entero igual o mayor a 0.",
+        "builtAreaRequired": "La superficie construida es obligatoria.",
+        "builtAreaInvalid": "La superficie construida debe ser un número mayor a 0 con hasta 2 decimales.",
+        "builtAreaExceedsLotArea": "La superficie construida no puede exceder la superficie del terreno.",
+        "constructionYearRequired": "El año de construcción es obligatorio.",
+        "constructionYearInvalid": "El año de construcción debe ser un número entero mayor a 0.",
+        "orientationRequired": "Selecciona una orientación.",
+        "ceilingHeightRequired": "La altura libre es obligatoria.",
+        "ceilingHeightInvalid": "La altura libre debe ser un número mayor a 0 con hasta 2 decimales.",
+        "loadingDocksRequired": "Los andenes de carga son obligatorios.",
+        "loadingDocksInvalid": "Los andenes de carga deben ser un número entero igual o mayor a 0.",
+        "internalOfficesRequired": "Las oficinas internas son obligatorias.",
+        "internalOfficesInvalid": "Las oficinas internas deben ser un número entero igual o mayor a 0.",
+        "landUseRequired": "El uso de suelo es obligatorio.",
+        "landUseMaxLength": "El uso de suelo no puede exceder 100 caracteres."
       },
       "pricing": {
         "salePriceRequired": "El precio de venta es obligatorio.",
         "rentPeriodRequired": "Activa al menos un periodo de renta.",
-        "rentPriceRequired": "Todos los periodos de renta activos deben tener precio."
+        "rentPriceRequired": "Todos los periodos de renta activos deben tener precio.",
+        "depositRequired": "Todos los periodos de renta activos deben tener depósito, aunque sea 0."
       }
     },
     "footer": {
@@ -322,6 +448,17 @@
       "body": "Aún no has seleccionado amenidades o servicios para esta propiedad. Mostrarlos en la vista pública ayuda a que el inmueble se vea más completo, atractivo y fácil de comparar para los usuarios. Puedes continuar sin ellos si prefieres agregarlos después.",
       "dismiss": "Volver a servicios",
       "confirm": "Continuar sin servicios"
+    },
+    "clausesEmptyDialog": {
+      "title": "Continuar sin cláusulas",
+      "body": "No has activado ninguna cláusula para esta propiedad. Puedes continuar y configurarlas después si lo necesitas.",
+      "dismiss": "Volver a cláusulas",
+      "confirm": "Continuar sin cláusulas"
+    },
+    "toast": {
+      "successTitle": "Propiedad registrada",
+      "successDescription": "Terminamos el registro y las fotos se subieron correctamente.",
+      "errorTitle": "No pudimos completar el registro"
     }
   },
   "searchPlaceholder": "Buscar propiedades...",
@@ -351,9 +488,13 @@
   },
   "states": {
     "empty": "No hay propiedades para mostrar.",
+    "emptyTitle": "Aún no hay propiedades registradas",
+    "emptyDescription": "Cuando registres la primera propiedad, aparecerá aquí para que puedas administrarla.",
+    "emptySelectionTitle": "No hay tipos seleccionados",
+    "emptySelectionDescription": "Selecciona al menos un tipo de propiedad para ver resultados en esta vista.",
     "loading": "Cargando propiedades...",
     "loadingRowLabel": "Cargando propiedad",
-    "loadErrorTitle": "No se pudieron cargar las propiedades.",
+    "loadErrorTitle": "No pudimos cargar las propiedades",
     "retry": "Reintentar"
   },
   "grid": {

@@ -10,8 +10,15 @@ type PropertiesTranslationFn = (
 ) => string;
 
 const exteriorInteriorPattern = /^[A-Za-z0-9#-]{1,8}$/;
-const lotAreaPattern = /^\d+(\.\d+)?$/;
 const postalCodePattern = /^\d{1,5}$/;
+
+function isValidLatitude(value: number) {
+  return Number.isFinite(value) && value >= -90 && value <= 90;
+}
+
+function isValidLongitude(value: number) {
+  return Number.isFinite(value) && value >= -180 && value <= 180;
+}
 
 export function createLocationSectionSchema(t: PropertiesTranslationFn) {
   return z.object({
@@ -38,20 +45,18 @@ export function createLocationSectionSchema(t: PropertiesTranslationFn) {
           !value || value === "" || exteriorInteriorPattern.test(value),
         t("create.validation.location.interiorNumberInvalid"),
       ),
-    lotArea: z
-      .string()
-      .trim()
-      .min(1, t("create.validation.location.lotAreaRequired"))
-      .regex(lotAreaPattern, t("create.validation.location.lotAreaInvalid")),
+    isPublicAddress: z.boolean(),
+    latitude: z
+      .number()
+      .refine(isValidLatitude, t("create.validation.location.latitudeInvalid")),
+    longitude: z
+      .number()
+      .refine(isValidLongitude, t("create.validation.location.longitudeInvalid")),
     neighborhood: z
       .string()
       .trim()
       .min(1, t("create.validation.location.neighborhoodRequired"))
       .max(60, t("create.validation.location.neighborhoodMaxLength")),
-    orientationId: z
-      .number()
-      .int()
-      .positive(t("create.validation.location.orientationRequired")),
     postalCode: z
       .string()
       .trim()
@@ -75,9 +80,10 @@ export function validateLocationSection(
     countryId: form.countryId ?? undefined,
     exteriorNumber: form.exteriorNumber,
     interiorNumber: form.interiorNumber,
-    lotArea: form.lotArea,
+    isPublicAddress: form.isPublicAddress,
+    latitude: Number(form.latitude),
+    longitude: Number(form.longitude),
     neighborhood: form.neighborhood,
-    orientationId: form.orientationId ?? undefined,
     postalCode: form.postalCode,
     stateId: form.stateId ?? undefined,
     street: form.street,

@@ -2,7 +2,6 @@
 
 import * as React from "react";
 
-import { useOrientations } from "@catalogs/application/hooks/useCatalogs";
 import { CreateFormSection } from "@properties/components/create/shared/CreateFormPrimitives";
 import type {
   PatchPropertyCreateForm,
@@ -28,7 +27,6 @@ export function LocationSection({
   const [stateSearch, setStateSearch] = React.useState("");
   const [isMunicipalityOpen, setIsMunicipalityOpen] = React.useState(false);
   const [municipalitySearch, setMunicipalitySearch] = React.useState("");
-  const orientationsQuery = useOrientations();
   const {
     cities,
     citiesQuery,
@@ -61,8 +59,10 @@ export function LocationSection({
       title={t("create.sections.locationDetails.title")}
     >
       <MapSubsection
+        isPublicAddress={form.isPublicAddress}
         latitude={form.latitude}
         longitude={form.longitude}
+        onPublicAddressChange={(isPublicAddress) => patchForm({ isPublicAddress })}
         onChange={({ latitude, longitude, source }) => {
           patchForm({ latitude, longitude });
 
@@ -99,8 +99,6 @@ export function LocationSection({
 
       <ExtrasSubsection
         form={form}
-        orientations={orientationsQuery.data ?? []}
-        orientationsLoading={orientationsQuery.isLoading}
         patchForm={patchForm}
       />
     </CreateFormSection>

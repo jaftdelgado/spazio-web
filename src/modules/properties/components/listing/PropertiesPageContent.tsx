@@ -7,15 +7,15 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { useInfiniteQuery, useQueries } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
-  FeedbackState,
-  FeedbackStateContent,
-  FeedbackStateDescription,
-  FeedbackStateHeader,
-  FeedbackStateMedia,
-  FeedbackStateTitle,
-} from "@components/core/FeedbackState";
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { Skeleton } from "@/components/ui/skeleton";
 import { usePropertyTypes } from "@catalogs/application/hooks/useCatalogs";
 import type { DataGridRowBase } from "@components/core/DataGrid";
 import { usePropertyList } from "@properties/application/get/hooks/useProperty";
@@ -29,6 +29,14 @@ import { PropertiesGridView } from "./PropertiesGridView";
 
 type PropertiesViewMode = "table" | "grid";
 type PropertyGridRow = DataGridRowBase & PropertyCard;
+
+function getFriendlyPropertiesErrorMessage(error: Error | null) {
+  if (error instanceof TypeError) {
+    return "No pudimos conectarnos en este momento. Revisa tu conexion e intenta nuevamente.";
+  }
+
+  return "No fue posible cargar las propiedades por ahora. Intenta de nuevo en un momento.";
+}
 
 function PropertiesDataGridFooterSkeleton() {
   return (
@@ -278,29 +286,32 @@ export function PropertiesPageContent() {
 
       {selectedPropertyTypeIds !== null &&
       selectedPropertyTypeIds.length === 0 ? (
-        <div className="rounded-3xl border border-dashed border-border/70 bg-muted/15 px-4 py-6 text-sm text-muted-foreground">
-          {t("states.empty")}
-        </div>
+        <Empty className="min-h-60 rounded-3xl border border-dashed border-border/70 bg-muted/15 p-6">
+          <EmptyHeader>
+            <EmptyTitle>{t("states.emptySelectionTitle")}</EmptyTitle>
+            <EmptyDescription>{t("states.emptySelectionDescription")}</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
         viewMode === "table"
           ? propertiesQuery.isError
           : propertiesInfiniteQuery.isError
       ) ? (
-        <FeedbackState className="min-h-0 flex-1" tone="danger">
-          <FeedbackStateHeader>
-            <FeedbackStateMedia variant="icon">
+        <Empty className="min-h-0 flex-1 rounded-3xl border border-dashed border-border/70 bg-muted/15 p-6">
+          <EmptyHeader>
+            <EmptyMedia className="bg-destructive/10 text-destructive" variant="icon">
               <HugeiconsIcon icon={Alert02Icon} size={24} strokeWidth={1.8} />
-            </FeedbackStateMedia>
-            <FeedbackStateTitle>
-              {t("states.loadErrorTitle")}
-            </FeedbackStateTitle>
-            <FeedbackStateDescription>
-              {viewMode === "table"
-                ? propertiesQuery.error?.message
-                : propertiesInfiniteQuery.error?.message}
-            </FeedbackStateDescription>
-          </FeedbackStateHeader>
-          <FeedbackStateContent>
+            </EmptyMedia>
+            <EmptyTitle>{t("states.loadErrorTitle")}</EmptyTitle>
+            <EmptyDescription>
+              {getFriendlyPropertiesErrorMessage(
+                viewMode === "table"
+                  ? (propertiesQuery.error ?? null)
+                  : (propertiesInfiniteQuery.error ?? null),
+              )}
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
             <Button
               className="rounded-2xl"
               disabled={isRetrying}
@@ -311,12 +322,15 @@ export function PropertiesPageContent() {
             >
               {t("states.retry")}
             </Button>
-          </FeedbackStateContent>
-        </FeedbackState>
+          </EmptyContent>
+        </Empty>
       ) : !isPropertiesLoading && rows.length === 0 ? (
-        <div className="rounded-3xl border border-dashed border-border/70 bg-muted/15 px-4 py-6 text-sm text-muted-foreground">
-          {t("states.empty")}
-        </div>
+        <Empty className="min-h-60 rounded-3xl border border-dashed border-border/70 bg-muted/15 p-6">
+          <EmptyHeader>
+            <EmptyTitle>{t("states.emptyTitle")}</EmptyTitle>
+            <EmptyDescription>{t("states.emptyDescription")}</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : viewMode === "table" ? (
         <div className="flex min-h-0 flex-1 flex-col gap-4">
           <div className="min-h-0 flex-1">

@@ -9,6 +9,7 @@ import { Toast } from "@heroui/react";
 import { DEFAULT_LOCALE } from "@/app/i18n/config";
 import { I18nProvider } from "@/app/i18n/I18nProvider";
 import { ThemeProvider } from "@/app/theme/ThemeProvider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { Navbar } from "@/components/layout/Navbar";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { AppQueryClientProvider } from "@lib/query/query-client-provider";
@@ -41,15 +42,17 @@ export default function RootLayout({
         <ThemeProvider>
           <I18nProvider>
             <AppQueryClientProvider>
-              <Toast.Provider placement="bottom" />
-              {isAuthRoute || isExploreRoute || isSettingsRoute ? (
-                children
-              ) : (
-                <>
-                  <Navbar />
-                  <PageWrapper>{children}</PageWrapper>
-                </>
-              )}
+              <TooltipProvider>
+                <Toast.Provider placement="bottom" />
+                {isAuthRoute || isExploreRoute || isSettingsRoute ? (
+                  children
+                ) : (
+                  <>
+                    <Navbar />
+                    <PageWrapper>{children}</PageWrapper>
+                  </>
+                )}
+              </TooltipProvider>
             </AppQueryClientProvider>
           </I18nProvider>
         </ThemeProvider>

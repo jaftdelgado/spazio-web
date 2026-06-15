@@ -4,12 +4,15 @@ import { PropertyLocationMapPicker } from "@properties/components/create/shared/
 import {
   CreateFormField,
   CreateFormSubsection,
+  CreateFormSwitchRow,
 } from "@properties/components/create/shared/CreateFormPrimitives";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 
 type MapSubsectionProps = {
+  isPublicAddress: boolean;
   latitude: string;
   longitude: string;
+  onPublicAddressChange: (value: boolean) => void;
   onChange: (next: {
     latitude: string;
     longitude: string;
@@ -18,8 +21,10 @@ type MapSubsectionProps = {
 };
 
 export function MapSubsection({
+  isPublicAddress,
   latitude,
   longitude,
+  onPublicAddressChange,
   onChange,
 }: MapSubsectionProps) {
   const { t } = usePropertiesTranslation();
@@ -41,6 +46,13 @@ export function MapSubsection({
           onChange={onChange}
         />
       </CreateFormField>
+
+      <CreateFormSwitchRow
+        title={t("create.fields.isPublicAddress.label")}
+        description={t("create.fields.isPublicAddress.description")}
+        isSelected={isPublicAddress}
+        onChange={onPublicAddressChange}
+      />
     </CreateFormSubsection>
   );
 }
