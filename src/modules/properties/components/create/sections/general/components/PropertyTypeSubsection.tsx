@@ -10,11 +10,13 @@ import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslat
 
 type PropertyTypeSubsectionProps = {
   form: PropertyCreateFormState;
+  disabled?: boolean;
   patchForm: PatchPropertyCreateForm;
 };
 
 export function PropertyTypeSubsection({
   form,
+  disabled = false,
   patchForm,
 }: PropertyTypeSubsectionProps) {
   const { t } = usePropertiesTranslation();
@@ -25,6 +27,7 @@ export function PropertyTypeSubsection({
       title={t("create.sections.propertyType.label")}
     >
       <PropertyTypeRadioCardGroup
+        disabled={disabled}
         selectedPropertyTypeId={form.propertyTypeId}
         onChange={(propertyTypeId) => patchForm({ propertyTypeId })}
       />

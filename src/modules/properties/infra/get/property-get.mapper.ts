@@ -3,6 +3,7 @@
 import type {
   CommercialDetail,
   PropertyCard,
+  PropertyCardLocation,
   PropertyCardModality,
   PropertyCardPrice,
   PropertyCardStatus,
@@ -15,6 +16,7 @@ import type {
   PropertyStatusHistory,
   ResidentialDetail,
 } from "@properties/domain/property.entity";
+import { resolvePropertyPhotoUrl } from "@properties/infra/shared/resolve-property-photo-url";
 
 type PropertyCardTypeDTO = {
   property_type_id: number;
@@ -48,6 +50,15 @@ type PropertyCardDTO = {
   modality: PropertyCardModalityDTO;
   status: PropertyCardStatusDTO;
   price: PropertyCardPriceDTO;
+  location: {
+    country_id: number;
+    country_name: string;
+    state_id: number;
+    state_name: string;
+    city_id: number;
+    city_name: string;
+  } | null;
+  address_summary: string | null;
   bedrooms?: number | null;
   bathrooms?: number | null;
   built_area?: number | null;
@@ -88,7 +99,12 @@ type CommercialDTO = {
 };
 
 type LocationDTO = {
+  country_id: number;
+  country_name: string;
+  state_id: number;
+  state_name: string;
   city_id: number;
+  city_name: string;
   neighborhood: string;
   street: string;
   exterior_number: string;
@@ -181,15 +197,35 @@ const mapPropertyCardPrice = (
   };
 };
 
+const mapPropertyCardLocation = (
+  dto: PropertyCardDTO["location"],
+): PropertyCardLocation | null => {
+  if (!dto) return null;
+
+  return {
+    countryId: dto.country_id,
+    countryName: dto.country_name,
+    stateId: dto.state_id,
+    stateName: dto.state_name,
+    cityId: dto.city_id,
+    cityName: dto.city_name,
+  };
+};
+
 const mapPropertyCard = (dto: PropertyCardDTO): PropertyCard => ({
   propertyId: dto.property_id,
   propertyUuid: dto.property_uuid,
   title: dto.title,
-  coverPhotoUrl: dto.cover_photo_url,
+  coverPhotoUrl: resolvePropertyPhotoUrl(
+    dto.cover_photo_url,
+    dto.property_uuid,
+  ),
   propertyType: mapPropertyCardType(dto.property_type),
   modality: mapPropertyCardModality(dto.modality),
   status: mapPropertyCardStatus(dto.status),
   price: mapPropertyCardPrice(dto.price),
+  location: mapPropertyCardLocation(dto.location),
+  addressSummary: dto.address_summary,
   bedrooms: dto.bedrooms ?? null,
   bathrooms: dto.bathrooms ?? null,
   builtArea: dto.built_area ?? null,
@@ -230,7 +266,12 @@ const mapCommercial = (dto: CommercialDTO): CommercialDetail => ({
 });
 
 const mapLocation = (dto: LocationDTO): PropertyLocation => ({
+  countryId: dto.country_id,
+  countryName: dto.country_name,
+  stateId: dto.state_id,
+  stateName: dto.state_name,
   cityId: dto.city_id,
+  cityName: dto.city_name,
   neighborhood: dto.neighborhood,
   street: dto.street,
   exteriorNumber: dto.exterior_number,

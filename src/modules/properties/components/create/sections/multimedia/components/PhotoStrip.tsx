@@ -21,7 +21,11 @@ export function PhotoStrip({
     <div className="-mx-2 flex gap-3 overflow-x-auto px-2 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {entries.map((entry, index) => (
         <PhotoStripCard
-          key={`${entry.file.name}-${entry.previewUrl}-${index}`}
+          key={
+            entry.kind === "existing"
+              ? `${entry.photoId ?? entry.storageKey ?? index}`
+              : `${entry.file?.name ?? "new-photo"}-${entry.previewUrl ?? index}-${index}`
+          }
           entry={entry}
           isSelected={index === selectedIndex}
           onClick={() => onSelect(index)}

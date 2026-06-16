@@ -11,16 +11,26 @@ import { PropertyTypeSubsection } from "./components/PropertyTypeSubsection";
 
 export function GeneralSection({
   form,
+  disableImmutableFields = false,
   patchForm,
 }: {
   form: PropertyCreateFormState;
+  disableImmutableFields?: boolean;
   patchForm: PatchPropertyCreateForm;
 }) {
   return (
     <>
       <IdentitySubsection form={form} patchForm={patchForm} />
-      <PropertyTypeSubsection form={form} patchForm={patchForm} />
-      <ModalitySubsection form={form} patchForm={patchForm} />
+      <PropertyTypeSubsection
+        disabled={disableImmutableFields}
+        form={form}
+        patchForm={patchForm}
+      />
+      <ModalitySubsection
+        disabled={disableImmutableFields}
+        form={form}
+        patchForm={patchForm}
+      />
     </>
   );
 }

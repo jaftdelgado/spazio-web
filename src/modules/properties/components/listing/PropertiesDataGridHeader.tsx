@@ -23,8 +23,8 @@ type PropertiesDataGridHeaderProps = {
   searchValue: string;
   onSearchChange: (value: string) => void;
   propertyTypeOptions: PropertyTypeOption[];
-  selectedPropertyTypeIds: number[];
-  onSelectedPropertyTypeIdsChange: (value: number[]) => void;
+  selectedPropertyTypeId: number | null;
+  onSelectedPropertyTypeIdChange: (value: number | null) => void;
   viewMode: "table" | "grid";
   onViewModeChange: (value: "table" | "grid") => void;
 };
@@ -33,8 +33,8 @@ export function PropertiesDataGridHeader({
   searchValue,
   onSearchChange,
   propertyTypeOptions,
-  selectedPropertyTypeIds,
-  onSelectedPropertyTypeIdsChange,
+  selectedPropertyTypeId,
+  onSelectedPropertyTypeIdChange,
   viewMode,
   onViewModeChange,
 }: PropertiesDataGridHeaderProps) {
@@ -73,9 +73,9 @@ export function PropertiesDataGridHeader({
 
       <div className="flex items-center gap-3 self-end md:self-auto">
         <PropertiesFiltersPopover
-          onSelectedPropertyTypeIdsChange={onSelectedPropertyTypeIdsChange}
+          onSelectedPropertyTypeIdChange={onSelectedPropertyTypeIdChange}
           propertyTypeOptions={propertyTypeOptions}
-          selectedPropertyTypeIds={selectedPropertyTypeIds}
+          selectedPropertyTypeId={selectedPropertyTypeId}
         />
 
         <div

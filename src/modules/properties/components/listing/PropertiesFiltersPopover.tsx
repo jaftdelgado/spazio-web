@@ -19,22 +19,16 @@ type PropertyTypeOption = {
 
 type PropertiesFiltersPopoverProps = {
   propertyTypeOptions: PropertyTypeOption[];
-  selectedPropertyTypeIds: number[];
-  onSelectedPropertyTypeIdsChange: (value: number[]) => void;
+  selectedPropertyTypeId: number | null;
+  onSelectedPropertyTypeIdChange: (value: number | null) => void;
 };
 
 export function PropertiesFiltersPopover({
   propertyTypeOptions,
-  selectedPropertyTypeIds,
-  onSelectedPropertyTypeIdsChange,
+  selectedPropertyTypeId,
+  onSelectedPropertyTypeIdChange,
 }: PropertiesFiltersPopoverProps) {
   const { t } = usePropertiesTranslation();
-  const allPropertyTypeIds = propertyTypeOptions.map(
-    (propertyType) => propertyType.propertyTypeId,
-  );
-  const allSelected =
-    propertyTypeOptions.length > 0 &&
-    selectedPropertyTypeIds.length === propertyTypeOptions.length;
 
   return (
     <Popover>
@@ -62,20 +56,18 @@ export function PropertiesFiltersPopover({
           <button
             className={cn(
               "rounded-full border px-3 py-1.5 text-sm transition-colors",
-              allSelected
+              selectedPropertyTypeId === null
                 ? "border-primary/20 bg-primary/10 text-primary"
                 : "border-border bg-background text-muted-foreground hover:bg-muted/40 hover:text-foreground",
             )}
             type="button"
-            onClick={() => onSelectedPropertyTypeIdsChange(allPropertyTypeIds)}
+            onClick={() => onSelectedPropertyTypeIdChange(null)}
           >
             {t("filters.all")}
           </button>
 
           {propertyTypeOptions.map((propertyType) => {
-            const isSelected = selectedPropertyTypeIds.includes(
-              propertyType.propertyTypeId,
-            );
+            const isSelected = selectedPropertyTypeId === propertyType.propertyTypeId;
 
             return (
               <button
@@ -88,13 +80,9 @@ export function PropertiesFiltersPopover({
                 )}
                 type="button"
                 onClick={() => {
-                  const nextIds = isSelected
-                    ? selectedPropertyTypeIds.filter(
-                        (id) => id !== propertyType.propertyTypeId,
-                      )
-                    : [...selectedPropertyTypeIds, propertyType.propertyTypeId];
-
-                  onSelectedPropertyTypeIdsChange(nextIds);
+                  onSelectedPropertyTypeIdChange(
+                    isSelected ? null : propertyType.propertyTypeId,
+                  );
                 }}
               >
                 {propertyType.name}

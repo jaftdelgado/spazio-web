@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 
 import {
   Building03Icon,
@@ -17,6 +18,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import { Button } from "@/components/ui/button";
+import { ROUTES } from "@/config/routes";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +31,7 @@ import {
   type DataGridColumn,
   type DataGridRowBase,
 } from "@components/core/DataGrid";
+import { saveEditingPropertyUuid } from "@properties/application/edit/property-edit-session";
 import type { PropertyCard } from "@properties/domain/property.entity";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 import { PropertyDeleteAlertDialog } from "./PropertyDeleteAlertDialog";
@@ -126,6 +129,7 @@ function renderPropertyCell(
     edit: string;
     delete: string;
   },
+  onEditPress: (row: PropertyGridRow) => void,
   onDeletePress: (row: PropertyGridRow) => void,
 ) {
   if (isLoadingRow(row)) {
@@ -134,12 +138,19 @@ function renderPropertyCell(
 
   switch (columnId) {
     case "title":
-      return <div className="font-medium text-foreground">{row.title}</div>;
+      return (
+        <div className="truncate font-medium text-foreground" title={row.title}>
+          {row.title}
+        </div>
+      );
     case "propertyType":
       return <span className={chipClassName}>{row.propertyType.name}</span>;
     case "address":
       return (
-        <span className="text-muted-foreground">
+        <span
+          className="block truncate text-muted-foreground"
+          title={formatAddress(propertyAddressMap[row.propertyUuid])}
+        >
           {formatAddress(propertyAddressMap[row.propertyUuid])}
         </span>
       );
@@ -186,7 +197,7 @@ function renderPropertyCell(
               />
               <span>{labels.view}</span>
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onEditPress(row)}>
               <HugeiconsIcon
                 className="text-muted-foreground"
                 icon={Edit03Icon}
@@ -226,6 +237,7 @@ export function PropertiesDataGrid({
   propertyAddressMap,
   isLoading = false,
 }: PropertiesDataGridProps) {
+  const router = useRouter();
   const { intlLocale, t } = usePropertiesTranslation();
   const [propertyPendingDelete, setPropertyPendingDelete] =
     React.useState<PropertyGridRow | null>(null);
@@ -319,6 +331,10 @@ export function PropertiesDataGrid({
             propertyAddressMap,
             intlLocale,
             actionLabels,
+            (row) => {
+              saveEditingPropertyUuid(row.propertyUuid);
+              router.push(ROUTES.admin.propertiesEdit);
+            },
             setPropertyPendingDelete,
           )
         }

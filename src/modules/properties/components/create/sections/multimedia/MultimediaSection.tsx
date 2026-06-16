@@ -116,6 +116,7 @@ export function MultimediaSection({
       remainingSlots -= 1;
 
       accepted.push({
+        kind: "new",
         file,
         previewUrl: URL.createObjectURL(file),
         label: "",
@@ -141,7 +142,9 @@ export function MultimediaSection({
 
     if (!removed) return;
 
-    URL.revokeObjectURL(removed.previewUrl);
+    if (removed.kind === "new" && removed.previewUrl) {
+      URL.revokeObjectURL(removed.previewUrl);
+    }
 
     const next = form.photos.filter((_, currentIndex) => currentIndex !== index);
     patchForm({ photos: removed.isCover ? ensureSingleCover(next) : next });

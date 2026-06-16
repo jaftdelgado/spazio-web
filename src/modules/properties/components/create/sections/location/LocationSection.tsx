@@ -10,7 +10,6 @@ import type {
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 
 import { AddressSubsection } from "./components/AddressSubsection";
-import { ExtrasSubsection } from "./components/ExtrasSubsection";
 import { MapSubsection } from "./components/MapSubsection";
 import { useLocationCatalogOptions } from "./hooks/useLocationCatalogOptions";
 import { useMapLocationSync } from "./hooks/useMapLocationSync";
@@ -95,11 +94,6 @@ export function LocationSection({
         onMunicipalitySearchChange={setMunicipalitySearch}
         onStateOpenChange={setIsStateOpen}
         onStateSearchChange={setStateSearch}
-      />
-
-      <ExtrasSubsection
-        form={form}
-        patchForm={patchForm}
       />
     </CreateFormSection>
   );

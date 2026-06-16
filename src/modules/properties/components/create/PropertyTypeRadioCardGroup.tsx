@@ -71,9 +71,11 @@ function getPropertyTypeTranslationKey(propertyType: PropertyType) {
 
 export function PropertyTypeRadioCardGroup({
   selectedPropertyTypeId,
+  disabled = false,
   onChange,
 }: {
   selectedPropertyTypeId: number | null;
+  disabled?: boolean;
   onChange: (propertyTypeId: number) => void;
 }) {
   const { t } = usePropertiesTranslation();
@@ -120,11 +122,13 @@ export function PropertyTypeRadioCardGroup({
               <button
                 key={propertyType.propertyTypeId}
                 aria-checked={isSelected}
+                disabled={disabled}
                 className={cn(
                   "flex min-h-28 flex-col items-center justify-center gap-3 rounded-2xl border px-3 py-4 text-center transition-colors",
                   isSelected
                     ? "border-primary bg-primary/10 text-foreground ring-3 ring-primary/15"
                     : "border-border bg-card text-muted-foreground shadow-sm hover:border-ring/50 hover:bg-muted/50 hover:text-foreground",
+                  disabled && "cursor-not-allowed opacity-65 hover:border-border hover:bg-card hover:text-muted-foreground",
                 )}
                 role="radio"
                 type="button"

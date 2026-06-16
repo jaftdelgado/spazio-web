@@ -230,6 +230,10 @@ async function uploadPropertyPhotos(
   photos: PhotoEntry[],
 ) {
   for (const [index, photo] of photos.entries()) {
+    if (!photo.file) {
+      continue;
+    }
+
     await uploadHttpAdapter.uploadPropertyPhoto({
       propertyUuid,
       file: photo.file,
@@ -376,7 +380,9 @@ export function PropertyCreatePageContent() {
   React.useEffect(() => {
     return () => {
       photosRef.current.forEach((entry) => {
-        URL.revokeObjectURL(entry.previewUrl);
+        if (entry.kind === "new" && entry.previewUrl) {
+          URL.revokeObjectURL(entry.previewUrl);
+        }
       });
     };
   }, []);

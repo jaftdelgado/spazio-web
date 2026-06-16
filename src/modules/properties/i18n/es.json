@@ -91,11 +91,6 @@
       "fields": {
         "title": "Dirección",
         "hint": "Completa o ajusta los datos base de ubicación del inmueble."
-      },
-      "extras": {
-        "title": "Datos adicionales",
-        "hint": "Captura información complementaria de la ubicación.",
-        "description": "La superficie del terreno ahora se captura dentro de la sección de detalles de la propiedad para mantener juntas las métricas del inmueble."
       }
     },
     "details": {
@@ -358,7 +353,7 @@
       "dropzoneHint": "Formatos: {{extensions}} · Máximo {{maxMb}} MB por archivo",
       "maxReached": "Límite de 10 fotos alcanzado",
       "coverBadge": "Portada",
-      "setCover": "Potaa",
+      "setCover": "Est. Portada",
       "coverLabel": "Portada",
       "labelField": "Etiqueta",
       "altField": "Texto alternativo",
@@ -467,6 +462,60 @@
       "successTitle": "Propiedad registrada",
       "successDescription": "Terminamos el registro y las fotos se subieron correctamente.",
       "errorTitle": "No pudimos completar el registro"
+    }
+  },
+  "edit": {
+    "page": {
+      "title": "Editar propiedad"
+    },
+    "sidebar": {
+      "eyebrow": "Edición"
+    },
+    "footer": {
+      "cancel": "Volver",
+      "save": "Guardar cambios",
+      "saving": "Guardando cambios..."
+    },
+    "cancelDialog": {
+      "title": "Cancelar edición",
+      "body": "Si sales ahora, perderás los cambios no guardados de esta propiedad.",
+      "dismiss": "Seguir editando",
+      "confirm": "Sí, cancelar"
+    },
+    "submitDialog": {
+      "title": "Confirmar cambios",
+      "body": "Se actualizará la información de la propiedad, sus precios, servicios, cláusulas y fotos.",
+      "bodyServicesEmpty": "Se actualizará la propiedad y sus fotos. No has seleccionado servicios; si confirmas, la propiedad quedará sin servicios asociados.",
+      "bodyClausesEmpty": "Se actualizará la propiedad y sus fotos. No has configurado cláusulas; si confirmas, la propiedad quedará sin cláusulas asociadas.",
+      "bodyServicesAndClausesEmpty": "Se actualizará la propiedad y sus fotos. No has seleccionado servicios ni configurado cláusulas; si confirmas, ambos quedarán vacíos.",
+      "dismiss": "Seguir editando",
+      "confirm": "Sí, guardar cambios",
+      "submitting": "Guardando cambios..."
+    },
+    "resultDialog": {
+      "successTitle": "Cambios guardados",
+      "successBody": "La propiedad se actualizó correctamente.",
+      "successDismiss": "Cerrar",
+      "successConfirm": "Ir al listado",
+      "errorTitle": "No pudimos guardar los cambios",
+      "errorDismiss": "Cerrar",
+      "errorConfirm": "Seguir editando"
+    },
+    "states": {
+      "loading": "Cargando propiedad...",
+      "missingSelectionTitle": "No encontramos una propiedad para editar",
+      "missingSelectionDescription": "Vuelve al listado y selecciona la opción Modificar desde la propiedad que quieres actualizar.",
+      "backToList": "Volver al listado",
+      "loadErrorTitle": "No pudimos cargar la propiedad"
+    },
+    "validation": {
+      "sectionIncomplete": {
+        "general": "Completa la información general antes de guardar los cambios.",
+        "details": "Revisa los detalles de la propiedad antes de guardar los cambios.",
+        "multimedia": "Agrega al menos una foto antes de guardar los cambios.",
+        "location": "Completa la ubicación antes de guardar los cambios.",
+        "pricing": "Completa la información de precios antes de guardar los cambios."
+      }
     }
   },
   "searchPlaceholder": "Buscar propiedades...",
