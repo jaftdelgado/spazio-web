@@ -4,42 +4,73 @@ import * as React from "react";
 
 import { Alert02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button, Skeleton } from "@heroui/react";
 import { useInfiniteQuery, useQueries } from "@tanstack/react-query";
 
+import { Button } from "@/components/ui/button";
 import {
-  FeedbackState,
-  FeedbackStateContent,
-  FeedbackStateDescription,
-  FeedbackStateHeader,
-  FeedbackStateMedia,
-  FeedbackStateTitle,
-} from "@components/core/FeedbackState";
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { Skeleton } from "@/components/ui/skeleton";
 import { usePropertyTypes } from "@catalogs/application/hooks/useCatalogs";
 import type { DataGridRowBase } from "@components/core/DataGrid";
 import { usePropertyList } from "@properties/application/get/hooks/useProperty";
-import { PropertiesDataGridHeader } from "./PropertiesDataGridHeader";
-import { PropertiesDataGrid } from "./PropertiesDataGrid";
-import { PropertiesDataGridFooter } from "./PropertiesDataGridFooter";
-import { PropertiesGridView } from "./PropertiesGridView";
 import { propertyGetHttpAdapter } from "@properties/infra/get/property-get.http-adapter";
 import type { PropertyCard } from "@properties/domain/property.entity";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
+import { PropertiesDataGrid } from "./PropertiesDataGrid";
+import { PropertiesDataGridFooter } from "./PropertiesDataGridFooter";
+import { PropertiesDataGridHeader } from "./PropertiesDataGridHeader";
+import { PropertiesGridView } from "./PropertiesGridView";
 
 type PropertiesViewMode = "table" | "grid";
 type PropertyGridRow = DataGridRowBase & PropertyCard;
 
+function getFriendlyPropertiesErrorMessage(error: Error | null) {
+  if (error instanceof TypeError) {
+    return "No pudimos conectarnos en este momento. Revisa tu conexion e intenta nuevamente.";
+  }
+
+  return "No fue posible cargar las propiedades por ahora. Intenta de nuevo en un momento.";
+}
+
 function PropertiesDataGridFooterSkeleton() {
   return (
-    <div className="grid w-full grid-cols-[auto_1fr] items-center gap-4 rounded-xl">
+    <div className="grid w-full grid-cols-[auto_1fr] items-center gap-4">
       <div className="flex items-center gap-2">
-        <Skeleton className="h-9 w-9 rounded-lg" />
-        <Skeleton className="h-9 w-9 rounded-lg" />
-        <Skeleton className="h-9 w-9 rounded-lg" />
-        <Skeleton className="h-9 w-9 rounded-lg" />
-        <Skeleton className="h-9 w-9 rounded-lg" />
+        {Array.from({ length: 5 }).map((_, index) => (
+          <Skeleton key={index} className="h-9 w-9 rounded-2xl" />
+        ))}
       </div>
-      <Skeleton className="h-4 w-48 justify-self-end rounded-lg" />
+      <Skeleton className="h-4 w-48 justify-self-end rounded-full" />
+    </div>
+  );
+}
+
+function PropertiesGridSkeleton() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <div
+          key={index}
+          className="overflow-hidden rounded-3xl border border-border/70 bg-card/70"
+        >
+          <Skeleton className="h-48 w-full rounded-none" />
+          <div className="space-y-3 px-5 py-5">
+            <Skeleton className="h-5 w-2/3 rounded-full" />
+            <Skeleton className="h-4 w-full rounded-full" />
+            <div className="flex gap-2">
+              <Skeleton className="h-6 w-20 rounded-full" />
+              <Skeleton className="h-6 w-16 rounded-full" />
+              <Skeleton className="h-6 w-16 rounded-full" />
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -232,7 +263,7 @@ export function PropertiesPageContent() {
   }, [propertiesInfiniteQuery, propertiesQuery, viewMode]);
 
   return (
-    <div className="flex flex-1 flex-col gap-4 min-h-0">
+    <div className="flex min-h-0 flex-1 flex-col gap-4">
       <PropertiesDataGridHeader
         onSelectedPropertyTypeIdsChange={(propertyTypeIds) => {
           setSelectedPropertyTypeIds(
@@ -246,56 +277,62 @@ export function PropertiesPageContent() {
           }));
         }}
         onSearchChange={setSearchValue}
+        onViewModeChange={setViewMode}
         propertyTypeOptions={propertyTypeOptions}
         searchValue={searchValue}
         selectedPropertyTypeIds={effectiveSelectedPropertyTypeIds}
-        onViewModeChange={setViewMode}
         viewMode={viewMode}
       />
 
       {selectedPropertyTypeIds !== null &&
       selectedPropertyTypeIds.length === 0 ? (
-        <div className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-600">
-          {t("states.empty")}
-        </div>
+        <Empty className="min-h-60 rounded-3xl border border-dashed border-border/70 bg-muted/15 p-6">
+          <EmptyHeader>
+            <EmptyTitle>{t("states.emptySelectionTitle")}</EmptyTitle>
+            <EmptyDescription>{t("states.emptySelectionDescription")}</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
-          viewMode === "table"
-            ? propertiesQuery.isError
-            : propertiesInfiniteQuery.isError
-        ) ? (
-        <FeedbackState className="min-h-0 flex-1" tone="danger">
-          <FeedbackStateHeader>
-            <FeedbackStateMedia variant="icon">
+        viewMode === "table"
+          ? propertiesQuery.isError
+          : propertiesInfiniteQuery.isError
+      ) ? (
+        <Empty className="min-h-0 flex-1 rounded-3xl border border-dashed border-border/70 bg-muted/15 p-6">
+          <EmptyHeader>
+            <EmptyMedia className="bg-destructive/10 text-destructive" variant="icon">
               <HugeiconsIcon icon={Alert02Icon} size={24} strokeWidth={1.8} />
-            </FeedbackStateMedia>
-            <FeedbackStateTitle>
-              {t("states.loadErrorTitle")}
-            </FeedbackStateTitle>
-            <FeedbackStateDescription>
-              {viewMode === "table"
-                ? propertiesQuery.error?.message
-                : propertiesInfiniteQuery.error?.message}
-            </FeedbackStateDescription>
-          </FeedbackStateHeader>
-          <FeedbackStateContent>
+            </EmptyMedia>
+            <EmptyTitle>{t("states.loadErrorTitle")}</EmptyTitle>
+            <EmptyDescription>
+              {getFriendlyPropertiesErrorMessage(
+                viewMode === "table"
+                  ? (propertiesQuery.error ?? null)
+                  : (propertiesInfiniteQuery.error ?? null),
+              )}
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
             <Button
-              isDisabled={isRetrying}
-              onPress={() => {
+              className="rounded-2xl"
+              disabled={isRetrying}
+              size="sm"
+              onClick={() => {
                 void handleRetry();
               }}
-              size="sm"
-              variant="primary"
             >
               {t("states.retry")}
             </Button>
-          </FeedbackStateContent>
-        </FeedbackState>
+          </EmptyContent>
+        </Empty>
       ) : !isPropertiesLoading && rows.length === 0 ? (
-        <div className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-600">
-          {t("states.empty")}
-        </div>
+        <Empty className="min-h-60 rounded-3xl border border-dashed border-border/70 bg-muted/15 p-6">
+          <EmptyHeader>
+            <EmptyTitle>{t("states.emptyTitle")}</EmptyTitle>
+            <EmptyDescription>{t("states.emptyDescription")}</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : viewMode === "table" ? (
-        <div className="flex flex-1 flex-col gap-4 min-h-0">
+        <div className="flex min-h-0 flex-1 flex-col gap-4">
           <div className="min-h-0 flex-1">
             <PropertiesDataGrid
               isLoading={isPropertiesLoading}
@@ -323,11 +360,9 @@ export function PropertiesPageContent() {
           </div>
         </div>
       ) : (
-        <div className="flex flex-1 flex-col gap-4 min-h-0">
+        <div className="flex min-h-0 flex-1 flex-col gap-4">
           {isPropertiesLoading ? (
-            <div className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-600">
-              {t("states.loading")}
-            </div>
+            <PropertiesGridSkeleton />
           ) : (
             <PropertiesGridView
               propertyAddressMap={propertyAddressMap}

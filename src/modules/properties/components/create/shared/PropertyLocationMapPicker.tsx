@@ -1,9 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { MapsLocation01Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Description } from "@heroui/react";
 import maplibregl from "maplibre-gl";
 import {
   Map,
@@ -11,8 +8,6 @@ import {
   NavigationControl,
   type MapRef,
 } from "@vis.gl/react-maplibre";
-
-import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 
 const DEFAULT_CENTER = {
   latitude: 19.4326,
@@ -44,9 +39,12 @@ export function PropertyLocationMapPicker({
 }: {
   latitude: string;
   longitude: string;
-  onChange: (next: { latitude: string; longitude: string }) => void;
+  onChange: (next: {
+    latitude: string;
+    longitude: string;
+    source: "auto" | "user";
+  }) => void;
 }) {
-  const { t } = usePropertiesTranslation();
   const mapRef = React.useRef<MapRef | null>(null);
   const hasInitializedLocationRef = React.useRef(false);
 
@@ -75,6 +73,7 @@ export function PropertyLocationMapPicker({
       onChange({
         latitude: DEFAULT_CENTER.latitude.toFixed(6),
         longitude: DEFAULT_CENTER.longitude.toFixed(6),
+        source: "auto",
       });
       return;
     }
@@ -84,12 +83,14 @@ export function PropertyLocationMapPicker({
         onChange({
           latitude: position.coords.latitude.toFixed(6),
           longitude: position.coords.longitude.toFixed(6),
+          source: "auto",
         });
       },
       () => {
         onChange({
           latitude: DEFAULT_CENTER.latitude.toFixed(6),
           longitude: DEFAULT_CENTER.longitude.toFixed(6),
+          source: "auto",
         });
       },
       {
@@ -113,7 +114,7 @@ export function PropertyLocationMapPicker({
   }, [selectedCoordinates]);
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
       <Map
         ref={mapRef}
         dragRotate={false}
@@ -133,6 +134,7 @@ export function PropertyLocationMapPicker({
           onChange({
             latitude: event.lngLat.lat.toFixed(6),
             longitude: event.lngLat.lng.toFixed(6),
+            source: "user",
           });
         }}
         onLoad={() => {
@@ -162,29 +164,12 @@ export function PropertyLocationMapPicker({
               onChange({
                 latitude: event.lngLat.lat.toFixed(6),
                 longitude: event.lngLat.lng.toFixed(6),
+                source: "user",
               });
             }}
           />
         ) : null}
       </Map>
-      <div className="border-t border-slate-200/80 px-4 py-3">
-        <div className="flex items-start gap-2">
-          <HugeiconsIcon
-            className="mt-0.5 shrink-0 text-muted"
-            icon={MapsLocation01Icon}
-            size={16}
-            strokeWidth={1.8}
-          />
-          <Description className="text-xs leading-relaxed">
-            {selectedCoordinates
-              ? t("create.fields.locationMap.coordinatesSelected", {
-                  latitude: selectedCoordinates.latitude.toFixed(6),
-                  longitude: selectedCoordinates.longitude.toFixed(6),
-                })
-              : t("create.fields.locationMap.loadingLocation")}
-          </Description>
-        </div>
-      </div>
     </div>
   );
 }

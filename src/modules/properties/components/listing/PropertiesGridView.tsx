@@ -8,7 +8,6 @@ import {
   RulerIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Card, Chip } from "@heroui/react";
 
 import type { DataGridRowBase } from "@components/core/DataGrid";
 import type { PropertyCard } from "@properties/domain/property.entity";
@@ -20,6 +19,9 @@ type PropertiesGridViewProps = {
   rows: PropertyGridRow[];
   propertyAddressMap: Record<string, string | null>;
 };
+
+const chipClassName =
+  "inline-flex rounded-full border border-border/70 bg-muted/30 px-2.5 py-1 text-xs font-medium text-muted-foreground";
 
 const formatCurrency = (price: PropertyCard["price"], locale: string) => {
   if (!price) return "-";
@@ -54,75 +56,74 @@ export function PropertiesGridView({
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {rows.map((row) => (
-          <Card key={row.id} className="overflow-hidden">
-            {row.coverPhotoUrl ? (
-              <div className="relative h-48 w-full">
-                <Image
-                  fill
-                  alt={row.title}
-                  className="object-cover"
-                  sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw"
-                  src={row.coverPhotoUrl}
-                  unoptimized
-                />
-              </div>
-            ) : (
-              <div className="flex h-48 items-center justify-center bg-slate-100 text-slate-400">
-                <HugeiconsIcon
-                  icon={Building03Icon}
-                  size={32}
-                  strokeWidth={1.8}
-                />
-              </div>
-            )}
+      {rows.map((row) => (
+        <article
+          key={row.id}
+          className="overflow-hidden rounded-3xl border border-border/70 bg-card/80 transition-colors hover:border-ring/40"
+        >
+          {row.coverPhotoUrl ? (
+            <div className="relative h-48 w-full bg-muted/30">
+              <Image
+                fill
+                alt={row.title}
+                className="object-cover"
+                sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw"
+                src={row.coverPhotoUrl}
+                unoptimized
+              />
+            </div>
+          ) : (
+            <div className="flex h-48 items-center justify-center bg-muted/35 text-muted-foreground">
+              <HugeiconsIcon
+                icon={Building03Icon}
+                size={32}
+                strokeWidth={1.8}
+              />
+            </div>
+          )}
 
-            <Card.Header className="gap-2">
-              <Card.Title>{row.title}</Card.Title>
-              <Card.Description className="flex items-start gap-2">
+          <div className="space-y-4 px-5 py-5">
+            <div className="space-y-2">
+              <h3 className="line-clamp-2 text-base font-medium text-foreground">
+                {row.title}
+              </h3>
+              <p className="flex items-start gap-2 text-sm leading-6 text-muted-foreground">
                 <HugeiconsIcon
-                  className="mt-0.5 shrink-0"
+                  className="mt-1 shrink-0"
                   icon={MapsLocation01Icon}
                   size={16}
                   strokeWidth={1.8}
                 />
                 <span>{formatAddress(propertyAddressMap[row.propertyUuid])}</span>
-              </Card.Description>
-            </Card.Header>
+              </p>
+            </div>
 
-            <Card.Content className="gap-4">
-              <div className="flex flex-wrap gap-2">
-                <Chip color="accent" size="sm" variant="secondary">
-                  <Chip.Label>{row.propertyType.name}</Chip.Label>
-                </Chip>
-                <Chip color="accent" size="sm" variant="secondary">
-                  <Chip.Label>{row.modality.name}</Chip.Label>
-                </Chip>
-                <Chip color="accent" size="sm" variant="secondary">
-                  <Chip.Label>{row.status.name}</Chip.Label>
-                </Chip>
-              </div>
-            </Card.Content>
+            <div className="flex flex-wrap gap-2">
+              <span className={chipClassName}>{row.propertyType.name}</span>
+              <span className={chipClassName}>{row.modality.name}</span>
+              <span className={chipClassName}>{row.status.name}</span>
+            </div>
 
-            <Card.Footer className="grid grid-cols-2 gap-3 text-sm">
+            <div className="grid grid-cols-2 gap-4 border-t border-border/60 pt-4 text-sm">
               <div>
-                <p className="text-slate-500">{t("grid.price")}</p>
-                <p className="font-medium text-slate-950">
+                <p className="text-muted-foreground">{t("grid.price")}</p>
+                <p className="mt-1 font-medium text-foreground">
                   {formatCurrency(row.price, intlLocale)}
                 </p>
               </div>
               <div>
-                <p className="flex items-center gap-1 text-slate-500">
+                <p className="flex items-center gap-1 text-muted-foreground">
                   <HugeiconsIcon icon={RulerIcon} size={14} strokeWidth={1.8} />
                   <span>{t("grid.area")}</span>
                 </p>
-                <p className="font-medium text-slate-950">
+                <p className="mt-1 font-medium text-foreground">
                   {formatArea(row.builtArea, intlLocale)}
                 </p>
               </div>
-            </Card.Footer>
-          </Card>
-        ))}
+            </div>
+          </div>
+        </article>
+      ))}
     </div>
   );
 }

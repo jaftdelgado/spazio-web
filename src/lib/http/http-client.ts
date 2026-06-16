@@ -12,6 +12,10 @@ type RequestOptions = {
   method: HttpMethod;
 };
 
+const isFormDataBody = (body: unknown): body is FormData => {
+  return typeof FormData !== "undefined" && body instanceof FormData;
+};
+
 const buildUrl = (path: string) => {
   return new URL(path, env.NEXT_PUBLIC_API_URL).toString();
 };
@@ -35,9 +39,12 @@ const request = async <T>(
   path: string,
   options: RequestOptions,
 ): Promise<T> => {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+  const headers: Record<string, string> = {};
+  const isFormData = isFormDataBody(options.body);
+
+  if (options.body !== undefined && !isFormData) {
+    headers["Content-Type"] = "application/json";
+  }
 
   const accessToken = authStorage.getAccessToken();
   if (accessToken) {
@@ -50,7 +57,12 @@ const request = async <T>(
     method: options.method,
     headers,
     credentials: "include",
-    body: options.body === undefined ? undefined : JSON.stringify(options.body),
+    body:
+      options.body === undefined
+        ? undefined
+        : isFormData
+          ? (options.body as FormData)
+          : JSON.stringify(options.body),
   });
 
   const responseBody = await parseResponseBody(response);

@@ -15,8 +15,15 @@ import {
   TaskDone02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button, Dropdown, Label, Chip, Skeleton } from "@heroui/react";
 
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   DataGrid,
   type DataGridColumn,
@@ -43,13 +50,15 @@ type LoadingPropertyGridRow = DataGridRowBase & {
 type PropertiesDataGridRow = PropertyGridRow | LoadingPropertyGridRow;
 
 const LOADING_ROW_COUNT = 8;
+const chipClassName =
+  "inline-flex rounded-full border border-border/70 bg-muted/30 px-2.5 py-1 text-xs font-medium text-muted-foreground";
 
 const columnLabel = (
   icon: React.ComponentProps<typeof HugeiconsIcon>["icon"],
   label: string,
 ) => (
-  <span className="flex items-center gap-2 text-muted">
-    <HugeiconsIcon className="h-4 w-4 shrink-0 text-muted" icon={icon} />
+  <span className="flex items-center gap-2 text-muted-foreground">
+    <HugeiconsIcon className="h-4 w-4 shrink-0" icon={icon} />
     <span>{label}</span>
   </span>
 );
@@ -88,19 +97,19 @@ function isLoadingRow(
 function renderLoadingCell(columnId: PropertyGridColumnId) {
   switch (columnId) {
     case "title":
-      return <Skeleton className="h-4 w-40 rounded-lg" />;
+      return <Skeleton className="h-4 w-40 rounded-full" />;
     case "propertyType":
     case "modality":
     case "status":
-      return <Skeleton className="h-4 w-24 rounded-full" />;
+      return <Skeleton className="h-6 w-24 rounded-full" />;
     case "address":
-      return <Skeleton className="h-4 w-52 rounded-lg" />;
+      return <Skeleton className="h-4 w-52 rounded-full" />;
     case "price":
-      return <Skeleton className="ml-auto h-4 w-28 rounded-lg" />;
+      return <Skeleton className="ml-auto h-4 w-28 rounded-full" />;
     case "builtArea":
-      return <Skeleton className="ml-auto h-4 w-16 rounded-lg" />;
+      return <Skeleton className="ml-auto h-4 w-16 rounded-full" />;
     case "actions":
-      return <Skeleton className="ml-auto h-4 w-4 rounded-lg" />;
+      return <Skeleton className="ml-auto h-8 w-8 rounded-2xl" />;
     default:
       return null;
   }
@@ -125,93 +134,81 @@ function renderPropertyCell(
 
   switch (columnId) {
     case "title":
-      return <div className="font-medium text-slate-950">{row.title}</div>;
+      return <div className="font-medium text-foreground">{row.title}</div>;
     case "propertyType":
-      return (
-        <Chip color="accent" variant="secondary">
-          <Chip.Label>{row.propertyType.name}</Chip.Label>
-        </Chip>
-      );
+      return <span className={chipClassName}>{row.propertyType.name}</span>;
     case "address":
-      return formatAddress(propertyAddressMap[row.propertyUuid]);
+      return (
+        <span className="text-muted-foreground">
+          {formatAddress(propertyAddressMap[row.propertyUuid])}
+        </span>
+      );
     case "modality":
-      return (
-        <Chip color="accent" variant="secondary">
-          <Chip.Label>{row.modality.name}</Chip.Label>
-        </Chip>
-      );
+      return <span className={chipClassName}>{row.modality.name}</span>;
     case "status":
-      return (
-        <Chip color="accent" variant="secondary">
-          <Chip.Label>{row.status.name}</Chip.Label>
-        </Chip>
-      );
+      return <span className={chipClassName}>{row.status.name}</span>;
     case "price":
       return (
-        <span className="tabular-nums">{formatCurrency(row.price, locale)}</span>
+        <span className="tabular-nums text-foreground">
+          {formatCurrency(row.price, locale)}
+        </span>
       );
     case "builtArea":
       return (
-        <span className="tabular-nums">
+        <span className="tabular-nums text-foreground">
           {formatArea(row.builtArea, locale)}
         </span>
       );
     case "actions":
       return (
-        <Dropdown>
-          <Button
-            isIconOnly
-            aria-label={labels.actionsAriaLabel}
-            size="sm"
-            variant="ghost"
-          >
-            <HugeiconsIcon
-              icon={MoreVerticalIcon}
-              size={18}
-              strokeWidth={1.8}
-            />
-          </Button>
-          <Dropdown.Popover placement="bottom end">
-            <Dropdown.Menu
-              onAction={() => {
-                // Placeholder until property detail/edit/delete flows are implemented.
-              }}
+        <DropdownMenu modal={false}>
+          <DropdownMenuTrigger asChild>
+            <Button
+              aria-label={labels.actionsAriaLabel}
+              className="rounded-2xl"
+              size="icon-sm"
+              variant="ghost"
             >
-              <Dropdown.Item id="view" textValue={labels.view}>
-                <HugeiconsIcon
-                  className="size-4 shrink-0 text-slate-500"
-                  icon={Building03Icon}
-                  size={16}
-                  strokeWidth={1.8}
-                />
-                <Label>{labels.view}</Label>
-              </Dropdown.Item>
-              <Dropdown.Item id="edit" textValue={labels.edit}>
-                <HugeiconsIcon
-                  className="size-4 shrink-0 text-slate-500"
-                  icon={Edit03Icon}
-                  size={16}
-                  strokeWidth={1.8}
-                />
-                <Label>{labels.edit}</Label>
-              </Dropdown.Item>
-              <Dropdown.Item
-                id="delete"
-                textValue={labels.delete}
-                variant="danger"
-                onAction={() => onDeletePress(row)}
-              >
-                <HugeiconsIcon
-                  className="size-4 shrink-0 text-danger"
-                  icon={Delete02Icon}
-                  size={16}
-                  strokeWidth={1.8}
-                />
-                <Label>{labels.delete}</Label>
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown.Popover>
-        </Dropdown>
+              <HugeiconsIcon
+                icon={MoreVerticalIcon}
+                size={18}
+                strokeWidth={1.8}
+              />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem>
+              <HugeiconsIcon
+                className="text-muted-foreground"
+                icon={Building03Icon}
+                size={16}
+                strokeWidth={1.8}
+              />
+              <span>{labels.view}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <HugeiconsIcon
+                className="text-muted-foreground"
+                icon={Edit03Icon}
+                size={16}
+                strokeWidth={1.8}
+              />
+              <span>{labels.edit}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => onDeletePress(row)}
+            >
+              <HugeiconsIcon
+                className="text-destructive"
+                icon={Delete02Icon}
+                size={16}
+                strokeWidth={1.8}
+              />
+              <span>{labels.delete}</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       );
     default:
       return null;
@@ -326,7 +323,7 @@ export function PropertiesDataGrid({
           )
         }
         rows={rowsToRender}
-        tableContainerClassName="rounded-xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        tableContainerClassName="rounded-3xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       />
 
       <PropertyDeleteAlertDialog

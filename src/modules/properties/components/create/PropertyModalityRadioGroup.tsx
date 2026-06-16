@@ -1,7 +1,8 @@
 "use client";
 
-import { Description, Label, Radio, RadioGroup, Skeleton } from "@heroui/react";
-
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useModalities } from "@catalogs/application/hooks/useCatalogs";
 import type { Modality } from "@catalogs/domain/catalog.entity";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
@@ -55,9 +56,7 @@ export function PropertyModalityRadioGroup({
 
   return (
     <div className="flex w-full flex-col gap-3">
-      <span className="sr-only">
-        {t("create.sections.modality.label")}
-      </span>
+      <span className="sr-only">{t("create.sections.modality.label")}</span>
 
       {modalitiesQuery.isLoading ? (
         <div className="flex flex-col gap-3">
@@ -73,10 +72,9 @@ export function PropertyModalityRadioGroup({
       {!modalitiesQuery.isLoading ? (
         <RadioGroup
           aria-label={t("create.sections.modality.label")}
-          id="property-modality-radio-group"
-          orientation="vertical"
-          value={selectedModalityId ? String(selectedModalityId) : undefined}
-          onChange={(value) => onChange(Number(value))}
+          className="grid gap-4"
+          value={selectedModalityId ? String(selectedModalityId) : ""}
+          onValueChange={(value) => onChange(Number(value))}
         >
           {modalities.map((modality) => {
             const translationKey = getModalityTranslationKey(modality);
@@ -87,29 +85,38 @@ export function PropertyModalityRadioGroup({
               : modality.name;
 
             return (
-              <Radio
+              <div
                 key={modality.modalityId}
-                value={String(modality.modalityId)}
+                className="flex items-start gap-3"
               >
-                <Radio.Control>
-                  <Radio.Indicator />
-                </Radio.Control>
-                <Radio.Content>
-                  <Label>{label}</Label>
+                <RadioGroupItem
+                  className="mt-0.5"
+                  id={`property-modality-${modality.modalityId}`}
+                  value={String(modality.modalityId)}
+                />
+                <Label
+                  className="grid gap-1 font-normal"
+                  htmlFor={`property-modality-${modality.modalityId}`}
+                >
+                  <span className="text-sm font-medium leading-none text-foreground">
+                    {label}
+                  </span>
                   {descriptionKey ? (
-                    <Description>{t(descriptionKey)}</Description>
+                    <span className="text-sm leading-5 text-muted-foreground">
+                      {t(descriptionKey)}
+                    </span>
                   ) : null}
-                </Radio.Content>
-              </Radio>
+                </Label>
+              </div>
             );
           })}
         </RadioGroup>
       ) : null}
 
       {modalitiesQuery.isError ? (
-        <Description className="text-xs text-danger">
+        <p className="text-xs text-destructive">
           {t("create.sections.modality.error")}
-        </Description>
+        </p>
       ) : null}
     </div>
   );

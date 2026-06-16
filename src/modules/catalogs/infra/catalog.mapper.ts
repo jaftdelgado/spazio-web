@@ -16,6 +16,7 @@ type PropertyTypeDTO = {
   property_type_id: number;
   name: string;
   icon: string | null;
+  subtype: "commercial" | "other" | "residential";
 };
 
 type RentPeriodDTO = {
@@ -40,6 +41,7 @@ export const mapPropertyType = (dto: PropertyTypeDTO): PropertyType => {
     propertyTypeId: dto.property_type_id,
     name: dto.name,
     icon: dto.icon,
+    subtype: dto.subtype,
   };
 };
 

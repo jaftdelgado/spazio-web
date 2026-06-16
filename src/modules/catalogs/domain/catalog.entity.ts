@@ -9,6 +9,7 @@ export interface PropertyType {
   propertyTypeId: number;
   name: string;
   icon: string | null;
+  subtype: "commercial" | "other" | "residential";
 }
 
 export interface RentPeriod {

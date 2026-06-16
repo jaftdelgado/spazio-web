@@ -14,7 +14,6 @@ export const propertyPostHttpAdapter: Pick<
 > = {
   async createProperty(input: CreatePropertyInput): Promise<CreatePropertyResult> {
     const body: Record<string, unknown> = {
-      subtype: input.subtype,
       title: input.title,
       description: input.description,
       property_type_id: input.propertyTypeId,

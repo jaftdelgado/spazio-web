@@ -1,0 +1,36 @@
+{
+  "descriptions": {
+    "PETS_ALLOWED": "Se aceptan mascotas en la estancia.",
+    "SMOKING_ALLOWED": "Se permite fumar dentro del inmueble.",
+    "CHILDREN_ALLOWED": "Se permiten menores en la estancia.",
+    "EVENTS_ALLOWED": "Se permiten reuniones o eventos.",
+    "MAX_TENANTS": "Cantidad máxima de ocupantes.",
+    "MIN_LEASE_MONTHS": "Duración mínima del contrato.",
+    "DEPOSIT_MONTHS": "Depósito requerido en meses.",
+    "ADVANCE_MONTHS": "Meses de renta por adelantado.",
+    "ACCEPTS_CREDIT": "Acepta pago o compra con crédito.",
+    "FURNISHED": "Incluye mobiliario en la estancia.",
+    "NEGOTIABLE_PRICE": "Permite negociar el precio publicado.",
+    "IMMEDIATE_AVAILABILITY": "Disponible para ocupar de inmediato.",
+    "MAINTENANCE_INCLUDED": "Incluye mantenimiento en el precio.",
+    "COMMERCIAL_USE_ALLOWED": "Autoriza uso comercial del inmueble.",
+    "PRICE_RANGE": "Permite capturar un rango de precio."
+  },
+  "labels": {
+    "PETS_ALLOWED": "Se permiten mascotas",
+    "SMOKING_ALLOWED": "Se permite fumar",
+    "CHILDREN_ALLOWED": "Se permiten niños",
+    "EVENTS_ALLOWED": "Se permiten eventos",
+    "MAX_TENANTS": "Máximo de inquilinos",
+    "MIN_LEASE_MONTHS": "Meses mínimos de contrato",
+    "DEPOSIT_MONTHS": "Meses de depósito",
+    "ADVANCE_MONTHS": "Meses por adelantado",
+    "ACCEPTS_CREDIT": "Acepta crédito",
+    "FURNISHED": "Amueblado",
+    "NEGOTIABLE_PRICE": "Precio negociable",
+    "IMMEDIATE_AVAILABILITY": "Disponibilidad inmediata",
+    "MAINTENANCE_INCLUDED": "Mantenimiento incluido",
+    "COMMERCIAL_USE_ALLOWED": "Uso comercial permitido",
+    "PRICE_RANGE": "Rango de precio"
+  }
+}

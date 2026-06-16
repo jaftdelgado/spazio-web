@@ -317,7 +317,6 @@ export type CreatePropertyClauseInput = {
 };
 
 export type CreatePropertyInput = {
-  subtype: "residential" | "commercial" | "other";
   title: string;
   description: string;
   propertyTypeId: number;

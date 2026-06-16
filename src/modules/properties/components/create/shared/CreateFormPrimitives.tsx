@@ -1,31 +1,42 @@
 "use client";
 
 import * as React from "react";
-import { Description, Label, Separator, Switch, TextField } from "@heroui/react";
+
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
 export function CreateFormSection({
   title,
   hint,
+  hideHeader = false,
   children,
 }: {
   title: string;
   hint?: string;
+  hideHeader?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <>
-      <section className="mt-8 grid gap-x-10 gap-y-6 lg:grid-cols-[180px_minmax(0,1fr)]">
-        <div>
-          <h2 className="text-sm font-medium text-slate-900">{title}</h2>
-          {hint ? (
-            <Description className="mt-1 text-xs leading-relaxed">
-              {hint}
-            </Description>
-          ) : null}
-        </div>
-        <div className="flex flex-col gap-5">{children}</div>
+      <section className="mt-8 grid gap-x-10 gap-y-6 lg:grid-cols-[190px_minmax(0,1fr)]">
+        {hideHeader ? (
+          <div className="flex flex-col gap-5 lg:col-span-2">{children}</div>
+        ) : (
+          <>
+            <div>
+              <h2 className="text-sm font-medium text-foreground">{title}</h2>
+              {hint ? (
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                  {hint}
+                </p>
+              ) : null}
+            </div>
+            <div className="flex flex-col gap-5">{children}</div>
+          </>
+        )}
       </section>
-      <Separator className="my-10" />
+      <div className="my-10 h-px bg-border" />
     </>
   );
 }
@@ -46,15 +57,50 @@ export function CreateFormField({
   children: React.ReactNode;
 }) {
   return (
-    <TextField fullWidth isRequired={isRequired} name={htmlFor}>
-      <Label className={isLabelHidden ? "sr-only" : undefined}>
+    <div className="space-y-2" data-required={isRequired}>
+      <Label className={cn(isLabelHidden && "sr-only")} htmlFor={htmlFor}>
         {label}
+        {isRequired ? <span className="text-destructive">*</span> : null}
       </Label>
       {children}
       {hint ? (
-        <Description className="text-xs">{hint}</Description>
+        <p className="text-xs leading-relaxed text-muted-foreground">{hint}</p>
       ) : null}
-    </TextField>
+    </div>
+  );
+}
+
+export function CreateFormSubsection({
+  title,
+  hint,
+  isFirst = false,
+  isLast = false,
+  children,
+}: {
+  title: string;
+  hint?: string;
+  isFirst?: boolean;
+  isLast?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={cn(
+        "grid gap-x-10 gap-y-4 lg:grid-cols-[190px_minmax(0,1fr)]",
+        !isFirst && "border-t border-border pt-6",
+        !isLast && "pb-6",
+      )}
+    >
+      <div>
+        <h3 className="text-sm font-medium text-foreground">{title}</h3>
+        {hint ? (
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+            {hint}
+          </p>
+        ) : null}
+      </div>
+      <div className="flex flex-col gap-5">{children}</div>
+    </div>
   );
 }
 
@@ -70,14 +116,14 @@ export function CreateFormSwitchRow({
   onChange: (value: boolean) => void;
 }) {
   return (
-    <div className="flex items-start justify-between gap-6 border-b border-slate-200/80 py-4 last:border-b-0">
+    <div className="flex items-start justify-between gap-6 border-b border-border py-4 last:border-b-0">
       <div>
-        <div className="text-sm font-medium text-slate-900">{title}</div>
-        <Description className="mt-0.5 text-xs leading-relaxed">
+        <div className="text-sm font-medium text-foreground">{title}</div>
+        <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
           {description}
-        </Description>
+        </p>
       </div>
-      <Switch isSelected={isSelected} onChange={onChange} />
+      <Switch checked={isSelected} onCheckedChange={onChange} />
     </div>
   );
 }

@@ -13,19 +13,23 @@
     },
     "nav": {
       "general": "General",
+      "details": "Details",
       "location": "Location",
       "pricing": "Pricing",
       "services": "Services",
-      "media": "Media",
+      "clauses": "Clauses",
+      "multimedia": "Photos",
       "settings": "Settings",
       "notes": "Notes"
     },
     "sectionDescriptions": {
       "general": "Main property information.",
+      "details": "Type-specific property characteristics.",
       "location": "Address and property context.",
       "pricing": "Commercial values for the property.",
       "services": "Amenities and services available in the property.",
-      "media": "Cover and visual references.",
+      "clauses": "Configurable property conditions and restrictions.",
+      "multimedia": "Property photos and visual assets.",
       "settings": "Visibility and publishing preferences.",
       "notes": "Internal registration notes."
     },
@@ -52,6 +56,10 @@
         "title": "Location",
         "hint": "Base address for the property."
       },
+      "propertyDetails": {
+        "title": "Characteristics",
+        "hint": "Complete the required attributes according to the selected property type."
+      },
       "pricingDetails": {
         "title": "Pricing",
         "hint": "Main property amounts."
@@ -60,14 +68,54 @@
         "title": "Services",
         "hint": "Choose the amenities available in the property."
       },
-      "media": {
-        "title": "Media"
+      "clauses": {
+        "title": "Clauses",
+        "hint": "Define the conditions and restrictions for the property."
+      },
+      "multimedia": {
+        "title": "Photos",
+        "hint": "Add between 1 and 10 photos of the property. The first one will be the cover by default."
       },
       "settings": {
         "title": "Preferences"
       },
       "notes": {
         "title": "Internal notes"
+      }
+    },
+    "location": {
+      "map": {
+        "title": "Map",
+        "hint": "Select the exact property point on the map."
+      },
+      "fields": {
+        "title": "Address",
+        "hint": "Complete or adjust the property's base location details."
+      },
+      "extras": {
+        "title": "Additional details",
+        "hint": "Capture complementary location information.",
+        "description": "Lot area is now captured inside the property details section so the main property measurements stay together."
+      }
+    },
+    "details": {
+      "unselected": {
+        "title": "Select a property type first",
+        "description": "We need to know whether the property is residential, commercial, or another type to show the proper fields."
+      },
+      "other": {
+        "title": "This type does not require a specific block",
+        "description": "You can continue without capturing residential or commercial attributes for this property type."
+      },
+      "residential": {
+        "title": "Residential details",
+        "hint": "Complete the layout and physical conditions of the residential property.",
+        "badge": "Residential"
+      },
+      "commercial": {
+        "title": "Commercial details",
+        "hint": "Complete the operational and technical setup of the commercial property.",
+        "badge": "Commercial"
       }
     },
     "fields": {
@@ -82,9 +130,7 @@
       "locationMap": {
         "label": "Map",
         "hint": "Click or drag the marker to set the exact property location.",
-        "selectionHint": "We will use the user's current location when available; otherwise, the map starts in Mexico City.",
-        "loadingLocation": "Looking up the current location to place the property's starting point.",
-        "coordinatesSelected": "Selected location: latitude {{latitude}}, longitude {{longitude}}."
+        "selectionHint": "We will use the user's current location when available; otherwise, the map starts in Mexico City."
       },
       "country": {
         "label": "Country",
@@ -113,19 +159,85 @@
       },
       "neighborhood": {
         "label": "Neighborhood",
-        "placeholder": "Area or neighborhood"
+        "placeholder": "Ex: Downtown, Del Valle Norte, or Las Palmas neighborhood"
       },
       "street": {
         "label": "Street",
-        "placeholder": "Street name"
+        "placeholder": "Ex: Insurgentes Sur Ave. or Morelos Street"
       },
       "exteriorNumber": {
         "label": "Exterior number",
-        "placeholder": "123"
+        "placeholder": "Ex: 742, 18-B, or N/A"
+      },
+      "interiorNumber": {
+        "label": "Interior number",
+        "placeholder": "Ex: Apt 4B, Tower 2, or Unit 7"
       },
       "postalCode": {
         "label": "Postal code",
-        "placeholder": "00000"
+        "placeholder": "Ex: 03100 or 91000"
+      },
+      "lotArea": {
+        "label": "Lot area",
+        "placeholder": "Ex: 180.5 m2"
+      },
+      "bedrooms": {
+        "label": "Bedrooms",
+        "placeholder": "Ex: 3"
+      },
+      "bathrooms": {
+        "label": "Bathrooms",
+        "placeholder": "Ex: 2"
+      },
+      "beds": {
+        "label": "Beds",
+        "placeholder": "Ex: 3"
+      },
+      "floors": {
+        "label": "Floors",
+        "placeholder": "Ex: 2"
+      },
+      "parkingSpots": {
+        "label": "Parking spots",
+        "placeholder": "Ex: 2"
+      },
+      "builtArea": {
+        "label": "Built area",
+        "placeholder": "Ex: 145.5 m2"
+      },
+      "constructionYear": {
+        "label": "Construction year",
+        "placeholder": "Ex: 2018"
+      },
+      "orientation": {
+        "label": "Property orientation",
+        "placeholder": "Select an orientation",
+        "loading": "Loading orientations...",
+        "empty": "No orientations available."
+      },
+      "isFurnished": {
+        "label": "Furnished",
+        "description": "Indicates whether the property is delivered with furniture."
+      },
+      "ceilingHeight": {
+        "label": "Ceiling height",
+        "placeholder": "Ex: 4.5 m"
+      },
+      "loadingDocks": {
+        "label": "Loading docks",
+        "placeholder": "Ex: 2"
+      },
+      "internalOffices": {
+        "label": "Internal offices",
+        "placeholder": "Ex: 4"
+      },
+      "threePhasePower": {
+        "label": "Three-phase power",
+        "description": "Enable if the property has a three-phase electrical installation."
+      },
+      "landUse": {
+        "label": "Land use",
+        "placeholder": "Ex: Commercial, mixed-use, or light industrial"
       },
       "salePrice": {
         "label": "Sale price",
@@ -136,19 +248,14 @@
         "prefix": "Rent",
         "placeholder": "0"
       },
+      "deposit": {
+        "label": "Deposit",
+        "placeholder": "0"
+      },
       "maintenanceFee": {
         "label": "Maintenance fee",
         "hint": "Monthly amount if applicable.",
         "placeholder": "0"
-      },
-      "mediaLabel": {
-        "label": "Internal label",
-        "hint": "Short reference for the team.",
-        "placeholder": "Main facade"
-      },
-      "mediaUpload": {
-        "action": "Upload files",
-        "hint": "You can wire the real upload later."
       },
       "isPublicAddress": {
         "label": "Show public address",
@@ -198,16 +305,19 @@
       "loadingDescription": "We are fetching the allowed rent types for this property.",
       "noPeriodsTitle": "No rent periods available",
       "noPeriodsDescription": "We could not find configured rent periods for the selected property type.",
-      "inputHint": "Only the prices you actually fill in will be sent.",
       "selectorTitle": "Price types",
       "selectorHint": "Click a row to choose which amount you want to edit.",
       "registeredTitle": "Registered prices",
       "registeredHint": "Summary of the amounts captured so far for this property.",
       "tableAriaLabel": "Registered prices for the property",
+      "tableActiveColumn": "Active",
       "tableTypeColumn": "Price type",
       "tableAmountColumn": "Amount",
       "tableEmpty": "You have not entered prices for this property yet.",
       "previewLabel": "Preview",
+      "editorHint": "Edit the amount for the price type that is currently selected.",
+      "negotiableLabel": "Negotiable price",
+      "negotiableDescription": "Enable this option if the sale price can be negotiated.",
       "salePreviewHint": "This amount will be sent as the sale price if you keep a value in this tab.",
       "rentPreviewHint": "This amount will be sent only for this rent period if you leave a captured value."
     },
@@ -220,23 +330,152 @@
       "availableHint": "Click an amenity to add it to the property.",
       "availableEmpty": "There are no more available amenities."
     },
+    "clauses": {
+      "add": "Add",
+      "addAriaLabel": "Add clause {{clause}}",
+      "availableHint": "Clauses you can enable for this property.",
+      "availableTitle": "Available",
+      "booleanAllowed": "Allowed",
+      "booleanNotAllowed": "Not allowed",
+      "columnAction": "Action",
+      "loading": "Loading clauses...",
+      "columnClause": "Clause",
+      "columnDescription": "Description",
+      "columnValue": "Value",
+      "descriptionTooltipAriaLabel": "View description for {{clause}}",
+      "remove": "Remove",
+      "removeAriaLabel": "Remove clause {{clause}}",
+      "rangePlaceholderMin": "Min",
+      "rangePlaceholderMax": "Max",
+      "selectedHint": "Active clauses and their current value.",
+      "selectedTitle": "Selected"
+    },
+    "multimedia": {
+      "uploaderTitle": "Photo upload",
+      "uploaderHint": "Add new property photos from your device.",
+      "editorTitle": "Photo management",
+      "editorHint": "Select a photo to edit its cover status, label, and alt text.",
+      "editorEmptyTitle": "No photos uploaded yet",
+      "editorEmptyHint": "Add at least one photo to organize it and complete its metadata.",
+      "dropzoneTitle": "Drop your photos here",
+      "dropzoneHint": "Formats: {{extensions}} · Max {{maxMb}} MB per file",
+      "maxReached": "10 photo limit reached",
+      "coverBadge": "Cover",
+      "setCover": "Set as cover",
+      "coverLabel": "Cover",
+      "labelField": "Label",
+      "altField": "Alt text",
+      "labelPlaceholder": "Ex: Front facade or main kitchen",
+      "altPlaceholder": "Briefly describe what appears in the photo",
+      "errorType": "Some files were rejected due to unsupported format.",
+      "errorSize": "Some files exceed the {{maxMb}} MB limit.",
+      "errorMax": "You can only add {{max}} photos in total."
+    },
+    "validation": {
+      "general": {
+        "titleRequired": "Title is required.",
+        "titleMaxLength": "Title cannot exceed 128 characters.",
+        "propertyTypeRequired": "Select a property type.",
+        "modalityRequired": "Select a modality."
+      },
+      "location": {
+        "countryRequired": "Select a country.",
+        "stateRequired": "Select a state.",
+        "cityRequired": "Select a municipality.",
+        "latitudeInvalid": "Select a valid latitude coordinate on the map.",
+        "longitudeInvalid": "Select a valid longitude coordinate on the map.",
+        "postalCodeRequired": "Postal code is required.",
+        "postalCodeInvalid": "Postal code must be numeric and cannot exceed 5 digits.",
+        "neighborhoodRequired": "Neighborhood is required.",
+        "neighborhoodMaxLength": "Neighborhood cannot exceed 60 characters.",
+        "streetRequired": "Street is required.",
+        "streetMaxLength": "Street cannot exceed 120 characters.",
+        "exteriorNumberRequired": "Exterior number is required.",
+        "exteriorNumberInvalid": "Exterior number only allows letters, numbers, hyphen, and #, with a maximum of 8 characters.",
+        "interiorNumberInvalid": "Interior number only allows letters, numbers, hyphen, and #, with a maximum of 8 characters.",
+        "lotAreaRequired": "Lot area is required.",
+        "lotAreaInvalid": "Lot area must be a valid numeric value."
+      },
+      "details": {
+        "lotAreaRequired": "Lot area is required.",
+        "lotAreaInvalid": "Lot area must be a number greater than 0 with up to 2 decimals.",
+        "bedroomsRequired": "Bedrooms are required.",
+        "bedroomsInvalid": "Bedrooms must be a whole number greater than or equal to 0.",
+        "bathroomsRequired": "Bathrooms are required.",
+        "bathroomsInvalid": "Bathrooms must be a whole number greater than or equal to 0.",
+        "bedsRequired": "Beds are required.",
+        "bedsInvalid": "Beds must be a whole number greater than or equal to 0.",
+        "floorsRequired": "Floors are required.",
+        "floorsInvalid": "Floors must be a whole number greater than or equal to 0.",
+        "parkingSpotsRequired": "Parking spots are required.",
+        "parkingSpotsInvalid": "Parking spots must be a whole number greater than or equal to 0.",
+        "builtAreaRequired": "Built area is required.",
+        "builtAreaInvalid": "Built area must be a number greater than 0 with up to 2 decimals.",
+        "builtAreaExceedsLotArea": "Built area cannot exceed lot area.",
+        "constructionYearRequired": "Construction year is required.",
+        "constructionYearInvalid": "Construction year must be a whole number greater than 0.",
+        "orientationRequired": "Select an orientation.",
+        "ceilingHeightRequired": "Ceiling height is required.",
+        "ceilingHeightInvalid": "Ceiling height must be a number greater than 0 with up to 2 decimals.",
+        "loadingDocksRequired": "Loading docks are required.",
+        "loadingDocksInvalid": "Loading docks must be a whole number greater than or equal to 0.",
+        "internalOfficesRequired": "Internal offices are required.",
+        "internalOfficesInvalid": "Internal offices must be a whole number greater than or equal to 0.",
+        "landUseRequired": "Land use is required.",
+        "landUseMaxLength": "Land use cannot exceed 100 characters."
+      },
+      "pricing": {
+        "salePriceRequired": "Sale price is required.",
+        "rentPeriodRequired": "Enable at least one rent period.",
+        "rentPriceRequired": "All enabled rent periods must have a price.",
+        "depositRequired": "All enabled rent periods must have a deposit, even if it is 0."
+      }
+    },
     "footer": {
       "dirty": "Unsaved changes",
       "clean": "No changes",
       "discard": "Discard",
+      "previous": "Previous",
+      "next": "Next",
       "cancel": "Back",
-      "save": "Save"
+      "save": "Save",
+      "saving": "Registering..."
     },
     "cancelDialog": {
       "title": "Cancel registration",
       "body": "If you leave now, you will lose the unsaved changes for this property.",
       "dismiss": "Keep editing",
       "confirm": "Yes, cancel"
+    },
+    "submitDialog": {
+      "title": "Confirm registration",
+      "body": "The property will be registered with the captured information and its photos will be uploaded.",
+      "bodyServicesEmpty": "The property will be registered and its photos will be uploaded. You have not selected services yet; you can add them later if needed.",
+      "bodyClausesEmpty": "The property will be registered and its photos will be uploaded. You have not configured clauses yet; you can add them later if needed.",
+      "bodyServicesAndClausesEmpty": "The property will be registered and its photos will be uploaded. You have not selected services or configured clauses yet; you can add them later if needed.",
+      "dismiss": "Keep editing",
+      "confirm": "Yes, register",
+      "submitting": "Registering..."
+    },
+    "resultDialog": {
+      "successTitle": "Property registered",
+      "successBody": "The registration is complete and the photos were uploaded successfully.",
+      "successDismiss": "Close",
+      "successConfirm": "Go to list",
+      "errorTitle": "We could not complete the registration",
+      "errorDismiss": "Close",
+      "errorConfirm": "Keep editing"
+    },
+    "toast": {
+      "successTitle": "Property registered",
+      "successDescription": "The registration is complete and the photos were uploaded successfully.",
+      "errorTitle": "We could not complete the registration"
     }
   },
   "searchPlaceholder": "Search properties...",
   "viewAriaLabel": "Properties view",
   "filters": {
+    "all": "All",
     "propertyTypeButton": "Type",
     "propertyTypeTitle": "Property types"
   },
@@ -260,9 +499,13 @@
   },
   "states": {
     "empty": "There are no properties to display.",
+    "emptyTitle": "There are no registered properties yet",
+    "emptyDescription": "Once you register the first property, it will appear here so you can manage it.",
+    "emptySelectionTitle": "No types selected",
+    "emptySelectionDescription": "Select at least one property type to see results in this view.",
     "loading": "Loading properties...",
     "loadingRowLabel": "Loading property",
-    "loadErrorTitle": "Properties could not be loaded.",
+    "loadErrorTitle": "We could not load the properties",
     "retry": "Retry"
   },
   "grid": {
