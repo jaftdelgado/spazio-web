@@ -12,6 +12,11 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import type { DataGridRowBase } from "@components/core/DataGrid";
 import type { PropertyCard } from "@properties/domain/property.entity";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
+import {
+  getModalityLabel,
+  getPropertyTypeLabel,
+  getStatusLabel,
+} from "./propertyListingLabels";
 
 type PropertyGridRow = DataGridRowBase & PropertyCard;
 
@@ -99,9 +104,15 @@ export function PropertiesGridView({
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <span className={chipClassName}>{row.propertyType.name}</span>
-              <span className={chipClassName}>{row.modality.name}</span>
-              <span className={chipClassName}>{row.status.name}</span>
+              <span className={chipClassName}>
+                {getPropertyTypeLabel(row.propertyType.propertyTypeId, row.propertyType.name, t)}
+              </span>
+              <span className={chipClassName}>
+                {getModalityLabel(row.modality.modalityId, row.modality.name, t)}
+              </span>
+              <span className={chipClassName}>
+                {getStatusLabel(row.status.statusId, row.status.name, t)}
+              </span>
             </div>
 
             <div className="grid grid-cols-2 gap-4 border-t border-border/60 pt-4 text-sm">

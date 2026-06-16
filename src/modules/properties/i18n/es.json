@@ -558,6 +558,25 @@
     "price": "Precio",
     "area": "Área"
   },
+  "listing": {
+    "propertyTypes": {
+      "house": "Casa",
+      "apartment": "Departamento",
+      "commercial": "Comercial"
+    },
+    "modalities": {
+      "sale": "Venta",
+      "rent": "Renta",
+      "mixed": "Mixta"
+    },
+    "statuses": {
+      "available": "Disponible",
+      "reserved": "Reservada",
+      "sold": "Vendida",
+      "rented": "Rentada",
+      "deleted": "Eliminada"
+    }
+  },
   "footer": {
     "showing": "Mostrando {{visibleRowCount}} de {{totalCount}} propiedades"
   },

@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
+import { getPropertyTypeLabel } from "./propertyListingLabels";
 
 type PropertyTypeOption = {
   propertyTypeId: number;
@@ -85,7 +86,11 @@ export function PropertiesFiltersPopover({
                   );
                 }}
               >
-                {propertyType.name}
+                {getPropertyTypeLabel(
+                  propertyType.propertyTypeId,
+                  propertyType.name,
+                  t,
+                )}
               </button>
             );
           })}

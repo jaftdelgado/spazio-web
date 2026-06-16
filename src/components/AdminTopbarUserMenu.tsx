@@ -7,25 +7,25 @@ import {
   UserCircleIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
-import { ROUTES } from "@/config/routes";
 import {
   Avatar,
-  Dropdown,
-  Header,
-  Label,
-  Separator,
-  toast,
-} from "@heroui/react";
-
-const TOPBAR_USER = {
-  name: "Jane Doe",
-  email: "jane.doe@spazio.mx",
-  image:
-    "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/orange.jpg",
-} as const;
+  AvatarFallback,
+} from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ROUTES } from "@/config/routes";
+import { useAuth } from "@lib/auth/useAuth";
+import { useLogout } from "@users/application/hooks/useUsers";
 
 function getInitials(name: string) {
   return name
@@ -36,136 +36,104 @@ function getInitials(name: string) {
     .join("");
 }
 
-import { useAuth } from "@lib/auth/useAuth";
-import { useLogout } from "@users/application/hooks/useUsers";
+function resolveRoleLabel(roleId: number | undefined) {
+  if (roleId === 1) return "Administrador";
+  if (roleId === 2) return "Agente";
+  return "Usuario";
+}
 
 export function AdminTopbarUserMenu() {
   const router = useRouter();
   const { t } = useTranslation("app");
-  const { user, role } = useAuth();
+  const { user } = useAuth();
   const logoutMutation = useLogout();
 
   const initials = getInitials(user?.email || "U");
+  const roleLabel = resolveRoleLabel(user?.roleId);
 
   return (
-    <Dropdown>
-      <Dropdown.Trigger className="rounded-full outline-none">
-        <Avatar
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
           aria-label={t("topbarUserMenu.triggerLabel")}
-          className="size-7 cursor-pointer ring-1 ring-white shadow-sm"
+          className="h-10 rounded-2xl border-border/70 px-2.5"
           size="sm"
+          variant="outline"
         >
-          <Avatar.Fallback>{initials}</Avatar.Fallback>
-        </Avatar>
-      </Dropdown.Trigger>
+          <Avatar className="size-7 border-border/70 bg-muted/70">
+            <AvatarFallback>{initials}</AvatarFallback>
+          </Avatar>
+          <span className="hidden max-w-28 truncate text-sm md:inline">
+            {user?.email ?? "Usuario"}
+          </span>
+        </Button>
+      </DropdownMenuTrigger>
 
-      <Dropdown.Popover className="min-w-56" placement="bottom start">
-        <div className="border-b border-slate-200 px-3 py-3">
+      <DropdownMenuContent align="end" className="w-72">
+        <DropdownMenuLabel className="px-3 py-3">
           <div className="flex items-center gap-3">
-            <Avatar color="accent" size="sm" variant="soft">
-              <Avatar.Fallback>{initials}</Avatar.Fallback>
+            <Avatar className="size-9 border-border/70 bg-muted/70">
+              <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-slate-950">
+              <p className="truncate text-sm font-medium text-foreground">
                 {user?.email ?? "Usuario"}
               </p>
-              <p className="truncate text-xs text-slate-500">
-                {role === 1 ? "Administrador" : "Agente"}
-              </p>
+              <p className="truncate text-xs text-muted-foreground">{roleLabel}</p>
             </div>
           </div>
-        </div>
+        </DropdownMenuLabel>
 
-        <Dropdown.Menu
-          onAction={async (key) => {
-            if (key === "logout") {
-              await logoutMutation.mutateAsync();
-              toast.success("Sesión cerrada", {
-                description: "Vuelve pronto",
-              });
-              router.push(ROUTES.auth.login);
-              return;
-            }
+        <DropdownMenuSeparator />
 
-            if (key === "profile" || key === "settings") {
-              toast.success(t("topbarUserMenu.toast.title"), {
-                description:
-                  key === "profile"
-                    ? t("topbarUserMenu.toast.profileDescription")
-                    : t("topbarUserMenu.toast.settingsDescription"),
-              });
-            }
+        <DropdownMenuItem onClick={() => router.push(ROUTES.admin.root)}>
+          <HugeiconsIcon
+            className="text-muted-foreground"
+            icon={UserCircleIcon}
+            size={16}
+            strokeWidth={1.8}
+          />
+          <span>{t("topbarUserMenu.actions.profile")}</span>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem disabled>
+          <HugeiconsIcon
+            className="text-muted-foreground"
+            icon={AiMail01Icon}
+            size={16}
+            strokeWidth={1.8}
+          />
+          <span className="truncate">{user?.email ?? "Usuario"}</span>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem onClick={() => router.push(ROUTES.admin.root)}>
+          <HugeiconsIcon
+            className="text-muted-foreground"
+            icon={AccountSetting01Icon}
+            size={16}
+            strokeWidth={1.8}
+          />
+          <span>{t("topbarUserMenu.actions.settings")}</span>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          variant="destructive"
+          onClick={async () => {
+            await logoutMutation.mutateAsync();
+            router.push(ROUTES.auth.login);
           }}
         >
-          <Dropdown.Section>
-            <Header>{t("topbarUserMenu.sections.account")}</Header>
-
-            <Dropdown.Item
-              id="profile"
-              textValue={t("topbarUserMenu.actions.profile")}
-            >
-              <div className="flex items-center justify-center">
-                <HugeiconsIcon
-                  className="size-4 shrink-0 text-slate-500"
-                  icon={UserCircleIcon}
-                  size={16}
-                  strokeWidth={1.8}
-                />
-              </div>
-              <Label>{t("topbarUserMenu.actions.profile")}</Label>
-            </Dropdown.Item>
-
-            <Dropdown.Item id="email" isDisabled textValue={TOPBAR_USER.email}>
-              <div className="flex items-center justify-center">
-                <HugeiconsIcon
-                  className="size-4 shrink-0 text-slate-400"
-                  icon={AiMail01Icon}
-                  size={16}
-                  strokeWidth={1.8}
-                />
-              </div>
-              <Label>{TOPBAR_USER.email}</Label>
-            </Dropdown.Item>
-
-            <Dropdown.Item
-              id="settings"
-              textValue={t("topbarUserMenu.actions.settings")}
-            >
-              <div className="flex items-center justify-center">
-                <HugeiconsIcon
-                  className="size-4 shrink-0 text-slate-500"
-                  icon={AccountSetting01Icon}
-                  size={16}
-                  strokeWidth={1.8}
-                />
-              </div>
-              <Label>{t("topbarUserMenu.actions.settings")}</Label>
-            </Dropdown.Item>
-          </Dropdown.Section>
-
-          <Separator />
-
-          <Dropdown.Section>
-            <Header>{t("topbarUserMenu.sections.session")}</Header>
-
-            <Dropdown.Item
-              id="logout"
-              textValue={t("topbarUserMenu.actions.logout")}
-              variant="danger"
-            >
-              <div className="flex items-center justify-center">
-                <HugeiconsIcon
-                  className="size-4 shrink-0 text-danger"
-                  icon={Logout02Icon}
-                  size={16}
-                  strokeWidth={1.8}
-                />
-              </div>
-              <Label>{t("topbarUserMenu.actions.logout")}</Label>
-            </Dropdown.Item>
-          </Dropdown.Section>
-        </Dropdown.Menu>
-      </Dropdown.Popover>
-    </Dropdown>
+          <HugeiconsIcon
+            className="text-destructive"
+            icon={Logout02Icon}
+            size={16}
+            strokeWidth={1.8}
+          />
+          <span>{t("topbarUserMenu.actions.logout")}</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

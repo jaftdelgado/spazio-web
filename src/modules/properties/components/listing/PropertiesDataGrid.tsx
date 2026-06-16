@@ -34,6 +34,11 @@ import {
 import { saveEditingPropertyUuid } from "@properties/application/edit/property-edit-session";
 import type { PropertyCard } from "@properties/domain/property.entity";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
+import {
+  getModalityLabel,
+  getPropertyTypeLabel,
+  getStatusLabel,
+} from "./propertyListingLabels";
 import { PropertyDeleteAlertDialog } from "./PropertyDeleteAlertDialog";
 
 type PropertyGridColumnId =
@@ -129,6 +134,7 @@ function renderPropertyCell(
     edit: string;
     delete: string;
   },
+  t: ReturnType<typeof usePropertiesTranslation>["t"],
   onEditPress: (row: PropertyGridRow) => void,
   onDeletePress: (row: PropertyGridRow) => void,
 ) {
@@ -144,7 +150,11 @@ function renderPropertyCell(
         </div>
       );
     case "propertyType":
-      return <span className={chipClassName}>{row.propertyType.name}</span>;
+      return (
+        <span className={chipClassName}>
+          {getPropertyTypeLabel(row.propertyType.propertyTypeId, row.propertyType.name, t)}
+        </span>
+      );
     case "address":
       return (
         <span
@@ -155,9 +165,17 @@ function renderPropertyCell(
         </span>
       );
     case "modality":
-      return <span className={chipClassName}>{row.modality.name}</span>;
+      return (
+        <span className={chipClassName}>
+          {getModalityLabel(row.modality.modalityId, row.modality.name, t)}
+        </span>
+      );
     case "status":
-      return <span className={chipClassName}>{row.status.name}</span>;
+      return (
+        <span className={chipClassName}>
+          {getStatusLabel(row.status.statusId, row.status.name, t)}
+        </span>
+      );
     case "price":
       return (
         <span className="tabular-nums text-foreground">
@@ -331,6 +349,7 @@ export function PropertiesDataGrid({
             propertyAddressMap,
             intlLocale,
             actionLabels,
+            t,
             (row) => {
               saveEditingPropertyUuid(row.propertyUuid);
               router.push(ROUTES.admin.propertiesEdit);

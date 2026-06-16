@@ -564,6 +564,25 @@
     "price": "Price",
     "area": "Area"
   },
+  "listing": {
+    "propertyTypes": {
+      "house": "House",
+      "apartment": "Apartment",
+      "commercial": "Commercial"
+    },
+    "modalities": {
+      "sale": "Sale",
+      "rent": "Rent",
+      "mixed": "Mixed"
+    },
+    "statuses": {
+      "available": "Available",
+      "reserved": "Reserved",
+      "sold": "Sold",
+      "rented": "Rented",
+      "deleted": "Deleted"
+    }
+  },
   "footer": {
     "showing": "Showing {{visibleRowCount}} of {{totalCount}} properties"
   },
