@@ -152,7 +152,11 @@ function renderPropertyCell(
     case "propertyType":
       return (
         <span className={chipClassName}>
-          {getPropertyTypeLabel(row.propertyType.propertyTypeId, row.propertyType.name, t)}
+          {getPropertyTypeLabel(
+            row.propertyType.propertyTypeId,
+            row.propertyType.name,
+            t,
+          )}
         </span>
       );
     case "address":
