@@ -73,7 +73,7 @@ export function PropertyModalityRadioGroup({
         <RadioGroup
           aria-label={t("create.sections.modality.label")}
           className="grid gap-4"
-          value={selectedModalityId ? String(selectedModalityId) : undefined}
+          value={selectedModalityId ? String(selectedModalityId) : ""}
           onValueChange={(value) => onChange(Number(value))}
         >
           {modalities.map((modality) => {

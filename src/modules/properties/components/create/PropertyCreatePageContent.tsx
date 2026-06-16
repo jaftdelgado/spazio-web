@@ -5,6 +5,7 @@ import {
   Alert02Icon,
   Building03Icon,
   Cancel01Icon,
+  CheckmarkCircle02Icon,
   DollarCircleIcon,
   Home09Icon,
   ImageUploadIcon,
@@ -14,7 +15,6 @@ import {
   SaveIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
-import { toast } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
 import {
@@ -31,7 +31,10 @@ import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/config/routes";
 import { HttpError } from "@lib/http/http-errors";
 import { cn } from "@/lib/utils";
-import { useModalities, usePropertyTypes } from "@catalogs/application/hooks/useCatalogs";
+import {
+  useModalities,
+  usePropertyTypes,
+} from "@catalogs/application/hooks/useCatalogs";
 import { useCreateProperty } from "@properties/application/post/hooks/useCreateProperty";
 import { ClausesSection } from "@properties/components/create/sections/clauses/ClausesSection";
 import { PropertyDetailsSection } from "@properties/components/create/sections/details/PropertyDetailsSection";
@@ -166,7 +169,9 @@ function buildCreatePropertyInput(
       street: form.street.trim(),
       exteriorNumber: form.exteriorNumber.trim(),
       interiorNumber:
-        form.interiorNumber.trim() === "" ? undefined : form.interiorNumber.trim(),
+        form.interiorNumber.trim() === ""
+          ? undefined
+          : form.interiorNumber.trim(),
       postalCode: form.postalCode.trim(),
       latitude: Number(form.latitude),
       longitude: Number(form.longitude),
@@ -215,11 +220,15 @@ function buildCreatePropertyInput(
           }))
         : undefined,
     services: form.serviceIds.length > 0 ? form.serviceIds : undefined,
-    clauses: form.clauses.length > 0 ? mapClausesForCreateInput(form) : undefined,
+    clauses:
+      form.clauses.length > 0 ? mapClausesForCreateInput(form) : undefined,
   };
 }
 
-async function uploadPropertyPhotos(propertyUuid: string, photos: PhotoEntry[]) {
+async function uploadPropertyPhotos(
+  propertyUuid: string,
+  photos: PhotoEntry[],
+) {
   for (const [index, photo] of photos.entries()) {
     await uploadHttpAdapter.uploadPropertyPhoto({
       propertyUuid,
@@ -232,6 +241,112 @@ async function uploadPropertyPhotos(propertyUuid: string, photos: PhotoEntry[]) 
   }
 }
 
+type PropertyCreateCompletionState = {
+  isGeneralSectionComplete: boolean;
+  isPropertyDetailsSectionComplete: boolean;
+  isMultimediaSectionComplete: boolean;
+  isLocationSectionComplete: boolean;
+  isPricingSectionComplete: boolean;
+  hasServicesSelection: boolean;
+  hasClausesSelection: boolean;
+};
+
+type SubmissionDialogState =
+  | { open: false; status: null; message: string }
+  | { open: true; status: "success" | "error"; message: string };
+
+function getEnabledSections(
+  completion: PropertyCreateCompletionState,
+) {
+  const unlocked = new Set<PropertyCreateSectionId>(["general"]);
+
+  if (completion.isGeneralSectionComplete) {
+    unlocked.add("details");
+  }
+
+  if (
+    completion.isGeneralSectionComplete &&
+    completion.isPropertyDetailsSectionComplete
+  ) {
+    unlocked.add("multimedia");
+  }
+
+  if (
+    completion.isGeneralSectionComplete &&
+    completion.isPropertyDetailsSectionComplete &&
+    completion.isMultimediaSectionComplete
+  ) {
+    unlocked.add("location");
+  }
+
+  if (
+    completion.isGeneralSectionComplete &&
+    completion.isPropertyDetailsSectionComplete &&
+    completion.isMultimediaSectionComplete &&
+    completion.isLocationSectionComplete
+  ) {
+    unlocked.add("pricing");
+  }
+
+  if (
+    completion.isGeneralSectionComplete &&
+    completion.isPropertyDetailsSectionComplete &&
+    completion.isMultimediaSectionComplete &&
+    completion.isLocationSectionComplete &&
+    completion.isPricingSectionComplete
+  ) {
+    unlocked.add("services");
+  }
+
+  if (
+    completion.isGeneralSectionComplete &&
+    completion.isPropertyDetailsSectionComplete &&
+    completion.isMultimediaSectionComplete &&
+    completion.isLocationSectionComplete &&
+    completion.isPricingSectionComplete
+  ) {
+    unlocked.add("clauses");
+  }
+
+  return unlocked;
+}
+
+function getCanGoNext(
+  activeSection: PropertyCreateSectionId,
+  nextSection: PropertyCreateSectionId | null,
+  completion: PropertyCreateCompletionState,
+) {
+  if (activeSection === "general") {
+    return Boolean(nextSection) && completion.isGeneralSectionComplete;
+  }
+
+  if (activeSection === "details") {
+    return Boolean(nextSection) && completion.isPropertyDetailsSectionComplete;
+  }
+
+  if (activeSection === "multimedia") {
+    return Boolean(nextSection) && completion.isMultimediaSectionComplete;
+  }
+
+  if (activeSection === "location") {
+    return Boolean(nextSection) && completion.isLocationSectionComplete;
+  }
+
+  if (activeSection === "pricing") {
+    return Boolean(nextSection) && completion.isPricingSectionComplete;
+  }
+
+  if (activeSection === "services") {
+    return Boolean(nextSection);
+  }
+
+  if (activeSection === "clauses") {
+    return true;
+  }
+
+  return false;
+}
+
 export function PropertyCreatePageContent() {
   const { t } = usePropertiesTranslation();
   const router = useRouter();
@@ -240,14 +355,15 @@ export function PropertyCreatePageContent() {
   const [activeSection, setActiveSection] =
     React.useState<PropertyCreateSectionId>("general");
   const [isCancelDialogOpen, setIsCancelDialogOpen] = React.useState(false);
-  const [isEmptyServicesDialogOpen, setIsEmptyServicesDialogOpen] =
+  const [isSubmitConfirmDialogOpen, setIsSubmitConfirmDialogOpen] =
     React.useState(false);
-  const [isEmptyClausesDialogOpen, setIsEmptyClausesDialogOpen] =
-    React.useState(false);
-  const [hasConfirmedEmptyServices, setHasConfirmedEmptyServices] =
-    React.useState(false);
-  const [hasConfirmedEmptyClauses, setHasConfirmedEmptyClauses] =
-    React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [submissionDialog, setSubmissionDialog] =
+    React.useState<SubmissionDialogState>({
+      open: false,
+      status: null,
+      message: "",
+    });
   const [form, setForm] = React.useState<PropertyCreateFormState>(
     initialPropertyCreateFormState,
   );
@@ -265,10 +381,6 @@ export function PropertyCreatePageContent() {
     };
   }, []);
 
-  const isDirty = React.useMemo(
-    () => JSON.stringify(form) !== JSON.stringify(initialPropertyCreateFormState),
-    [form],
-  );
   const generalSectionValidation = React.useMemo(
     () => validateGeneralSection(form, t),
     [form, t],
@@ -316,92 +428,30 @@ export function PropertyCreatePageContent() {
   const isPricingSectionComplete = pricingSectionValidation.success;
   const hasServicesSelection = form.serviceIds.length > 0;
   const hasClausesSelection = form.clauses.length > 0;
-
-  React.useEffect(() => {
-    if (hasServicesSelection) {
-      setHasConfirmedEmptyServices(false);
-    }
-  }, [hasServicesSelection]);
-
-  React.useEffect(() => {
-    if (hasClausesSelection) {
-      setHasConfirmedEmptyClauses(false);
-    }
-  }, [hasClausesSelection]);
+  const completion = React.useMemo<PropertyCreateCompletionState>(
+    () => ({
+      isGeneralSectionComplete,
+      isPropertyDetailsSectionComplete,
+      isMultimediaSectionComplete,
+      isLocationSectionComplete,
+      isPricingSectionComplete,
+      hasServicesSelection,
+      hasClausesSelection,
+    }),
+    [
+      hasClausesSelection,
+      hasServicesSelection,
+      isGeneralSectionComplete,
+      isLocationSectionComplete,
+      isMultimediaSectionComplete,
+      isPropertyDetailsSectionComplete,
+      isPricingSectionComplete,
+    ],
+  );
 
   const enabledSections = React.useMemo(() => {
-    const unlocked = new Set<PropertyCreateSectionId>(["general"]);
-
-    if (isGeneralSectionComplete) {
-      unlocked.add("details");
-    }
-
-    if (isGeneralSectionComplete && isPropertyDetailsSectionComplete) {
-      unlocked.add("multimedia");
-    }
-
-    if (
-      isGeneralSectionComplete &&
-      isPropertyDetailsSectionComplete &&
-      isMultimediaSectionComplete
-    ) {
-      unlocked.add("location");
-    }
-
-    if (
-      isGeneralSectionComplete &&
-      isPropertyDetailsSectionComplete &&
-      isMultimediaSectionComplete &&
-      isLocationSectionComplete
-    ) {
-      unlocked.add("pricing");
-    }
-
-    if (
-      isGeneralSectionComplete &&
-      isPropertyDetailsSectionComplete &&
-      isMultimediaSectionComplete &&
-      isLocationSectionComplete &&
-      isPricingSectionComplete
-    ) {
-      unlocked.add("services");
-    }
-
-    if (
-      isGeneralSectionComplete &&
-      isPropertyDetailsSectionComplete &&
-      isMultimediaSectionComplete &&
-      isLocationSectionComplete &&
-      isPricingSectionComplete &&
-      (hasServicesSelection || hasConfirmedEmptyServices)
-    ) {
-      unlocked.add("clauses");
-    }
-
-    if (
-      isGeneralSectionComplete &&
-      isPropertyDetailsSectionComplete &&
-      isMultimediaSectionComplete &&
-      isLocationSectionComplete &&
-      isPricingSectionComplete &&
-      (hasServicesSelection || hasConfirmedEmptyServices) &&
-      (hasClausesSelection || hasConfirmedEmptyClauses)
-    ) {
-      unlocked.add("multimedia");
-    }
-
-    return unlocked;
-  }, [
-    hasClausesSelection,
-    hasServicesSelection,
-    hasConfirmedEmptyClauses,
-    isGeneralSectionComplete,
-    hasConfirmedEmptyServices,
-    isLocationSectionComplete,
-    isMultimediaSectionComplete,
-    isPropertyDetailsSectionComplete,
-    isPricingSectionComplete,
-  ]);
+    return getEnabledSections(completion);
+  }, [completion]);
 
   const activeNav = createNavItems.find((item) => item.id === activeSection);
   const activeSectionIndex = createSectionOrder.indexOf(activeSection);
@@ -414,25 +464,29 @@ export function PropertyCreatePageContent() {
       : null;
   const canGoBack =
     previousSection !== null && enabledSections.has(previousSection);
-  const canGoNext =
-    activeSection === "general"
-      ? Boolean(nextSection) && isGeneralSectionComplete
-      : activeSection === "details"
-        ? Boolean(nextSection) && isPropertyDetailsSectionComplete
-      : activeSection === "multimedia"
-        ? Boolean(nextSection) && isMultimediaSectionComplete
-      : activeSection === "location"
-        ? Boolean(nextSection) && isLocationSectionComplete
-        : activeSection === "pricing"
-          ? Boolean(nextSection) && isPricingSectionComplete
-          : activeSection === "services"
-            ? Boolean(nextSection)
-            : activeSection === "clauses"
-              ? true
-      : false;
+  const canGoNext = getCanGoNext(activeSection, nextSection, completion);
 
   function patchForm(patch: Partial<PropertyCreateFormState>) {
-    setForm((current) => ({ ...current, ...patch }));
+    setForm((current) => {
+      const next = { ...current, ...patch };
+
+      if (
+        patch.modalityId !== undefined &&
+        patch.modalityId !== current.modalityId
+      ) {
+        next.clauses = [];
+      }
+
+      if (
+        patch.propertyTypeId !== undefined &&
+        patch.propertyTypeId !== current.propertyTypeId
+      ) {
+        next.serviceIds = [];
+      }
+
+      return next;
+    });
+
   }
 
   function handleSectionChange(sectionId: PropertyCreateSectionId) {
@@ -444,7 +498,7 @@ export function PropertyCreatePageContent() {
   }
 
   function handleGoBack() {
-    if (createPropertyMutation.isPending) {
+    if (isSubmitting) {
       return;
     }
 
@@ -455,87 +509,80 @@ export function PropertyCreatePageContent() {
     setActiveSection(previousSection);
   }
 
+  function getSubmitConfirmationMessage() {
+    const servicesEmpty = !completion.hasServicesSelection;
+    const clausesEmpty = !completion.hasClausesSelection;
+
+    if (servicesEmpty && clausesEmpty) {
+      return t("create.submitDialog.bodyServicesAndClausesEmpty");
+    }
+
+    if (servicesEmpty) {
+      return t("create.submitDialog.bodyServicesEmpty");
+    }
+
+    if (clausesEmpty) {
+      return t("create.submitDialog.bodyClausesEmpty");
+    }
+
+    return t("create.submitDialog.body");
+  }
+
   async function handleSubmit() {
+    setIsSubmitting(true);
+
     try {
-      const payload = buildCreatePropertyInput(form, propertyTypeKind, pricingMode);
+      const payload = buildCreatePropertyInput(
+        form,
+        propertyTypeKind,
+        pricingMode,
+      );
       const result = await createPropertyMutation.mutateAsync(payload);
 
       if (form.photos.length > 0) {
         await uploadPropertyPhotos(result.propertyUuid, form.photos);
       }
 
-      toast.success(t("create.toast.successTitle"), {
-        description: t("create.toast.successDescription"),
+      setIsSubmitConfirmDialogOpen(false);
+      setSubmissionDialog({
+        open: true,
+        status: "success",
+        message: t("create.resultDialog.successBody"),
       });
-      router.push(ROUTES.admin.properties);
     } catch (error) {
-      toast.danger(t("create.toast.errorTitle"), {
-        description: getErrorMessage(error),
+      setIsSubmitConfirmDialogOpen(false);
+      setSubmissionDialog({
+        open: true,
+        status: "error",
+        message: getErrorMessage(error),
       });
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
   function handleGoNext() {
-    if (createPropertyMutation.isPending) {
-      return;
-    }
-
-    if (!nextSection) {
-      void handleSubmit();
-      return;
-    }
-
-    if (
-      (activeSection === "general" && isGeneralSectionComplete) ||
-      (activeSection === "details" && isPropertyDetailsSectionComplete) ||
-      (activeSection === "multimedia" && isMultimediaSectionComplete) ||
-      (activeSection === "location" && isLocationSectionComplete) ||
-      (activeSection === "pricing" && isPricingSectionComplete)
-    ) {
-      setActiveSection(nextSection);
-      return;
-    }
-
-    if (activeSection === "services") {
-      if (hasServicesSelection) {
-        setHasConfirmedEmptyServices(false);
-        setActiveSection(nextSection);
-        return;
-      }
-
-      setIsEmptyServicesDialogOpen(true);
+    if (isSubmitting) {
       return;
     }
 
     if (activeSection === "clauses") {
-      if (hasClausesSelection) {
-        setHasConfirmedEmptyClauses(false);
+      setIsSubmitConfirmDialogOpen(true);
+      return;
+    }
+
+    if (canGoNext && activeSection !== "services") {
+      if (nextSection) {
         setActiveSection(nextSection);
-        return;
       }
-
-      setIsEmptyClausesDialogOpen(true);
-    }
-  }
-
-  function handleConfirmEmptyServices() {
-    if (!nextSection) {
       return;
     }
 
-    setHasConfirmedEmptyServices(true);
-    setIsEmptyServicesDialogOpen(false);
-    setActiveSection(nextSection);
-  }
-
-  function handleConfirmEmptyClauses() {
-    if (!nextSection) {
-      return;
+    if (activeSection === "services") {
+      if (nextSection) {
+        setActiveSection(nextSection);
+      }
     }
-
-    setHasConfirmedEmptyClauses(true);
-    setIsEmptyClausesDialogOpen(false);
-    setActiveSection(nextSection);
   }
 
   function renderActiveSection() {
@@ -568,91 +615,113 @@ export function PropertyCreatePageContent() {
   return (
     <div className="admin-page-view flex min-h-full flex-col bg-background text-foreground">
       <div className="grid w-full gap-8 xl:grid-cols-[230px_minmax(0,1fr)]">
-        <aside className="xl:border-r xl:border-border xl:py-8 xl:pr-6">
-          <div className="text-[11px] font-medium uppercase tracking-[0.24em] text-muted-foreground">
-            {t("create.sidebar.eyebrow")}
-          </div>
-          <div className="mt-1 truncate text-lg font-semibold tracking-tight text-foreground">
-            {form.title || t("create.page.title")}
-          </div>
+        <aside
+          className="hidden self-start xl:block xl:border-r xl:border-border xl:bg-background xl:pr-6"
+          style={{
+            position: "sticky",
+            top: "var(--admin-topbar-height)",
+          }}
+        >
+          <div className="bg-background pt-(--admin-page-padding-y)">
+            <div className="text-[11px] font-medium uppercase tracking-[0.24em] text-muted-foreground">
+              {t("create.sidebar.eyebrow")}
+            </div>
+            <div className="mt-1 truncate text-lg font-semibold tracking-tight text-foreground">
+              {form.title || t("create.page.title")}
+            </div>
 
-          <ul className="mt-6 flex flex-col gap-1">
-            {createNavItems.map(({ id, icon, labelKey }) => {
-              const isActive = id === activeSection;
-              const isEnabled = enabledSections.has(id);
+            <ul className="mt-6 flex flex-col gap-1">
+              {createNavItems.map(({ id, icon, labelKey }) => {
+                const isActive = id === activeSection;
+                const isEnabled = enabledSections.has(id);
 
-              return (
-                <li key={id}>
+                return (
+                  <li key={id}>
+                    <Button
+                      className={cn(
+                        "h-10 w-full justify-start rounded-2xl px-3 text-sm",
+                        isActive
+                          ? "bg-primary/10 text-primary hover:bg-primary/15 dark:bg-primary/20"
+                          : !isEnabled
+                            ? "text-muted-foreground/50"
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      )}
+                      disabled={!isEnabled}
+                      onClick={() => handleSectionChange(id)}
+                      variant="ghost"
+                    >
+                      <HugeiconsIcon
+                        className="opacity-70"
+                        icon={icon}
+                        size={16}
+                        strokeWidth={1.8}
+                      />
+                      <span>{t(labelKey)}</span>
+                    </Button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </aside>
+
+        <main className="min-w-0 pb-8 xl:px-4">
+          <div className="sticky top-(--admin-topbar-height) z-30 bg-background">
+            <header className="flex flex-col gap-4 border-b border-border bg-background pt-(--admin-page-padding-y) pb-6 md:flex-row md:items-start md:justify-between">
+              <div>
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+                  {activeNav ? t(activeNav.labelKey) : t("create.page.title")}
+                </h1>
+                <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
+                  {t(`create.sectionDescriptions.${activeSection}`)}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {canGoBack ? (
                   <Button
-                    className={cn(
-                      "h-10 w-full justify-start rounded-2xl px-3 text-sm",
-                      isActive
-                        ? "bg-primary/10 text-primary hover:bg-primary/15 dark:bg-primary/20"
-                        : !isEnabled
-                          ? "text-muted-foreground/50"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                    )}
-                    disabled={!isEnabled}
-                    onClick={() => handleSectionChange(id)}
-                    variant="ghost"
+                    type="button"
+                    variant="outline"
+                    onClick={handleGoBack}
                   >
+                    {t("create.footer.previous")}
+                  </Button>
+                ) : null}
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isSubmitting}
+                  onClick={() => setIsCancelDialogOpen(true)}
+                >
+                  {t("create.footer.cancel")}
+                </Button>
+                <Button
+                  disabled={!canGoNext || isSubmitting}
+                  type="button"
+                  onClick={handleGoNext}
+                >
+                  {isSubmitting ? (
+                    <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  ) : (
                     <HugeiconsIcon
-                      className="opacity-70"
-                      icon={icon}
+                      icon={SaveIcon}
                       size={16}
                       strokeWidth={1.8}
                     />
-                    <span>{t(labelKey)}</span>
-                  </Button>
-                </li>
-              );
-            })}
-          </ul>
-        </aside>
-
-        <main className="min-w-0 py-8 xl:px-4">
-          <header className="flex flex-col gap-4 border-b border-border pb-6 md:flex-row md:items-start md:justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-                {activeNav ? t(activeNav.labelKey) : t("create.page.title")}
-              </h1>
-              <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
-                {t(`create.sectionDescriptions.${activeSection}`)}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {canGoBack ? (
-                <Button type="button" variant="outline" onClick={handleGoBack}>
-                  {t("create.footer.previous")}
+                  )}
+                  <span>
+                    {isSubmitting
+                      ? t("create.footer.saving")
+                      : nextSection
+                      ? t("create.footer.next")
+                      : t("create.footer.save")}
+                  </span>
                 </Button>
-              ) : null}
-              <Button
-                type="button"
-                variant="outline"
-                disabled={createPropertyMutation.isPending}
-                onClick={() => setIsCancelDialogOpen(true)}
-              >
-                {t("create.footer.cancel")}
-              </Button>
-              <Button
-                disabled={!canGoNext || createPropertyMutation.isPending}
-                type="button"
-                onClick={handleGoNext}
-              >
-                <HugeiconsIcon
-                  icon={SaveIcon}
-                  size={16}
-                  strokeWidth={1.8}
-                />
-                <span>
-                  {nextSection ? t("create.footer.next") : t("create.footer.save")}
-                </span>
-              </Button>
-            </div>
-          </header>
+              </div>
+            </header>
+          </div>
 
-          {renderActiveSection()}
+          <div>{renderActiveSection()}</div>
         </main>
       </div>
 
@@ -663,13 +732,11 @@ export function PropertyCreatePageContent() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <div className="mb-2 flex size-10 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
-                <HugeiconsIcon
-                  icon={Cancel01Icon}
-                  size={20}
-                  strokeWidth={1.8}
-                />
+              <HugeiconsIcon icon={Cancel01Icon} size={20} strokeWidth={1.8} />
             </div>
-            <AlertDialogTitle>{t("create.cancelDialog.title")}</AlertDialogTitle>
+            <AlertDialogTitle>
+              {t("create.cancelDialog.title")}
+            </AlertDialogTitle>
             <AlertDialogDescription>
               {t("create.cancelDialog.body")}
             </AlertDialogDescription>
@@ -688,62 +755,118 @@ export function PropertyCreatePageContent() {
       </AlertDialog>
 
       <AlertDialog
-        open={isEmptyServicesDialogOpen}
-        onOpenChange={setIsEmptyServicesDialogOpen}
+        open={isSubmitConfirmDialogOpen}
+        onOpenChange={(open) => {
+          if (isSubmitting) {
+            return;
+          }
+
+          setIsSubmitConfirmDialogOpen(open);
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
             <div className="mb-2 flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <HugeiconsIcon
-                icon={PackageIcon}
-                size={20}
-                strokeWidth={1.8}
-              />
+              <HugeiconsIcon icon={SaveIcon} size={20} strokeWidth={1.8} />
             </div>
             <AlertDialogTitle>
-              {t("create.servicesEmptyDialog.title")}
+              {t("create.submitDialog.title")}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {t("create.servicesEmptyDialog.body")}
+              {getSubmitConfirmationMessage()}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>
-              {t("create.servicesEmptyDialog.dismiss")}
+            <AlertDialogCancel disabled={isSubmitting}>
+              {t("create.submitDialog.dismiss")}
             </AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmEmptyServices}>
-              {t("create.servicesEmptyDialog.confirm")}
+            <AlertDialogAction
+              disabled={isSubmitting}
+              onClick={(event) => {
+                event.preventDefault();
+                if (isSubmitting) {
+                  return;
+                }
+
+                void handleSubmit();
+              }}
+            >
+              {isSubmitting ? (
+                <span className="inline-flex items-center gap-2">
+                  <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  <span>{t("create.submitDialog.submitting")}</span>
+                </span>
+              ) : (
+                t("create.submitDialog.confirm")
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       <AlertDialog
-        open={isEmptyClausesDialogOpen}
-        onOpenChange={setIsEmptyClausesDialogOpen}
+        open={submissionDialog.open}
+        onOpenChange={(open) => {
+          setSubmissionDialog((current) =>
+            open
+              ? current
+              : {
+                  open: false,
+                  status: null,
+                  message: "",
+                },
+          );
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <div className="mb-2 flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <div
+              className={cn(
+                "mb-2 flex size-10 items-center justify-center rounded-2xl",
+                submissionDialog.status === "success"
+                  ? "bg-primary/10 text-primary"
+                  : "bg-destructive/10 text-destructive",
+              )}
+            >
               <HugeiconsIcon
-                icon={NoteIcon}
+                icon={
+                  submissionDialog.status === "success"
+                    ? CheckmarkCircle02Icon
+                    : Alert02Icon
+                }
                 size={20}
                 strokeWidth={1.8}
               />
             </div>
             <AlertDialogTitle>
-              {t("create.clausesEmptyDialog.title")}
+              {submissionDialog.status === "success"
+                ? t("create.resultDialog.successTitle")
+                : t("create.resultDialog.errorTitle")}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {t("create.clausesEmptyDialog.body")}
+              {submissionDialog.message}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>
-              {t("create.clausesEmptyDialog.dismiss")}
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmEmptyClauses}>
-              {t("create.clausesEmptyDialog.confirm")}
+            {submissionDialog.status === "success" ? (
+              <AlertDialogCancel>
+                {t("create.resultDialog.successDismiss")}
+              </AlertDialogCancel>
+            ) : (
+              <AlertDialogCancel>
+                {t("create.resultDialog.errorDismiss")}
+              </AlertDialogCancel>
+            )}
+            <AlertDialogAction
+              onClick={() => {
+                if (submissionDialog.status === "success") {
+                  router.push(ROUTES.admin.properties);
+                }
+              }}
+            >
+              {submissionDialog.status === "success"
+                ? t("create.resultDialog.successConfirm")
+                : t("create.resultDialog.errorConfirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

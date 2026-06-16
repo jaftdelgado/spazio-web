@@ -36,7 +36,7 @@ export function IdentitySubsection({
         label={t("create.fields.title.label")}
       >
         <Input
-          className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+          className="h-11 rounded-2xl border-input px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
           id="property-title"
           maxLength={128}
           placeholder={t("create.fields.title.placeholder")}

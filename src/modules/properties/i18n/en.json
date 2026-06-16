@@ -438,7 +438,8 @@
       "previous": "Previous",
       "next": "Next",
       "cancel": "Back",
-      "save": "Save"
+      "save": "Save",
+      "saving": "Registering..."
     },
     "cancelDialog": {
       "title": "Cancel registration",
@@ -446,17 +447,24 @@
       "dismiss": "Keep editing",
       "confirm": "Yes, cancel"
     },
-    "servicesEmptyDialog": {
-      "title": "Continue without services",
-      "body": "You have not selected amenities or services for this property yet. Showing them on the public listing helps the property look more complete, attractive, and easier for users to compare. You can continue without them if you prefer to add them later.",
-      "dismiss": "Back to services",
-      "confirm": "Continue without services"
+    "submitDialog": {
+      "title": "Confirm registration",
+      "body": "The property will be registered with the captured information and its photos will be uploaded.",
+      "bodyServicesEmpty": "The property will be registered and its photos will be uploaded. You have not selected services yet; you can add them later if needed.",
+      "bodyClausesEmpty": "The property will be registered and its photos will be uploaded. You have not configured clauses yet; you can add them later if needed.",
+      "bodyServicesAndClausesEmpty": "The property will be registered and its photos will be uploaded. You have not selected services or configured clauses yet; you can add them later if needed.",
+      "dismiss": "Keep editing",
+      "confirm": "Yes, register",
+      "submitting": "Registering..."
     },
-    "clausesEmptyDialog": {
-      "title": "Continue without clauses",
-      "body": "You have not enabled any clauses for this property. You can continue and configure them later if needed.",
-      "dismiss": "Back to clauses",
-      "confirm": "Continue without clauses"
+    "resultDialog": {
+      "successTitle": "Property registered",
+      "successBody": "The registration is complete and the photos were uploaded successfully.",
+      "successDismiss": "Close",
+      "successConfirm": "Go to list",
+      "errorTitle": "We could not complete the registration",
+      "errorDismiss": "Close",
+      "errorConfirm": "Keep editing"
     },
     "toast": {
       "successTitle": "Property registered",

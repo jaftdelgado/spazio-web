@@ -64,7 +64,7 @@ export type PropertyCreateFormState = {
 };
 
 export const initialPropertyCreateFormState: PropertyCreateFormState = {
-  title: "Casa en Bosques del Lago",
+  title: "",
   propertyTypeId: null,
   modalityId: null,
   description: "",

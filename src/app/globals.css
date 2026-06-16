@@ -10,6 +10,7 @@
   --shadow-border:
     0px 0px 0px 1px rgba(0, 0, 0, 0.06), 0px 1px 2px -1px rgba(0, 0, 0, 0.06),
     0px 2px 4px 0px rgba(0, 0, 0, 0.04);
+  --admin-topbar-height: 4.5rem;
   --admin-page-padding-x: 1.5rem;
   --admin-page-padding-y: 0.5rem;
   --control-surface: #f2f2f2;
@@ -112,7 +113,6 @@ body {
 
 .admin-page-view {
   padding-inline: var(--admin-page-padding-x);
-  padding-block: var(--admin-page-padding-y);
 }
 
 body [data-slot="input"],

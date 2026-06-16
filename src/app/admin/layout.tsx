@@ -17,12 +17,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <ProtectedRoute allowedRoles={allowedRoles} redirectTo="/explore">
-
       <div className="admin-shell min-h-screen text-slate-950">
         <div className="flex min-h-screen flex-col">
           <header
-            className="admin-topbar border-b border-slate-200/80"
+            className="admin-topbar sticky top-0 z-50 border-b border-slate-200/80 bg-background"
             style={{
+              minHeight: "var(--admin-topbar-height)",
               paddingInline: "var(--admin-page-padding-x)",
               paddingBlock: "var(--admin-page-padding-y)",
             }}
@@ -37,7 +37,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </div>
           </header>
 
-          <main className="flex flex-1 flex-col p-6">
+          <main
+            className="flex flex-1 flex-col px-6 pb-6"
+            style={{ paddingTop: "var(--admin-page-padding-y)" }}
+          >
             <div className="mx-auto flex min-h-full w-full max-w-7xl flex-1 flex-col">
               {children}
             </div>

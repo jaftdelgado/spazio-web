@@ -19,7 +19,7 @@ export function DescriptionField({ value, onChange }: DescriptionFieldProps) {
       htmlFor="property-description"
       label={t("create.sections.description.label")}
     >
-      <div className="overflow-hidden rounded-3xl border border-input focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/30">
+      <div className="overflow-hidden rounded-3xl shadow-border focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/30">
         <Textarea
           className="min-h-36 rounded-none border-0 bg-transparent px-4 py-3 text-[15px] shadow-none focus-visible:ring-0"
           id="property-description"

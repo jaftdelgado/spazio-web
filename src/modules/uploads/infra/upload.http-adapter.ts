@@ -14,11 +14,11 @@ type UploadPhotosBatchResultDTO = Parameters<
 >[0];
 
 type UploadPhotoResponse = {
-  data: UploadPhotoResultDTO;
+  data?: UploadPhotoResultDTO;
 };
 
 type UploadPhotosBatchResponse = {
-  data: UploadPhotosBatchResultDTO;
+  data?: UploadPhotosBatchResultDTO;
 };
 
 export const uploadHttpAdapter: UploadRepository = {
@@ -48,7 +48,9 @@ export const uploadHttpAdapter: UploadRepository = {
       formData,
     );
 
-    return mapUploadPhotoResult(response.data);
+    return mapUploadPhotoResult(
+      (response.data ?? response) as UploadPhotoResultDTO,
+    );
   },
 
   async uploadPropertyPhotos(params) {
@@ -63,6 +65,8 @@ export const uploadHttpAdapter: UploadRepository = {
       formData,
     );
 
-    return mapUploadPhotosBatchResult(response.data);
+    return mapUploadPhotosBatchResult(
+      (response.data ?? response) as UploadPhotosBatchResultDTO,
+    );
   },
 };

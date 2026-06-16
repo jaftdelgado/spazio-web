@@ -435,7 +435,8 @@
       "previous": "Anterior",
       "next": "Siguiente",
       "cancel": "Volver",
-      "save": "Guardar"
+      "save": "Guardar",
+      "saving": "Registrando..."
     },
     "cancelDialog": {
       "title": "Cancelar registro",
@@ -443,17 +444,24 @@
       "dismiss": "Seguir editando",
       "confirm": "Sí, cancelar"
     },
-    "servicesEmptyDialog": {
-      "title": "Continuar sin servicios",
-      "body": "Aún no has seleccionado amenidades o servicios para esta propiedad. Mostrarlos en la vista pública ayuda a que el inmueble se vea más completo, atractivo y fácil de comparar para los usuarios. Puedes continuar sin ellos si prefieres agregarlos después.",
-      "dismiss": "Volver a servicios",
-      "confirm": "Continuar sin servicios"
+    "submitDialog": {
+      "title": "Confirmar registro",
+      "body": "Se registrará la propiedad con la información capturada y se subirán sus fotos.",
+      "bodyServicesEmpty": "Se registrará la propiedad y se subirán sus fotos. No has seleccionado servicios todavía; podrás agregarlos después si lo necesitas.",
+      "bodyClausesEmpty": "Se registrará la propiedad y se subirán sus fotos. No has configurado cláusulas todavía; podrás agregarlas después si lo necesitas.",
+      "bodyServicesAndClausesEmpty": "Se registrará la propiedad y se subirán sus fotos. No has seleccionado servicios ni configurado cláusulas todavía; podrás agregarlos más adelante si lo necesitas.",
+      "dismiss": "Seguir editando",
+      "confirm": "Sí, registrar",
+      "submitting": "Registrando..."
     },
-    "clausesEmptyDialog": {
-      "title": "Continuar sin cláusulas",
-      "body": "No has activado ninguna cláusula para esta propiedad. Puedes continuar y configurarlas después si lo necesitas.",
-      "dismiss": "Volver a cláusulas",
-      "confirm": "Continuar sin cláusulas"
+    "resultDialog": {
+      "successTitle": "Propiedad registrada",
+      "successBody": "Terminamos el registro y las fotos se subieron correctamente.",
+      "successDismiss": "Cerrar",
+      "successConfirm": "Ir al listado",
+      "errorTitle": "No pudimos completar el registro",
+      "errorDismiss": "Cerrar",
+      "errorConfirm": "Seguir editando"
     },
     "toast": {
       "successTitle": "Propiedad registrada",

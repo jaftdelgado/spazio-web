@@ -93,7 +93,7 @@ export function AddressSubsection({
         >
           <Select
             name="property-country"
-            value={selectedCountryKey ?? undefined}
+            value={selectedCountryKey ?? ""}
             onValueChange={(value) => {
               patchForm({
                 countryId: Number(value),
@@ -145,7 +145,7 @@ export function AddressSubsection({
             disabled={!form.countryId || statesLoading}
             name="property-state"
             open={isStateOpen}
-            value={selectedStateKey ?? undefined}
+            value={selectedStateKey ?? ""}
             onOpenChange={onStateOpenChange}
             onValueChange={(value) => {
               patchForm({
@@ -197,7 +197,7 @@ export function AddressSubsection({
             disabled={!form.stateId || isCitiesPending}
             name="property-municipality"
             open={isMunicipalityOpen}
-            value={selectedCityKey ?? undefined}
+            value={selectedCityKey ?? ""}
             onOpenChange={onMunicipalityOpenChange}
             onValueChange={(value) => {
               const nextCityId = Number(value);

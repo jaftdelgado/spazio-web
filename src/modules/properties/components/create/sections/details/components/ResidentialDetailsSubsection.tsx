@@ -192,7 +192,7 @@ export function ResidentialDetailsSubsection({
           label={t("create.fields.orientation.label")}
         >
           <Select
-            value={form.orientationId ? String(form.orientationId) : undefined}
+            value={form.orientationId ? String(form.orientationId) : ""}
             onValueChange={(value) =>
               patchForm({ orientationId: Number(value) })
             }
