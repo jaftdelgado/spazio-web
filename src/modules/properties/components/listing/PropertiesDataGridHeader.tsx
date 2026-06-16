@@ -10,6 +10,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 import { PropertiesFiltersPopover } from "./PropertiesFiltersPopover";
@@ -78,41 +79,32 @@ export function PropertiesDataGridHeader({
           selectedPropertyTypeId={selectedPropertyTypeId}
         />
 
-        <div
-          aria-label={t("viewAriaLabel")}
-          className="inline-flex rounded-2xl border border-border/70 bg-muted/20 p-1"
-          role="tablist"
+        <Tabs
+          value={viewMode}
+          onValueChange={(value) => onViewModeChange(value as "table" | "grid")}
         >
-          {[
-            { id: "table", icon: TableIcon },
-            { id: "grid", icon: GridTableIcon },
-          ].map((option) => {
-            const isActive = option.id === viewMode;
-
-            return (
-              <Button
+          <TabsList
+            aria-label={t("viewAriaLabel")}
+            className="rounded-2xl border border-border/70 bg-muted/20 p-1"
+          >
+            {[
+              { id: "table", icon: TableIcon },
+              { id: "grid", icon: GridTableIcon },
+            ].map((option) => (
+              <TabsTrigger
                 key={option.id}
-                aria-selected={isActive}
-                className={cn(
-                  "h-9 rounded-xl px-3",
-                  isActive &&
-                    "bg-background text-foreground shadow-sm hover:bg-background",
-                )}
-                role="tab"
-                size="sm"
-                type="button"
-                variant="ghost"
-                onClick={() => onViewModeChange(option.id as "table" | "grid")}
+                value={option.id}
+                className={cn("h-9 rounded-xl px-3 data-active:shadow-sm")}
               >
                 <HugeiconsIcon
                   icon={option.icon}
                   size={16}
                   strokeWidth={1.8}
                 />
-              </Button>
-            );
-          })}
-        </div>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
       </div>
     </div>
   );
