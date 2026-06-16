@@ -45,9 +45,11 @@ function getModalityDescriptionTranslationKey(modality: Modality) {
 
 export function PropertyModalityRadioGroup({
   selectedModalityId,
+  disabled = false,
   onChange,
 }: {
   selectedModalityId: number | null;
+  disabled?: boolean;
   onChange: (modalityId: number) => void;
 }) {
   const { t } = usePropertiesTranslation();
@@ -73,6 +75,7 @@ export function PropertyModalityRadioGroup({
         <RadioGroup
           aria-label={t("create.sections.modality.label")}
           className="grid gap-4"
+          disabled={disabled}
           value={selectedModalityId ? String(selectedModalityId) : ""}
           onValueChange={(value) => onChange(Number(value))}
         >

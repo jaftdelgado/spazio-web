@@ -91,11 +91,6 @@
       "fields": {
         "title": "Address",
         "hint": "Complete or adjust the property's base location details."
-      },
-      "extras": {
-        "title": "Additional details",
-        "hint": "Capture complementary location information.",
-        "description": "Lot area is now captured inside the property details section so the main property measurements stay together."
       }
     },
     "details": {
@@ -472,6 +467,63 @@
       "errorTitle": "We could not complete the registration"
     }
   },
+  "edit": {
+    "page": {
+      "title": "Edit property"
+    },
+    "sidebar": {
+      "eyebrow": "Editing"
+    },
+    "general": {
+      "readOnlyHint": "Property type and modality are no longer editable because the backend does not allow changing them after registration."
+    },
+    "footer": {
+      "cancel": "Back",
+      "save": "Save changes",
+      "saving": "Saving changes..."
+    },
+    "cancelDialog": {
+      "title": "Cancel editing",
+      "body": "If you leave now, you will lose the unsaved changes for this property.",
+      "dismiss": "Keep editing",
+      "confirm": "Yes, cancel"
+    },
+    "submitDialog": {
+      "title": "Confirm changes",
+      "body": "The property information, prices, services, clauses, and photos will be updated.",
+      "bodyServicesEmpty": "The property and its photos will be updated. You have not selected services; if you confirm, the property will end up without associated services.",
+      "bodyClausesEmpty": "The property and its photos will be updated. You have not configured clauses; if you confirm, the property will end up without associated clauses.",
+      "bodyServicesAndClausesEmpty": "The property and its photos will be updated. You have not selected services or configured clauses; if you confirm, both will remain empty.",
+      "dismiss": "Keep editing",
+      "confirm": "Yes, save changes",
+      "submitting": "Saving changes..."
+    },
+    "resultDialog": {
+      "successTitle": "Changes saved",
+      "successBody": "The property was updated successfully.",
+      "successDismiss": "Close",
+      "successConfirm": "Go to list",
+      "errorTitle": "We could not save the changes",
+      "errorDismiss": "Close",
+      "errorConfirm": "Keep editing"
+    },
+    "states": {
+      "loading": "Loading property...",
+      "missingSelectionTitle": "We could not find a property to edit",
+      "missingSelectionDescription": "Go back to the list and choose Edit from the property you want to update.",
+      "backToList": "Back to list",
+      "loadErrorTitle": "We could not load the property"
+    },
+    "validation": {
+      "sectionIncomplete": {
+        "general": "Complete the general information before saving changes.",
+        "details": "Review the property details before saving changes.",
+        "multimedia": "Add at least one photo before saving changes.",
+        "location": "Complete the location before saving changes.",
+        "pricing": "Complete the pricing information before saving changes."
+      }
+    }
+  },
   "searchPlaceholder": "Search properties...",
   "viewAriaLabel": "Properties view",
   "filters": {
@@ -511,6 +563,25 @@
   "grid": {
     "price": "Price",
     "area": "Area"
+  },
+  "listing": {
+    "propertyTypes": {
+      "house": "House",
+      "apartment": "Apartment",
+      "commercial": "Commercial"
+    },
+    "modalities": {
+      "sale": "Sale",
+      "rent": "Rent",
+      "mixed": "Mixed"
+    },
+    "statuses": {
+      "available": "Available",
+      "reserved": "Reserved",
+      "sold": "Sold",
+      "rented": "Rented",
+      "deleted": "Deleted"
+    }
   },
   "footer": {
     "showing": "Showing {{visibleRowCount}} of {{totalCount}} properties"

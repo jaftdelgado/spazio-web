@@ -1,13 +1,17 @@
 "use client";
 
+import * as React from "react";
 import {
   Delete02Icon,
+  Image01Icon,
   StarIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 import type { PhotoEntry } from "@properties/components/create/types";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 
@@ -29,15 +33,41 @@ export function PhotoEditPanel({
   onRemove,
 }: PhotoEditPanelProps) {
   const { t } = usePropertiesTranslation();
+  const [isImageLoading, setIsImageLoading] = React.useState(Boolean(entry.previewUrl));
+
+  React.useEffect(() => {
+    setIsImageLoading(Boolean(entry.previewUrl));
+  }, [entry.previewUrl]);
 
   return (
     <div className="flex items-start gap-4">
       <div className="relative h-[108px] w-[144px] shrink-0 overflow-hidden rounded-2xl">
-        <img
-          alt={entry.altText || ""}
-          className="size-36 rounded-2xl object-cover"
-          src={entry.previewUrl}
-        />
+        {entry.previewUrl ? (
+          <>
+            {isImageLoading ? (
+              <Skeleton className="absolute inset-0 rounded-2xl" />
+            ) : null}
+            <img
+              alt={entry.altText || ""}
+              className={cn(
+                "size-36 rounded-2xl object-cover transition-opacity",
+                isImageLoading ? "opacity-0" : "opacity-100",
+              )}
+              src={entry.previewUrl}
+              onError={() => setIsImageLoading(false)}
+              onLoad={() => setIsImageLoading(false)}
+            />
+          </>
+        ) : (
+          <div className="flex size-full items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+            <HugeiconsIcon
+              color="currentColor"
+              icon={Image01Icon}
+              size={22}
+              strokeWidth={1.5}
+            />
+          </div>
+        )}
       </div>
       <div className="flex flex-1 items-start gap-4">
         <div className="flex flex-1 flex-col gap-3">

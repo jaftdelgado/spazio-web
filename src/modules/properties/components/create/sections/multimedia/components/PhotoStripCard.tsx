@@ -3,10 +3,12 @@
 import * as React from "react";
 import {
   Cancel01Icon,
+  Image01Icon,
   StarIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { PhotoEntry } from "@properties/components/create/types";
 
@@ -23,6 +25,12 @@ export function PhotoStripCard({
   onClick,
   onRemove,
 }: PhotoStripCardProps) {
+  const [isImageLoading, setIsImageLoading] = React.useState(Boolean(entry.previewUrl));
+
+  React.useEffect(() => {
+    setIsImageLoading(Boolean(entry.previewUrl));
+  }, [entry.previewUrl]);
+
   return (
     <div
       role="button"
@@ -39,11 +47,32 @@ export function PhotoStripCard({
         }
       }}
     >
-      <img
-        alt={entry.altText || ""}
-        className="size-full object-cover"
-        src={entry.previewUrl}
-      />
+      {entry.previewUrl ? (
+        <>
+          {isImageLoading ? (
+            <Skeleton className="absolute inset-0 rounded-2xl" />
+          ) : null}
+          <img
+            alt={entry.altText || ""}
+            className={cn(
+              "size-full object-cover transition-opacity",
+              isImageLoading ? "opacity-0" : "opacity-100",
+            )}
+            src={entry.previewUrl}
+            onError={() => setIsImageLoading(false)}
+            onLoad={() => setIsImageLoading(false)}
+          />
+        </>
+      ) : (
+        <div className="flex size-full items-center justify-center bg-muted text-muted-foreground">
+          <HugeiconsIcon
+            color="currentColor"
+            icon={Image01Icon}
+            size={18}
+            strokeWidth={1.5}
+          />
+        </div>
+      )}
       <button
         className="absolute top-1.5 right-1.5 inline-flex size-5 items-center justify-center rounded-full bg-background/80 text-foreground"
         type="button"

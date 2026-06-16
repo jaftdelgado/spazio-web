@@ -9,6 +9,7 @@ export const ROUTES = {
     root: "/admin",
     properties: "/admin/properties",
     propertiesCreate: "/admin/properties/new",
+    propertiesEdit: "/admin/properties/edit",
     visits: "/admin/visits",
     payments: "/admin/payments",
   },

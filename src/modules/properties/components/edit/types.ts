@@ -11,7 +11,7 @@ export type PhotoEntry = {
   isCover: boolean;
 };
 
-export type PropertyCreateSectionId =
+export type PropertyEditSectionId =
   | "general"
   | "details"
   | "location"
@@ -20,7 +20,7 @@ export type PropertyCreateSectionId =
   | "clauses"
   | "multimedia";
 
-export type PropertyCreateFormState = {
+export type PropertyEditFormState = {
   title: string;
   propertyTypeId: number | null;
   modalityId: number | null;
@@ -66,7 +66,7 @@ export type PropertyCreateFormState = {
   internalNotes: string;
 };
 
-export const initialPropertyCreateFormState: PropertyCreateFormState = {
+export const initialPropertyEditFormState: PropertyEditFormState = {
   title: "",
   propertyTypeId: null,
   modalityId: null,
@@ -112,6 +112,6 @@ export const initialPropertyCreateFormState: PropertyCreateFormState = {
   internalNotes: "",
 };
 
-export type PatchPropertyCreateForm = (
-  patch: Partial<PropertyCreateFormState>,
+export type PatchPropertyEditForm = (
+  patch: Partial<PropertyEditFormState>,
 ) => void;

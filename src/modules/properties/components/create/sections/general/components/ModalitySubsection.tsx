@@ -10,11 +10,13 @@ import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslat
 
 type ModalitySubsectionProps = {
   form: PropertyCreateFormState;
+  disabled?: boolean;
   patchForm: PatchPropertyCreateForm;
 };
 
 export function ModalitySubsection({
   form,
+  disabled = false,
   patchForm,
 }: ModalitySubsectionProps) {
   const { t } = usePropertiesTranslation();
@@ -25,6 +27,7 @@ export function ModalitySubsection({
       title={t("create.sections.modality.label")}
     >
       <PropertyModalityRadioGroup
+        disabled={disabled}
         selectedModalityId={form.modalityId}
         onChange={(modalityId) => patchForm({ modalityId })}
       />

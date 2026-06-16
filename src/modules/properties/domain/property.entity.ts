@@ -32,9 +32,20 @@ export interface PropertyCard {
   modality: PropertyCardModality;
   status: PropertyCardStatus;
   price: PropertyCardPrice | null;
+  location: PropertyCardLocation | null;
+  addressSummary: string | null;
   bedrooms: number | null;
   bathrooms: number | null;
   builtArea: number | null;
+}
+
+export interface PropertyCardLocation {
+  countryId: number;
+  countryName: string;
+  stateId: number;
+  stateName: string;
+  cityId: number;
+  cityName: string;
 }
 
 export interface PropertyListMeta {
@@ -72,7 +83,12 @@ export interface CommercialDetail {
 }
 
 export interface PropertyLocation {
+  countryId: number;
+  countryName: string;
+  stateId: number;
+  stateName: string;
   cityId: number;
+  cityName: string;
   neighborhood: string;
   street: string;
   exteriorNumber: string;
@@ -193,6 +209,7 @@ export type DeletePropertyInput = {
 export type PropertyPhoto = {
   photoId: number;
   storageKey: string;
+  url: string | null;
   mimeType: string;
   sortOrder: number;
   isCover: boolean;

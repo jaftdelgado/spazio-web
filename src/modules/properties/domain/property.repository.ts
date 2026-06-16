@@ -25,7 +25,7 @@ export interface PropertyListFilters {
   pageSize?: number;
   q?: string;
   statusId?: number[];
-  propertyTypeId?: number[];
+  propertyTypeId?: number;
   modalityId?: number;
   countryId?: number;
   stateId?: number;

@@ -4,7 +4,7 @@ import * as React from "react";
 
 import { Alert02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useInfiniteQuery, useQueries } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -80,9 +80,8 @@ export function PropertiesPageContent() {
   const [searchValue, setSearchValue] = React.useState("");
   const [isRetrying, setIsRetrying] = React.useState(false);
   const [viewMode, setViewMode] = React.useState<PropertiesViewMode>("table");
-  const [selectedPropertyTypeIds, setSelectedPropertyTypeIds] = React.useState<
-    number[] | null
-  >(null);
+  const [selectedPropertyTypeId, setSelectedPropertyTypeId] =
+    React.useState<number | null>(null);
   const [listState, setListState] = React.useState({
     page: 1,
     query: "",
@@ -115,11 +114,11 @@ export function PropertiesPageContent() {
     () => ({
       pageSize: 20,
       q: listState.query || undefined,
-      propertyTypeId: selectedPropertyTypeIds ?? undefined,
+      propertyTypeId: selectedPropertyTypeId ?? undefined,
       sort: "created_at" as const,
       order: "desc" as const,
     }),
-    [listState.query, selectedPropertyTypeIds],
+    [listState.query, selectedPropertyTypeId],
   );
 
   const filters = React.useMemo(
@@ -162,12 +161,6 @@ export function PropertiesPageContent() {
     () => propertyTypesQuery.data ?? [],
     [propertyTypesQuery.data],
   );
-  const effectiveSelectedPropertyTypeIds = React.useMemo(
-    () =>
-      selectedPropertyTypeIds ??
-      propertyTypeOptions.map((propertyType) => propertyType.propertyTypeId),
-    [propertyTypeOptions, selectedPropertyTypeIds],
-  );
 
   React.useEffect(() => {
     if (viewMode !== "grid") return;
@@ -196,55 +189,17 @@ export function PropertiesPageContent() {
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage, viewMode]);
 
-  const propertyDetailsQueries = useQueries({
-    queries:
-      selectedPropertyTypeIds !== null && selectedPropertyTypeIds.length === 0
-        ? []
-        : rows.map((row) => ({
-            queryKey: ["properties", "detail", row.propertyUuid],
-            queryFn: () => propertyGetHttpAdapter.getProperty(row.propertyUuid),
-            enabled: row.propertyUuid.length > 0,
-            staleTime: 60_000,
-          })),
-  });
-
-  const propertyAddressMap = React.useMemo(() => {
-    return Object.fromEntries(
-      rows.map((row, index) => {
-        const detail = propertyDetailsQueries[index]?.data;
-        const location = detail?.location;
-
-        if (!location) {
-          return [row.propertyUuid, null];
-        }
-
-        const addressParts = [
-          location.street,
-          location.exteriorNumber,
-          location.interiorNumber
-            ? `${t("address.interiorNumberPrefix")} ${location.interiorNumber}`
-            : null,
-          location.neighborhood,
-        ].filter(Boolean);
-
-        return [row.propertyUuid, addressParts.join(", ")];
-      }),
-    ) as Record<string, string | null>;
-  }, [propertyDetailsQueries, rows, t]);
-
-  const isTableDetailsLoading = React.useMemo(
+  const propertyAddressMap = React.useMemo(
     () =>
-      viewMode === "table" &&
-      rows.length > 0 &&
-      propertyDetailsQueries.some(
-        (query) => query.status === "pending" && query.data === undefined,
-      ),
-    [propertyDetailsQueries, rows.length, viewMode],
+      Object.fromEntries(
+        rows.map((row) => [row.propertyUuid, row.addressSummary]),
+      ) as Record<string, string | null>,
+    [rows],
   );
 
   const isPropertiesLoading =
     viewMode === "table"
-      ? propertiesQuery.isLoading || isTableDetailsLoading
+      ? propertiesQuery.isLoading
       : propertiesInfiniteQuery.isLoading;
 
   const handleRetry = React.useCallback(async () => {
@@ -265,12 +220,8 @@ export function PropertiesPageContent() {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       <PropertiesDataGridHeader
-        onSelectedPropertyTypeIdsChange={(propertyTypeIds) => {
-          setSelectedPropertyTypeIds(
-            propertyTypeIds.length === propertyTypeOptions.length
-              ? null
-              : propertyTypeIds,
-          );
+        onSelectedPropertyTypeIdChange={(propertyTypeId) => {
+          setSelectedPropertyTypeId(propertyTypeId);
           setListState((current) => ({
             ...current,
             page: 1,
@@ -280,23 +231,13 @@ export function PropertiesPageContent() {
         onViewModeChange={setViewMode}
         propertyTypeOptions={propertyTypeOptions}
         searchValue={searchValue}
-        selectedPropertyTypeIds={effectiveSelectedPropertyTypeIds}
+        selectedPropertyTypeId={selectedPropertyTypeId}
         viewMode={viewMode}
       />
 
-      {selectedPropertyTypeIds !== null &&
-      selectedPropertyTypeIds.length === 0 ? (
-        <Empty className="min-h-60 rounded-3xl border border-dashed border-border/70 bg-muted/15 p-6">
-          <EmptyHeader>
-            <EmptyTitle>{t("states.emptySelectionTitle")}</EmptyTitle>
-            <EmptyDescription>{t("states.emptySelectionDescription")}</EmptyDescription>
-          </EmptyHeader>
-        </Empty>
-      ) : (
-        viewMode === "table"
-          ? propertiesQuery.isError
-          : propertiesInfiniteQuery.isError
-      ) ? (
+      {(viewMode === "table"
+        ? propertiesQuery.isError
+        : propertiesInfiniteQuery.isError) ? (
         <Empty className="min-h-0 flex-1 rounded-3xl border border-dashed border-border/70 bg-muted/15 p-6">
           <EmptyHeader>
             <EmptyMedia className="bg-destructive/10 text-destructive" variant="icon">
