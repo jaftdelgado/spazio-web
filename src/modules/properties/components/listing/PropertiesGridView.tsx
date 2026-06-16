@@ -28,7 +28,11 @@ import { ROUTES } from "@/config/routes";
 import { saveEditingPropertyUuid } from "@properties/application/edit/property-edit-session";
 import type { PropertyCard } from "@properties/domain/property.entity";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
-import { getModalityLabel, getPropertyTypeLabel, getStatusLabel } from "./propertyListingLabels";
+import {
+  getModalityLabel,
+  getPropertyTypeLabel,
+  getStatusLabel,
+} from "./propertyListingLabels";
 import { PropertyDeleteAlertDialog } from "./PropertyDeleteAlertDialog";
 
 type PropertyGridRow = DataGridRowBase & PropertyCard;
@@ -113,7 +117,11 @@ export function PropertiesGridView({
                     )}
                   </span>
                   <span className={chipClassName}>
-                    {getModalityLabel(row.modality.modalityId, row.modality.name, t)}
+                    {getModalityLabel(
+                      row.modality.modalityId,
+                      row.modality.name,
+                      t,
+                    )}
                   </span>
                 </div>
 
@@ -183,8 +191,14 @@ export function PropertiesGridView({
                     {row.title}
                   </h3>
                   <span className="inline-flex shrink-0 items-center gap-1 text-[12px] font-medium text-foreground">
-                    <HugeiconsIcon icon={StarIcon} size={12} strokeWidth={1.8} />
-                    <span>{getStatusLabel(row.status.statusId, row.status.name, t)}</span>
+                    <HugeiconsIcon
+                      icon={StarIcon}
+                      size={12}
+                      strokeWidth={1.8}
+                    />
+                    <span>
+                      {getStatusLabel(row.status.statusId, row.status.name, t)}
+                    </span>
                   </span>
                 </div>
 
