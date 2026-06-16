@@ -40,6 +40,7 @@ import {
   getStatusLabel,
 } from "./propertyListingLabels";
 import { PropertyDeleteAlertDialog } from "./PropertyDeleteAlertDialog";
+import { usePropertyDeleteFlow } from "./usePropertyDeleteFlow";
 
 type PropertyGridColumnId =
   | "title"
@@ -261,8 +262,12 @@ export function PropertiesDataGrid({
 }: PropertiesDataGridProps) {
   const router = useRouter();
   const { intlLocale, t } = usePropertiesTranslation();
-  const [propertyPendingDelete, setPropertyPendingDelete] =
-    React.useState<PropertyGridRow | null>(null);
+  const {
+    propertyPendingDelete,
+    setPropertyPendingDelete,
+    handleDeleteConfirm,
+    isDeletePending,
+  } = usePropertyDeleteFlow();
   const columns = React.useMemo<DataGridColumn<PropertyGridColumnId>[]>(
     () => [
       {
@@ -367,8 +372,10 @@ export function PropertiesDataGrid({
 
       <PropertyDeleteAlertDialog
         isOpen={propertyPendingDelete !== null}
+        isPending={isDeletePending}
+        onConfirm={handleDeleteConfirm}
         onOpenChange={(isOpen) => {
-          if (!isOpen) {
+          if (!isOpen && !isDeletePending) {
             setPropertyPendingDelete(null);
           }
         }}

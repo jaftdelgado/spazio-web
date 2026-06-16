@@ -595,6 +595,8 @@
     "confirm": "Delete",
     "successTitle": "Property deleted",
     "successDescription": "{{propertyTitle}} was deleted successfully.",
-    "successDescriptionFallback": "The property was deleted successfully."
+    "successDescriptionFallback": "The property was deleted successfully.",
+    "errorTitle": "We couldn't delete the property",
+    "errorDescription": "We ran into a problem deleting the property. Please try again."
   }
 }

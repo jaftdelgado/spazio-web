@@ -25,12 +25,12 @@ function Tabs({
 }
 
 const tabsListVariants = cva(
-  "group/tabs-list inline-flex w-fit items-center justify-center rounded-full p-1 text-muted-foreground group-data-horizontal/tabs:h-9 group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col group-data-vertical/tabs:rounded-2xl data-[variant=line]:rounded-none",
+  "group/tabs-list relative inline-flex w-fit items-center justify-center p-1 text-muted-foreground group-data-horizontal/tabs:h-9 group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col group-data-vertical/tabs:rounded-2xl rounded-full bg-input/80 data-[variant=line]:rounded-none data-[variant=line]:bg-transparent",
   {
     variants: {
       variant: {
-        default: "bg-muted",
-        line: "gap-1 bg-transparent",
+        default: "",
+        line: "gap-1",
       },
     },
     defaultVariants: {
@@ -42,16 +42,77 @@ const tabsListVariants = cva(
 function TabsList({
   className,
   variant = "default",
+  children,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.List> &
   VariantProps<typeof tabsListVariants>) {
+  const wrapperRef = React.useRef<HTMLDivElement>(null);
+  const [thumb, setThumb] = React.useState<{
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+  } | null>(null);
+  const [ready, setReady] = React.useState(false);
+
+  const updateThumb = React.useCallback(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+    const active = wrapper.querySelector<HTMLElement>('[data-state="active"]');
+    if (!active) return;
+    const wr = wrapper.getBoundingClientRect();
+    const ar = active.getBoundingClientRect();
+    setThumb({
+      left: ar.left - wr.left,
+      top: ar.top - wr.top,
+      width: ar.width,
+      height: ar.height,
+    });
+    setReady(true);
+  }, []);
+
+  React.useLayoutEffect(() => {
+    updateThumb();
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+    const observer = new MutationObserver(updateThumb);
+    observer.observe(wrapper, {
+      attributes: true,
+      subtree: true,
+      attributeFilter: ["data-state"],
+    });
+    return () => observer.disconnect();
+  }, [updateThumb]);
+
   return (
-    <TabsPrimitive.List
-      data-slot="tabs-list"
-      data-variant={variant}
-      className={cn(tabsListVariants({ variant }), className)}
-      {...props}
-    />
+    <div ref={wrapperRef} className="relative inline-flex">
+      {/* Sliding thumb — flat white pill, no shadow */}
+      {variant !== "line" && thumb && (
+        <span
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute rounded-full",
+            "bg-white dark:bg-white/10",
+            "transition-[left,top,width,height] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+            ready ? "opacity-100" : "opacity-0",
+          )}
+          style={{
+            left: thumb.left,
+            top: thumb.top,
+            width: thumb.width,
+            height: thumb.height,
+          }}
+        />
+      )}
+      <TabsPrimitive.List
+        data-slot="tabs-list"
+        data-variant={variant}
+        className={cn(tabsListVariants({ variant }), className)}
+        {...props}
+      >
+        {children}
+      </TabsPrimitive.List>
+    </div>
   );
 }
 
@@ -63,10 +124,29 @@ function TabsTrigger({
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-2 rounded-full border border-transparent! px-3 py-1 text-sm font-medium whitespace-nowrap text-foreground/60 transition-all group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start group-data-vertical/tabs:rounded-2xl group-data-vertical/tabs:px-3 group-data-vertical/tabs:py-1.5 hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 dark:text-muted-foreground dark:hover:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-active:bg-transparent dark:group-data-[variant=line]/tabs-list:data-active:border-transparent dark:group-data-[variant=line]/tabs-list:data-active:bg-transparent",
-        "data-active:bg-background data-active:text-foreground dark:data-active:border-input dark:data-active:bg-input/30 dark:data-active:text-foreground",
-        "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-horizontal/tabs:after:inset-x-0 group-data-horizontal/tabs:after:-bottom-1.25 group-data-horizontal/tabs:after:h-0.5 group-data-vertical/tabs:after:inset-y-0 group-data-vertical/tabs:after:-right-1 group-data-vertical/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-active:after:opacity-100",
+        // Layout
+        "relative z-10 inline-flex h-[calc(100%-2px)] flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium whitespace-nowrap",
+        "group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start group-data-vertical/tabs:rounded-xl group-data-vertical/tabs:px-3 group-data-vertical/tabs:py-1.5",
+        // No borders, no rings, no shadows — flat
+        "border-0 outline-none ring-0 shadow-none focus:outline-none focus-visible:outline-none",
+        // Inactive
+        "text-muted-foreground [&_svg]:text-muted-foreground",
+        // Hover
+        "hover:text-foreground/70 [&:hover_svg]:text-foreground/70",
+        // Active
+        "data-[state=active]:text-foreground data-[state=active]:[&_svg]:text-foreground",
+        // Smooth color only
+        "transition-colors duration-200",
+        // Icons
+        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        // Disabled
+        "disabled:pointer-events-none disabled:opacity-50",
+        // Line variant underline
+        "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity",
+        "group-data-horizontal/tabs:after:inset-x-0 group-data-horizontal/tabs:after:-bottom-1.25 group-data-horizontal/tabs:after:h-0.5",
+        "group-data-vertical/tabs:after:inset-y-0 group-data-vertical/tabs:after:-right-1 group-data-vertical/tabs:after:w-0.5",
+        "group-data-[variant=line]/tabs-list:data-[state=active]:after:opacity-100",
         className,
       )}
       {...props}

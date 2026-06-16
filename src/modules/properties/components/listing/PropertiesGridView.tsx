@@ -34,6 +34,7 @@ import {
   getStatusLabel,
 } from "./propertyListingLabels";
 import { PropertyDeleteAlertDialog } from "./PropertyDeleteAlertDialog";
+import { usePropertyDeleteFlow } from "./usePropertyDeleteFlow";
 
 type PropertyGridRow = DataGridRowBase & PropertyCard;
 
@@ -76,8 +77,12 @@ export function PropertiesGridView({
 }: PropertiesGridViewProps) {
   const router = useRouter();
   const { intlLocale, t } = usePropertiesTranslation();
-  const [propertyPendingDelete, setPropertyPendingDelete] =
-    React.useState<PropertyGridRow | null>(null);
+  const {
+    propertyPendingDelete,
+    setPropertyPendingDelete,
+    handleDeleteConfirm,
+    isDeletePending,
+  } = usePropertyDeleteFlow();
 
   return (
     <>
@@ -256,8 +261,10 @@ export function PropertiesGridView({
 
       <PropertyDeleteAlertDialog
         isOpen={propertyPendingDelete !== null}
+        isPending={isDeletePending}
+        onConfirm={handleDeleteConfirm}
         onOpenChange={(isOpen) => {
-          if (!isOpen) {
+          if (!isOpen && !isDeletePending) {
             setPropertyPendingDelete(null);
           }
         }}

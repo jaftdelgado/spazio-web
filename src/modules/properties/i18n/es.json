@@ -589,6 +589,8 @@
     "confirm": "Eliminar",
     "successTitle": "Propiedad eliminada",
     "successDescription": "{{propertyTitle}} fue eliminada correctamente.",
-    "successDescriptionFallback": "La propiedad fue eliminada correctamente."
+    "successDescriptionFallback": "La propiedad fue eliminada correctamente.",
+    "errorTitle": "No pudimos eliminar la propiedad",
+    "errorDescription": "Tuvimos un problema al eliminar la propiedad. Intentalo de nuevo."
   }
 }

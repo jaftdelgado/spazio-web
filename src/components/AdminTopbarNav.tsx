@@ -4,7 +4,6 @@ import {
   Building03Icon,
   Calendar03Icon,
   CreditCardIcon,
-  Home01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import { usePathname, useRouter } from "next/navigation";
@@ -19,7 +18,6 @@ type TopbarNavItem = {
   href: string;
   icon: IconSvgElement;
   labelKey:
-    | "adminTopbarNav.items.summary"
     | "adminTopbarNav.items.properties"
     | "adminTopbarNav.items.visits"
     | "adminTopbarNav.items.payments";
@@ -27,12 +25,6 @@ type TopbarNavItem = {
 };
 
 const adminNavItems: readonly TopbarNavItem[] = [
-  {
-    href: ROUTES.admin.root,
-    icon: Home01Icon,
-    labelKey: "adminTopbarNav.items.summary",
-    allowedRoles: [1, 2],
-  },
   {
     href: ROUTES.admin.properties,
     icon: Building03Icon,
@@ -54,10 +46,6 @@ const adminNavItems: readonly TopbarNavItem[] = [
 ] as const;
 
 function isNavItemActive(pathname: string, href: string) {
-  if (href === ROUTES.admin.root) {
-    return pathname === href;
-  }
-
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 

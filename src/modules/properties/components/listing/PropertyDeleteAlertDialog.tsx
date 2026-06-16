@@ -17,13 +17,17 @@ import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslat
 
 type PropertyDeleteAlertDialogProps = {
   isOpen: boolean;
+  isPending?: boolean;
   propertyTitle: string;
+  onConfirm: () => void;
   onOpenChange: (isOpen: boolean) => void;
 };
 
 export function PropertyDeleteAlertDialog({
   isOpen,
+  isPending = false,
   propertyTitle,
+  onConfirm,
   onOpenChange,
 }: PropertyDeleteAlertDialogProps) {
   const { t } = usePropertiesTranslation();
@@ -39,7 +43,8 @@ export function PropertyDeleteAlertDialog({
           <AlertDialogDescription>
             {propertyTitle ? (
               <>
-                {t("deleteDialog.bodyPrefix")} <strong>{propertyTitle}</strong>{" "}
+                {t("deleteDialog.bodyPrefix")}{" "}
+                <span className="font-medium text-foreground">{propertyTitle}</span>{" "}
                 {t("deleteDialog.bodySuffix")}
               </>
             ) : (
@@ -48,8 +53,17 @@ export function PropertyDeleteAlertDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>{t("deleteDialog.cancel")}</AlertDialogCancel>
-          <AlertDialogAction className="bg-destructive text-white hover:bg-destructive/90">
+          <AlertDialogCancel disabled={isPending}>
+            {t("deleteDialog.cancel")}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            className="bg-destructive text-white hover:bg-destructive/90"
+            disabled={isPending}
+            onClick={(event) => {
+              event.preventDefault();
+              onConfirm();
+            }}
+          >
             {t("deleteDialog.confirm")}
           </AlertDialogAction>
         </AlertDialogFooter>
