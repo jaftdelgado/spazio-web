@@ -5,13 +5,18 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { DeletePropertyInput } from "@properties/domain/property.entity";
 import { propertyDeleteHttpAdapter } from "@properties/infra/delete/property-delete.http-adapter";
 
-export const useDeleteProperty = (uuid: string) => {
+type DeletePropertyMutationInput = {
+  uuid: string;
+  input: DeletePropertyInput;
+};
+
+export const useDeleteProperty = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: DeletePropertyInput) =>
+    mutationFn: ({ uuid, input }: DeletePropertyMutationInput) =>
       propertyDeleteHttpAdapter.deleteProperty(uuid, input),
-    onSuccess: () => {
+    onSuccess: (_, { uuid }) => {
       queryClient.invalidateQueries({
         queryKey: ["properties", "detail", uuid],
       });

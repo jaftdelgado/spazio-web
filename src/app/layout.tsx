@@ -4,12 +4,11 @@ import type { ReactNode } from "react";
 import localFont from "next/font/local";
 import { usePathname } from "next/navigation";
 
-import { Toast } from "@heroui/react";
-
 import { DEFAULT_LOCALE } from "@/app/i18n/config";
 import { I18nProvider } from "@/app/i18n/I18nProvider";
 import { ThemeProvider } from "@/app/theme/ThemeProvider";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
 import { Navbar } from "@/components/layout/Navbar";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { AppQueryClientProvider } from "@lib/query/query-client-provider";
@@ -43,7 +42,7 @@ export default function RootLayout({
           <I18nProvider>
             <AppQueryClientProvider>
               <TooltipProvider>
-                <Toast.Provider placement="bottom" />
+                <Toaster position="bottom-right" richColors visibleToasts={5} />
                 {isAuthRoute || isExploreRoute || isSettingsRoute ? (
                   children
                 ) : (

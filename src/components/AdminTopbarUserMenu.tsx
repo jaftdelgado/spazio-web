@@ -86,7 +86,7 @@ export function AdminTopbarUserMenu() {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem onClick={() => router.push(ROUTES.admin.root)}>
+        <DropdownMenuItem onClick={() => router.push(ROUTES.admin.properties)}>
           <HugeiconsIcon
             className="text-muted-foreground"
             icon={UserCircleIcon}
@@ -106,7 +106,7 @@ export function AdminTopbarUserMenu() {
           <span className="truncate">{user?.email ?? "Usuario"}</span>
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={() => router.push(ROUTES.admin.root)}>
+        <DropdownMenuItem onClick={() => router.push(ROUTES.admin.properties)}>
           <HugeiconsIcon
             className="text-muted-foreground"
             icon={AccountSetting01Icon}
