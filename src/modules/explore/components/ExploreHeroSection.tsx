@@ -11,6 +11,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { usePropertiesTranslation } from "@/modules/properties/i18n/usePropertiesTranslation";
 
 type ExploreHeroSectionProps = {
   activeCount: number;
@@ -29,21 +30,22 @@ export function ExploreHeroSection({
   onSearchSubmit,
   totalCount,
 }: ExploreHeroSectionProps) {
+  const { t } = usePropertiesTranslation();
+
   return (
     <section className="grid gap-4 rounded-[2rem] border bg-card px-5 py-6 shadow-sm md:grid-cols-[1.4fr_0.9fr] md:px-7">
       <div className="space-y-5">
         <div className="inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-xs text-muted-foreground">
           <HugeiconsIcon icon={Store04Icon} size={14} />
-          Vista publica de propiedades
+          {t("explore.hero.eyebrow")}
         </div>
 
         <div className="space-y-3">
           <h1 className="max-w-2xl text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            Encuentra espacios listos para vivir, invertir o trabajar.
+            {t("explore.hero.title")}
           </h1>
           <p className="max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
-            Explora propiedades destacadas de Spazio con una experiencia clara,
-            rapida y pensada para clientes.
+            {t("explore.hero.description")}
           </p>
         </div>
 
@@ -57,12 +59,12 @@ export function ExploreHeroSection({
             <Input
               value={heroSearch}
               onChange={(event) => onHeroSearchChange(event.target.value)}
-              placeholder="Buscar por ciudad, zona o tipo"
+              placeholder={t("explore.hero.searchPlaceholder")}
               className="h-11 pl-10"
             />
           </div>
           <Button type="button" className="h-11 px-5" onClick={onSearchSubmit}>
-            Buscar
+            {t("explore.hero.searchButton")}
           </Button>
         </div>
       </div>
@@ -70,17 +72,17 @@ export function ExploreHeroSection({
       <div className="grid gap-3 sm:grid-cols-3 md:grid-cols-1">
         <QuickStat
           icon={Building06Icon}
-          label="Propiedades activas"
+          label={t("explore.hero.stats.activeProperties")}
           value={String(totalCount)}
         />
         <QuickStat
           icon={GridViewIcon}
-          label="Resultados filtrados"
+          label={t("explore.hero.stats.filteredResults")}
           value={String(listingCount)}
         />
         <QuickStat
           icon={FilterHorizontalIcon}
-          label="Filtros activos"
+          label={t("explore.hero.stats.activeFilters")}
           value={String(activeCount)}
         />
       </div>

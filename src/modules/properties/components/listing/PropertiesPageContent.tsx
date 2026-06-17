@@ -30,12 +30,17 @@ import { PropertiesGridView } from "./PropertiesGridView";
 type PropertiesViewMode = "table" | "grid";
 type PropertyGridRow = DataGridRowBase & PropertyCard;
 
-function getFriendlyPropertiesErrorMessage(error: Error | null) {
+type PropertiesTranslator = ReturnType<typeof usePropertiesTranslation>["t"];
+
+function getFriendlyPropertiesErrorMessage(
+  error: Error | null,
+  t: PropertiesTranslator,
+) {
   if (error instanceof TypeError) {
-    return "No pudimos conectarnos en este momento. Revisa tu conexion e intenta nuevamente.";
+    return t("states.connectionErrorDescription");
   }
 
-  return "No fue posible cargar las propiedades por ahora. Intenta de nuevo en un momento.";
+  return t("states.loadErrorDescription");
 }
 
 function PropertiesDataGridFooterSkeleton() {
@@ -249,6 +254,7 @@ export function PropertiesPageContent() {
                 viewMode === "table"
                   ? (propertiesQuery.error ?? null)
                   : (propertiesInfiniteQuery.error ?? null),
+                t,
               )}
             </EmptyDescription>
           </EmptyHeader>

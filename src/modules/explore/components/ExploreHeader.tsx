@@ -9,11 +9,13 @@ import { useAuth } from "@lib/auth/useAuth";
 import { Button } from "@/components/ui/button";
 import { TopbarUserMenu } from "@/components/TopbarUserMenu";
 import { useUsersTranslation } from "@users/i18n/useUsersTranslation";
+import { usePropertiesTranslation } from "@/modules/properties/i18n/usePropertiesTranslation";
 
 export function ExploreHeader() {
   const router = useRouter();
   const { isAuthenticated, isLoading, role } = useAuth();
-  const { t } = useUsersTranslation();
+  const { t: usersT } = useUsersTranslation();
+  const { t: propertiesT } = usePropertiesTranslation();
   const canAccessPanel = !isLoading && role !== null && (role === 1 || role === 2);
 
   const cta = useMemo(() => {
@@ -24,7 +26,7 @@ export function ExploreHeader() {
     if (!isAuthenticated) {
       return {
         icon: Login01Icon,
-        label: t("auth.shell.navigation.toLogin"),
+        label: usersT("auth.shell.navigation.toLogin"),
         onClick: () => router.push("/auth/login"),
       };
     }
@@ -32,18 +34,18 @@ export function ExploreHeader() {
     if (canAccessPanel) {
       return {
         icon: DashboardCircleIcon,
-        label: t("auth.shell.menu.goToPanel"),
+        label: usersT("auth.shell.menu.goToPanel"),
         onClick: () => router.push("/admin"),
       };
     }
 
     return null;
-  }, [canAccessPanel, isAuthenticated, isLoading, router, t]);
+  }, [canAccessPanel, isAuthenticated, isLoading, router, usersT]);
 
   return (
     <header className="fixed inset-x-0 top-0 z-30 border-b bg-background/90 backdrop-blur supports-backdrop-filter:bg-background/80">
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-6">
-        <div 
+        <div
           className="flex cursor-pointer items-center gap-3"
           onClick={() => router.push("/explore")}
         >
@@ -53,7 +55,7 @@ export function ExploreHeader() {
           <div className="min-w-0">
             <p className="text-sm font-medium text-foreground">Spazio</p>
             <p className="text-xs text-muted-foreground">
-              Explora propiedades publicas
+              {propertiesT("explore.header.subtitle")}
             </p>
           </div>
         </div>
