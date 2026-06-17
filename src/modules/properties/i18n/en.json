@@ -618,6 +618,9 @@
     "clausesEmpty": "This property does not have configured clauses.",
     "locationEmpty": "No location is available for this property.",
     "pricingEmpty": "There are no active prices for this property.",
+    "summary": {
+      "registeredByLabel": "Registered by"
+    },
     "pricing": {
       "sale": "Sale",
       "rent": "Rent",

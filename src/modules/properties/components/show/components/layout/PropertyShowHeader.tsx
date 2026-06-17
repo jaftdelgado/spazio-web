@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft01Icon, MapsLocation01Icon, UserIcon } from "@hugeicons/core-free-icons";
+import { ArrowLeft01Icon, MapsLocation01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import { Button } from "@/components/ui/button";
@@ -10,11 +10,9 @@ type PropertyShowHeaderProps = {
   canEdit: boolean;
   onBack: () => void;
   onEdit: () => void;
-  registeredBy: string | null;
   title: string;
   backLabel: string;
   editLabel: string;
-  registeredByLabel: string;
 };
 
 export function PropertyShowHeader({
@@ -22,11 +20,9 @@ export function PropertyShowHeader({
   canEdit,
   onBack,
   onEdit,
-  registeredBy,
   title,
   backLabel,
   editLabel,
-  registeredByLabel,
 }: PropertyShowHeaderProps) {
   return (
     <header className="space-y-5 pt-(--admin-page-padding-y)">
@@ -56,12 +52,6 @@ export function PropertyShowHeader({
                 strokeWidth={1.8}
               />
               <span>{address}</span>
-            </span>
-          ) : null}
-          {registeredBy ? (
-            <span className="flex items-center gap-2">
-              <HugeiconsIcon icon={UserIcon} size={16} strokeWidth={1.8} />
-              <span>{registeredByLabel}</span>
             </span>
           ) : null}
         </div>

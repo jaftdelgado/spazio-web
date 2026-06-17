@@ -124,14 +124,6 @@ export function PropertyShowPageContent({
           saveEditingPropertyUuid(detail.propertyUuid);
           router.push(ROUTES.admin.propertiesEdit);
         }}
-        registeredBy={detail.registeredBy ?? null}
-        registeredByLabel={
-          detail.registeredBy
-            ? t("show.hero.registeredBy", {
-                user: detail.registeredBy,
-              })
-            : ""
-        }
         title={detail.title}
       />
 
@@ -180,6 +172,7 @@ export function PropertyShowPageContent({
             intlLocale={intlLocale}
             modalityName={modality?.name ?? ""}
             propertyTypeName={propertyType?.name ?? ""}
+            registeredByName={detail.registeredBy ?? null}
           />
         </aside>
       </div>

@@ -1,10 +1,22 @@
 "use client";
 
-import { Building03Icon, Home04Icon, RulerIcon, SaleTag02Icon, Sofa01Icon, TaskDone02Icon } from "@hugeicons/core-free-icons";
+import {
+  Building03Icon,
+  Home04Icon,
+  RulerIcon,
+  SaleTag02Icon,
+  Sofa01Icon,
+  TaskDone02Icon,
+  UserIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getModalityLabel, getPropertyTypeLabel, getStatusLabel } from "@properties/components/listing/propertyListingLabels";
+import {
+  getModalityLabel,
+  getPropertyTypeLabel,
+  getStatusLabel,
+} from "@properties/components/listing/propertyListingLabels";
 import type { PropertyDetail } from "@properties/domain/property.entity";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 import { formatPropertyArea } from "../property-show.helpers";
@@ -14,6 +26,7 @@ type PropertySummaryCardProps = {
   modalityName: string;
   propertyTypeName: string;
   detail: PropertyDetail;
+  registeredByName: string | null;
 };
 
 export function PropertySummaryCard({
@@ -21,6 +34,7 @@ export function PropertySummaryCard({
   modalityName,
   propertyTypeName,
   detail,
+  registeredByName,
 }: PropertySummaryCardProps) {
   const { t } = usePropertiesTranslation();
 
@@ -59,10 +73,19 @@ export function PropertySummaryCard({
           : t("show.values.no")
         : t("show.values.notAvailable"),
     },
+    ...(registeredByName
+      ? [
+          {
+            icon: UserIcon,
+            label: t("show.summary.registeredByLabel"),
+            value: registeredByName,
+          },
+        ]
+      : []),
   ];
 
   return (
-    <Card className="rounded-[28px] border-0 bg-background shadow-none ring-1 ring-border/60">
+    <Card className="rounded-[28px] bg-background shadow-border">
       <CardHeader className="pb-0">
         <CardTitle className="text-xl font-semibold">
           {t("show.sections.summaryTitle")}
@@ -70,24 +93,24 @@ export function PropertySummaryCard({
       </CardHeader>
       <CardContent>
         <div className="overflow-hidden rounded-none border-y border-border/60 bg-transparent">
-        {items.map((item) => (
-          <div
-            key={item.label}
-            className="grid grid-cols-[28px_minmax(0,1fr)] items-start gap-3 border-b border-border/60 py-4 last:border-b-0"
-          >
-            <div className="flex size-7 items-center justify-center text-[#222222]">
-              <HugeiconsIcon icon={item.icon} size={20} strokeWidth={1.8} />
+          {items.map((item) => (
+            <div
+              key={item.label}
+              className="grid grid-cols-[28px_minmax(0,1fr)] items-start gap-3 border-b border-border/60 py-4 last:border-b-0"
+            >
+              <div className="flex size-7 items-center justify-center text-[#222222]">
+                <HugeiconsIcon icon={item.icon} size={20} strokeWidth={1.8} />
+              </div>
+              <div className="min-w-0">
+                <p className="m-0 text-[15px] font-normal leading-[1.4] text-[#222222]">
+                  {item.label}
+                </p>
+                <p className="mt-1 text-[15px] font-normal leading-[1.4] text-muted-foreground">
+                  {item.value}
+                </p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="m-0 text-[15px] font-normal leading-[1.4] text-[#222222]">
-                {item.label}
-              </p>
-              <p className="mt-1 text-[15px] font-normal leading-[1.4] text-muted-foreground">
-                {item.value}
-              </p>
-            </div>
-          </div>
-        ))}
+          ))}
         </div>
       </CardContent>
     </Card>

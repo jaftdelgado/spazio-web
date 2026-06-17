@@ -612,6 +612,9 @@
     "clausesEmpty": "Esta propiedad no tiene cláusulas configuradas.",
     "locationEmpty": "No hay ubicación disponible para esta propiedad.",
     "pricingEmpty": "No hay precios activos para esta propiedad.",
+    "summary": {
+      "registeredByLabel": "Registrado por"
+    },
     "pricing": {
       "sale": "Venta",
       "rent": "Renta",
