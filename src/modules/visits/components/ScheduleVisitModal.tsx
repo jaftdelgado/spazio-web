@@ -7,15 +7,17 @@ import {
   Home01Icon 
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { 
-  Button, 
-  Input, 
-  Dropdown, 
+import {
+  Button,
+  Input,
+  Dropdown,
   Label, 
   AlertDialog,
   Skeleton
 } from "@heroui/react";
 
+import { HttpError } from "@lib/http/http-errors";
+import type { PropertyList } from "@/modules/properties/domain/property.entity";
 import { usePropertyList } from "@/modules/properties/application/get/hooks/useProperty";
 import { useAvailableSlots, useVisitsMutations } from "../application/hooks/useVisits";
 import { useVisitsTranslation } from "../i18n/useVisitsTranslation";
@@ -24,6 +26,26 @@ type ScheduleVisitModalProps = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   onSuccess: () => void;
+};
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (error instanceof HttpError) {
+    const body = error.body;
+    if (
+      typeof body === "object" &&
+      body !== null &&
+      "error" in body &&
+      typeof body.error === "string"
+    ) {
+      return body.error;
+    }
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return fallback;
 };
 
 export function ScheduleVisitModal({ isOpen, onOpenChange, onSuccess }: ScheduleVisitModalProps) {
@@ -45,7 +67,7 @@ export function ScheduleVisitModal({ isOpen, onOpenChange, onSuccess }: Schedule
   // Mutations
   const { scheduleVisit } = useVisitsMutations();
 
-  const properties = (propertiesResponse as any)?.data || [];
+  const properties = (propertiesResponse as PropertyList | undefined)?.data ?? [];
 
   // Minimum date: Today + 3 days (approx 72h to be safe with 48h rule)
   const minDate = React.useMemo(() => {
@@ -77,10 +99,10 @@ export function ScheduleVisitModal({ isOpen, onOpenChange, onSuccess }: Schedule
         setSelectedDate("");
         setSelectedSlot(null);
       },
-      onError: (err: any) => {
-        const errorMsg = err.body?.error || err.message || "Error desconocido";
+      onError: (error: unknown) => {
+        const errorMsg = getErrorMessage(error, "Error desconocido");
         alert(`No se pudo agendar la visita: ${errorMsg}`);
-      }
+      },
     });
   };
 
@@ -117,7 +139,10 @@ export function ScheduleVisitModal({ isOpen, onOpenChange, onSuccess }: Schedule
                 <Dropdown.Popover className="min-w-64 max-h-60 overflow-y-auto">
                   <Dropdown.Menu
                     onAction={(key) => {
-                      const prop = properties.find((p: any) => p.propertyId.toString() === key.toString());
+                      const prop = properties.find(
+                        (property) =>
+                          property.propertyId.toString() === key.toString(),
+                      );
                       if (prop) {
                         setSelectedPropertyId(prop.propertyId);
                         setSelectedPropertyTitle(prop.title);
@@ -130,7 +155,7 @@ export function ScheduleVisitModal({ isOpen, onOpenChange, onSuccess }: Schedule
                     ) : properties.length === 0 ? (
                       <Dropdown.Item id="empty" isDisabled>No hay propiedades disponibles</Dropdown.Item>
                     ) : (
-                      properties.map((prop: any) => (
+                      properties.map((prop) => (
                         <Dropdown.Item id={prop.propertyId.toString()} key={prop.propertyId}>
                           {prop.title}
                         </Dropdown.Item>
