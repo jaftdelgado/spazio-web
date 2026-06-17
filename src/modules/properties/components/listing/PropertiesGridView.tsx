@@ -92,7 +92,7 @@ export function PropertiesGridView({
             key={row.id}
             className="flex h-full flex-col overflow-hidden rounded-[22px] bg-background"
           >
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[20px] bg-muted/30">
+            <div className="relative aspect-4/3 w-full overflow-hidden rounded-[20px] bg-muted/30">
               {row.coverPhotoUrl ? (
                 <Image
                   fill
@@ -146,7 +146,13 @@ export function PropertiesGridView({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        router.push(
+                          ROUTES.admin.propertyDetail(row.propertyUuid),
+                        )
+                      }
+                    >
                       <HugeiconsIcon
                         className="text-muted-foreground"
                         icon={Building03Icon}

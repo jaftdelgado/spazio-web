@@ -8,6 +8,7 @@ export const ROUTES = {
   admin: {
     root: "/admin",
     properties: "/admin/properties",
+    propertyDetail: (uuid: string) => `/admin/properties/${uuid}`,
     propertiesCreate: "/admin/properties/new",
     propertiesEdit: "/admin/properties/edit",
     visits: "/admin/visits",

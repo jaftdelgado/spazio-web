@@ -136,6 +136,7 @@ function renderPropertyCell(
     delete: string;
   },
   t: ReturnType<typeof usePropertiesTranslation>["t"],
+  onViewPress: (row: PropertyGridRow) => void,
   onEditPress: (row: PropertyGridRow) => void,
   onDeletePress: (row: PropertyGridRow) => void,
 ) {
@@ -211,7 +212,7 @@ function renderPropertyCell(
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onViewPress(row)}>
               <HugeiconsIcon
                 className="text-muted-foreground"
                 icon={Building03Icon}
@@ -359,6 +360,7 @@ export function PropertiesDataGrid({
             intlLocale,
             actionLabels,
             t,
+            (row) => router.push(ROUTES.admin.propertyDetail(row.propertyUuid)),
             (row) => {
               saveEditingPropertyUuid(row.propertyUuid);
               router.push(ROUTES.admin.propertiesEdit);

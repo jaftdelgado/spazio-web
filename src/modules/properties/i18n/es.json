@@ -580,6 +580,63 @@
   "footer": {
     "showing": "Mostrando {{visibleRowCount}} de {{totalCount}} propiedades"
   },
+  "show": {
+    "actions": {
+      "backToList": "Volver a propiedades",
+      "edit": "Modificar",
+      "show": "Mostrar",
+      "hide": "Ocultar"
+    },
+    "hero": {
+      "registeredBy": "Registrada por {{user}}"
+    },
+    "states": {
+      "loadErrorTitle": "No pudimos cargar la propiedad"
+    },
+    "sections": {
+      "descriptionTitle": "Descripción",
+      "descriptionDescription": "Contexto y detalles del inmueble tal como se publican internamente.",
+      "detailsTitle": "Características",
+      "servicesTitle": "Servicios y amenidades",
+      "servicesDescription": "Equipamiento y servicios disponibles en la propiedad.",
+      "clausesTitle": "Cláusulas y restricciones",
+      "clausesDescription": "Condiciones activas configuradas para este inmueble.",
+      "locationTitle": "Ubicación",
+      "locationDescription": "Mapa y referencia geográfica del inmueble.",
+      "pricingTitle": "Precios activos",
+      "summaryTitle": "Resumen de la propiedad"
+    },
+    "descriptionEmpty": "Esta propiedad no tiene descripción capturada.",
+    "photosEmpty": "Esta propiedad no tiene fotos disponibles.",
+    "servicesEmpty": "Esta propiedad no tiene servicios asociados.",
+    "clausesEmpty": "Esta propiedad no tiene cláusulas configuradas.",
+    "locationEmpty": "No hay ubicación disponible para esta propiedad.",
+    "pricingEmpty": "No hay precios activos para esta propiedad.",
+    "summary": {
+      "registeredByLabel": "Registrado por"
+    },
+    "pricing": {
+      "sale": "Venta",
+      "rent": "Renta",
+      "rentPeriod": "Periodo",
+      "deposit": "Depósito",
+      "negotiable": "Negociable"
+    },
+    "locationCard": {
+      "title": "Dirección",
+      "address": "Referencia",
+      "visibility": "Visibilidad",
+      "public": "Dirección pública",
+      "private": "Dirección reservada"
+    },
+    "values": {
+      "yes": "Sí",
+      "no": "No",
+      "from": "Desde",
+      "to": "Hasta",
+      "notAvailable": "No disponible"
+    }
+  },
   "deleteDialog": {
     "title": "Eliminar propiedad",
     "bodyPrefix": "Esta acción eliminará",
