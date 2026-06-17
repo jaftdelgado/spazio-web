@@ -315,12 +315,17 @@
     },
     "services": {
       "loading": "Cargando amenidades disponibles...",
+      "searchPlaceholder": "Buscar servicio o amenidad...",
+      "clearSearch": "Limpiar búsqueda de servicios",
       "selectedTitle": "Seleccionados",
       "selectedHint": "Haz clic en una amenidad para quitarla de la propiedad.",
       "selectedEmpty": "Aún no has seleccionado amenidades.",
       "availableTitle": "Disponibles",
       "availableHint": "Haz clic en una amenidad para agregarla a la propiedad.",
-      "availableEmpty": "No hay más amenidades disponibles."
+      "availableEmpty": "No hay más amenidades disponibles.",
+      "availableSearchEmpty": "No encontramos servicios con esa búsqueda.",
+      "loadMore": "Cargar más...",
+      "loadingMore": "Cargando..."
     },
     "clauses": {
       "add": "Agregar",

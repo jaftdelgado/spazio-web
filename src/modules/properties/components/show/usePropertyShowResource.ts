@@ -23,7 +23,7 @@ export function usePropertyShowResource(propertyUuid: string) {
   const modalitiesQuery = useModalities();
   const orientationsQuery = useOrientations();
   const rentPeriodsQuery = useRentPeriods(detailQuery.data?.propertyTypeId ?? 0);
-  const servicesCatalogQuery = useServices();
+  const servicesCatalogQuery = useServices({ page: 1, pageSize: 50 });
   const supportsClausesCatalog =
     detailQuery.data?.modalityId !== undefined &&
     detailQuery.data.modalityId !== 3;

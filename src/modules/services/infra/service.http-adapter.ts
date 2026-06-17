@@ -24,8 +24,16 @@ export const serviceHttpAdapter: ServiceRepository = {
       searchParams.set("q", params.q);
     }
 
-    if (params?.limit !== undefined) {
-      searchParams.set("limit", String(params.limit));
+    if (params?.categoryId !== undefined) {
+      searchParams.set("category_id", String(params.categoryId));
+    }
+
+    if (params?.page !== undefined) {
+      searchParams.set("page", String(params.page));
+    }
+
+    if (params?.pageSize !== undefined) {
+      searchParams.set("page_size", String(params.pageSize));
     }
 
     const queryString = searchParams.toString();

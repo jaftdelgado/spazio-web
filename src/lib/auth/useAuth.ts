@@ -3,20 +3,12 @@
 import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { httpClient } from "@lib/http/http-client";
 import { authStorage } from "@lib/auth/auth-storage";
 import { HttpError } from "@lib/http/http-errors";
+import type { UserProfile } from "@users/domain/users.entity";
+import { usersHttpAdapter } from "@users/infra/users.http-adapter";
 
 import { AUTH_SESSION_CHANGED_EVENT } from "./auth";
-
-type ProfileResponse = {
-  user_id: number;
-  user_uuid: string;
-  email: string;
-  role_id: number;
-  role_name: string;
-  created_at: string;
-};
 
 export const authSessionQueryKey = ["auth", "session"] as const;
 
@@ -40,7 +32,7 @@ export function useAuth() {
     queryKey: authSessionQueryKey,
     queryFn: async () => {
       try {
-        return await httpClient.get<ProfileResponse>("/api/v1/users/profile");
+        return await usersHttpAdapter.getProfile();
       } catch (error) {
         if (error instanceof HttpError && error.status === 401) {
           authStorage.clearTokens();
@@ -52,16 +44,7 @@ export function useAuth() {
     staleTime: 1 * 60 * 1000,
   });
 
-  const user = data
-    ? {
-        userId: data.user_id,
-        userUuid: data.user_uuid,
-        email: data.email,
-        roleId: data.role_id,
-        roleName: data.role_name,
-        createdAt: new Date(data.created_at),
-      }
-    : null;
+  const user: UserProfile | null = data ?? null;
 
   return {
     user,

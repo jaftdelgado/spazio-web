@@ -1,10 +1,10 @@
 {
   "auth": {
     "shell": {
-      "tagline": "Gestión inmobiliaria, simplificada.",
+      "tagline": "Gestion inmobiliaria, simplificada.",
       "localeLabel": "Cambiar idioma",
       "navigation": {
-        "toLogin": "Iniciar sesión",
+        "toLogin": "Iniciar sesion",
         "toSignUp": "Crear cuenta"
       },
       "theme": {
@@ -14,8 +14,8 @@
       },
       "discardRegistration": {
         "title": "¿Descartar registro?",
-        "description": "Tu correo ya fue verificado. Si sales ahora, tendrás que reenviar el código para continuar después.",
-        "cancel": "Seguir aquí",
+        "description": "Tu correo ya fue verificado. Si sales ahora, tendras que reenviar el codigo para continuar despues.",
+        "cancel": "Seguir aqui",
         "confirm": "Descartar y salir"
       },
       "footer": {
@@ -27,7 +27,7 @@
         "visits": "Mis visitas",
         "payments": "Mis pagos",
         "settings": "Ajustes",
-        "logout": "Cerrar sesión",
+        "logout": "Cerrar sesion",
         "goToPanel": "Ir al panel"
       }
     },
@@ -44,34 +44,58 @@
       }
     },
     "login": {
-      "title": "Iniciar sesión",
+      "title": "Iniciar sesion",
       "description": "Ingresa tus credenciales para continuar",
-      "passwordPlaceholder": "Tu contraseña",
-      "submit": "Iniciar sesión",
+      "passwordPlaceholder": "Tu contrasena",
+      "submit": "Iniciar sesion",
       "divider": "o",
       "signupPrompt": "¿No tienes cuenta?",
-      "signupLink": "Regístrate",
+      "signupLink": "Registrate",
+      "forgotPassword": "Olvide mi contrasena",
       "validation": {
-        "emailInvalid": "Correo inválido",
-        "passwordRequired": "Contraseña requerida"
+        "emailInvalid": "Correo invalido",
+        "passwordRequired": "Contrasena requerida"
+      }
+    },
+    "forgotPassword": {
+      "email": {
+        "title": "Recuperar contrasena",
+        "description": "Ingresa el correo asociado a tu cuenta y te enviaremos un codigo.",
+        "genericNotice": "Si el correo existe, enviaremos un codigo de verificacion.",
+        "submit": "Enviar codigo"
+      },
+      "otp": {
+        "title": "Verifica el codigo",
+        "descriptionPrefix": "Ingresa el codigo de 6 digitos enviado a",
+        "descriptionSuffix": "Revisa tambien tu carpeta de spam.",
+        "verifying": "Verificando"
+      },
+      "password": {
+        "title": "Define una nueva contrasena",
+        "description": "Elige una contrasena segura para terminar la recuperacion.",
+        "submit": "Actualizar contrasena"
+      },
+      "success": {
+        "title": "Contrasena actualizada",
+        "description": "Tu contrasena se actualizo correctamente. Ya puedes iniciar sesion."
       }
     },
     "signUp": {
       "email": {
         "title": "Crea tu cuenta",
-        "description": "Ingresa tu correo electrónico para comenzar. Te enviaremos un código de verificación.",
+        "description": "Ingresa tu correo electronico para comenzar. Te enviaremos un codigo de verificacion.",
         "submit": "Continuar",
         "validation": {
           "required": "El correo es requerido",
           "tooLong": "El correo es demasiado largo",
-          "invalid": "Ingresa un correo electrónico válido",
+          "invalid": "Ingresa un correo electronico valido",
           "noSpaces": "El correo no puede contener espacios"
         }
       },
       "otp": {
         "title": "Verifica tu correo",
-        "descriptionPrefix": "Enviamos un código de 6 dígitos a",
-        "descriptionSuffix": "Revisa también tu carpeta de spam.",
+        "descriptionPrefix": "Enviamos un codigo de 6 digitos a",
+        "descriptionSuffix": "Revisa tambien tu carpeta de spam.",
         "verifying": "Verificando",
         "actions": {
           "resending": "Enviando",
@@ -80,8 +104,8 @@
         }
       },
       "profile": {
-        "title": "Cuéntanos sobre ti",
-        "description": "Ingresa tu nombre y datos de contacto. Esta información aparecerá en tu perfil.",
+        "title": "Cuentanos sobre ti",
+        "description": "Ingresa tu nombre y datos de contacto. Esta informacion aparecera en tu perfil.",
         "fields": {
           "firstName": {
             "label": "Nombre",
@@ -99,50 +123,50 @@
         "validation": {
           "firstNameRequired": "El nombre es requerido",
           "lastNameRequired": "Los apellidos son requeridos",
-          "minLength": "Mínimo 2 caracteres",
-          "maxLength": "Máximo 50 caracteres",
+          "minLength": "Minimo 2 caracteres",
+          "maxLength": "Maximo 50 caracteres",
           "lettersOnly": "Solo se permiten letras",
-          "phoneInvalid": "Ingresa un número de teléfono válido (7-20 dígitos)"
+          "phoneInvalid": "Ingresa un numero de telefono valido (7-20 digitos)"
         }
       },
       "password": {
-        "title": "Elige una contraseña",
-        "description": "Crea una contraseña segura de 8 a 32 caracteres con mayúsculas, números y símbolos.",
+        "title": "Elige una contrasena",
+        "description": "Crea una contrasena segura de 8 a 32 caracteres con mayusculas, numeros y simbolos.",
         "fields": {
           "password": {
             "label": "Contrasena",
-            "placeholder": "Crea una contraseña"
+            "placeholder": "Crea una contrasena"
           },
           "confirmPassword": {
             "label": "Confirmar contrasena",
-            "placeholder": "Repite tu contraseña"
+            "placeholder": "Repite tu contrasena"
           }
         },
         "submit": "Crear cuenta",
         "validation": {
-          "required": "La contraseña es requerida",
-          "minLength": "Mínimo 8 caracteres",
-          "maxLength": "Máximo 32 caracteres",
-          "uppercase": "Incluye al menos una letra mayúscula",
-          "number": "Incluye al menos un número",
-          "specialCharacter": "Incluye al menos un carácter especial (!@#$...)",
+          "required": "La contrasena es requerida",
+          "minLength": "Minimo 8 caracteres",
+          "maxLength": "Maximo 32 caracteres",
+          "uppercase": "Incluye al menos una letra mayuscula",
+          "number": "Incluye al menos un numero",
+          "specialCharacter": "Incluye al menos un caracter especial (!@#$...)",
           "confirmMismatch": "Las contrasenas no coinciden"
         },
         "criteria": {
-          "length": "La contraseña debe tener entre 8 y 32 caracteres.",
-          "uppercase": "Incluye al menos una mayúscula.",
-          "number": "Agrega al menos un número.",
-          "specialCharacter": "Usa un símbolo especial (!, @, #, etc.)."
+          "length": "La contrasena debe tener entre 8 y 32 caracteres.",
+          "uppercase": "Incluye al menos una mayuscula.",
+          "number": "Agrega al menos un numero.",
+          "specialCharacter": "Usa un simbolo especial (!, @, #, etc.)."
         }
       },
       "result": {
         "success": {
-          "title": "Tu cuenta ya está lista",
-          "description": "El registro se completó correctamente. Ya puedes iniciar sesión con tu correo y contraseña."
+          "title": "Tu cuenta ya esta lista",
+          "description": "El registro se completo correctamente. Ya puedes iniciar sesion con tu correo y contrasena."
         },
         "error": {
           "title": "No pudimos crear tu cuenta",
-          "defaultMessage": "Ocurrió un problema de conexión o validación. Revisa tus datos e inténtalo de nuevo."
+          "defaultMessage": "Ocurrio un problema de conexion o validacion. Revisa tus datos e intentalo de nuevo."
         },
         "actions": {
           "retry": "Intentar de nuevo",
@@ -150,5 +174,133 @@
         }
       }
     }
+  },
+  "profile": {
+    "header": {
+      "title": "Cuenta y perfil",
+      "description": "Administra tu informacion personal, foto, correo y credenciales."
+    },
+    "common": {
+      "save": "Guardar cambios",
+      "saving": "Guardando..."
+    },
+    "identity": {
+      "title": "Identidad",
+      "hint": "Resumen rapido de tu cuenta actual.",
+      "emailLabel": "Correo",
+      "roleLabel": "Rol"
+    },
+    "personal": {
+      "title": "Datos personales",
+      "hint": "Actualiza tu nombre y telefono de forma independiente.",
+      "firstName": "Nombre",
+      "lastName": "Apellidos",
+      "phone": "Telefono",
+      "successTitle": "Perfil actualizado",
+      "validation": {
+        "firstName": "El nombre es obligatorio",
+        "lastName": "Los apellidos son obligatorios"
+      }
+    },
+    "photo": {
+      "title": "Foto de perfil",
+      "hint": "Sube una imagen nueva para tu avatar.",
+      "description": "Puedes seleccionar una imagen desde tu dispositivo y guardarla cuando estes listo.",
+      "requirements": "Acepta una sola imagen JPG, PNG o WEBP de hasta 5 MB.",
+      "previewAlt": "Vista previa de foto de perfil",
+      "pickFile": "Seleccionar archivo",
+      "upload": "Subir foto",
+      "uploading": "Subiendo...",
+      "clear": "Quitar seleccion",
+      "successTitle": "Foto actualizada",
+      "errorTitle": "No pudimos subir la foto",
+      "validation": {
+        "required": "Selecciona una imagen para continuar.",
+        "single": "Solo puedes subir una imagen a la vez.",
+        "format": "Usa una imagen JPG, PNG o WEBP.",
+        "size": "La imagen es demasiado pesada. Usa un archivo de hasta 5 MB."
+      }
+    },
+    "email": {
+      "title": "Correo electronico",
+      "hint": "Cambia tu correo en un flujo de verificacion corto.",
+      "current": "Correo actual",
+      "new": "Nuevo correo",
+      "code": "Codigo de verificacion",
+      "requestSubmit": "Enviar codigo",
+      "verifySubmit": "Confirmar cambio",
+      "requestSuccessTitle": "Codigo enviado",
+      "requestSuccessDescription": "Enviamos un codigo al nuevo correo para confirmar el cambio.",
+      "successTitle": "Correo actualizado",
+      "verifyNotice": "Ingresa el codigo enviado a {{email}} para completar el cambio.",
+      "sessionDialog": {
+        "successTitle": "Correo actualizado",
+        "errorTitle": "No pudimos actualizar tu correo"
+      }
+    },
+    "password": {
+      "title": "Contrasena",
+      "hint": "Actualiza tu contrasena sin afectar el resto de tu perfil.",
+      "current": "Contrasena actual",
+      "new": "Nueva contrasena",
+      "confirm": "Confirmar nueva contrasena",
+      "submit": "Actualizar contrasena",
+      "successTitle": "Contrasena actualizada",
+      "sessionDialog": {
+        "successTitle": "Contrasena actualizada",
+        "errorTitle": "No pudimos actualizar tu contrasena"
+      },
+      "validation": {
+        "currentRequired": "La contrasena actual es obligatoria"
+      }
+    },
+    "securityDialog": {
+      "action": "Continuar"
+    },
+    "delete": {
+      "title": "Eliminar cuenta",
+      "hint": "Accion delicada que cerrara tu sesion y eliminara tu acceso.",
+      "cardTitle": "Eliminar mi cuenta",
+      "cardDescription": "Antes de continuar, revisa con cuidado esta decision. Una vez completada, ya no podras iniciar sesion con esta cuenta.",
+      "submit": "Eliminar cuenta",
+      "cancel": "Cancelar",
+      "deleting": "Eliminando...",
+      "dialogTitle": "Eliminar cuenta",
+      "dialogDescription": "Esta accion cerrara tu sesion y eliminara tu acceso. Para confirmar, escribe",
+      "dialogWarning": "Esta accion puede afectar tu informacion y revocar tu acceso de manera inmediata.",
+      "dialogInput": "Escribe ELIMINAR para continuar"
+    }
+  },
+  "staff": {
+    "title": "Crear usuario staff",
+    "description": "Registra una cuenta de admin o agente y entrega la contrasena temporal al usuario.",
+    "submit": "Crear usuario",
+    "submitting": "Creando...",
+    "successTitle": "Usuario creado",
+    "fields": {
+      "firstName": "Nombre",
+      "lastName": "Apellidos",
+      "email": "Correo",
+      "phone": "Telefono",
+      "role": "Rol"
+    },
+    "roles": {
+      "admin": "Administrador",
+      "agent": "Agente"
+    },
+    "validation": {
+      "firstName": "El nombre es obligatorio",
+      "lastName": "Los apellidos son obligatorios"
+    },
+    "temporaryPasswordTitle": "Contrasena temporal",
+    "temporaryPasswordDescription": "Se mantendra visible hasta que cierres esta vista.",
+    "passwordLabel": "Contrasena temporal",
+    "copy": "Copiar contrasena",
+    "copySuccessTitle": "Contrasena copiada",
+    "copySuccessDescription": "Ya puedes compartirla con el usuario.",
+    "shareHint": "Comparte esta contrasena con el usuario y pidela que la cambie desde su cuenta cuando inicie sesion.",
+    "emptyState": "Cuando crees un usuario staff, la contrasena temporal aparecera aqui.",
+    "forbiddenTitle": "Acceso restringido",
+    "forbiddenDescription": "Solo un administrador puede crear usuarios staff."
   }
 }

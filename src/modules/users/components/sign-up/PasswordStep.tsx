@@ -134,7 +134,7 @@ export function PasswordStep({
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>
       <div className="relative">
-        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-black/40">
+        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground">
           <HugeiconsIcon icon={LockPasswordIcon} size={17} strokeWidth={1.7} />
         </span>
         <Input
@@ -158,7 +158,7 @@ export function PasswordStep({
               : t("auth.common.showPassword")
           }
           onClick={onToggle}
-          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-black/40 transition-colors hover:text-black/70"
+          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
         >
           <HugeiconsIcon
             icon={showValue ? ViewOffSlashIcon : ViewIcon}

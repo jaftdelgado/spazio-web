@@ -98,11 +98,11 @@ export function PropertySummaryCard({
               key={item.label}
               className="grid grid-cols-[28px_minmax(0,1fr)] items-start gap-3 border-b border-border/60 py-4 last:border-b-0"
             >
-              <div className="flex size-7 items-center justify-center text-[#222222]">
+              <div className="flex size-7 items-center justify-center text-foreground">
                 <HugeiconsIcon icon={item.icon} size={20} strokeWidth={1.8} />
               </div>
               <div className="min-w-0">
-                <p className="m-0 text-[15px] font-normal leading-[1.4] text-[#222222]">
+                <p className="m-0 text-[15px] font-normal leading-[1.4] text-foreground">
                   {item.label}
                 </p>
                 <p className="mt-1 text-[15px] font-normal leading-[1.4] text-muted-foreground">

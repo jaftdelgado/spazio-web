@@ -9,7 +9,9 @@ export interface Service {
 
 export interface ListServicesMeta {
   total: number;
-  shown: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
   query: string | null;
 }
 

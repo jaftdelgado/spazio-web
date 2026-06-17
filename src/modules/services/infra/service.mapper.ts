@@ -14,7 +14,9 @@ type ServiceDTO = {
 
 type ListServicesMetaDTO = {
   total: number;
-  shown: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
   query?: string | null;
 };
 
@@ -32,7 +34,9 @@ export const mapListServicesMeta = (
 ): ListServicesMeta => {
   return {
     total: dto.total,
-    shown: dto.shown,
+    page: dto.page,
+    pageSize: dto.page_size,
+    totalPages: dto.total_pages,
     query: dto.query ?? null,
   };
 };
