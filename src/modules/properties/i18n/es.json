@@ -879,6 +879,56 @@
     },
     "important": {
       "description": "La información de la propiedad puede cambiar. Confirma precio, disponibilidad y condiciones antes de iniciar el proceso."
+    },
+    "rentalFlow": {
+      "title": "Solicitar renta",
+      "description": "Completa los datos para calcular la renta de {{propertyTitle}}.",
+      "fields": {
+        "startDate": "Fecha de inicio",
+        "endDate": "Fecha de fin",
+        "period": "Periodo de renta",
+        "periodPlaceholder": "Selecciona un periodo",
+        "periodFallback": "Periodo {{periodId}}",
+        "noPeriods": "No hay periodos disponibles para esta propiedad."
+      },
+      "preview": {
+        "loading": "Calculando vista previa de renta...",
+        "title": "Vista previa de renta",
+        "description": "Revisa el desglose antes de confirmar la operación.",
+        "subtotal": "Subtotal",
+        "deposit": "Depósito",
+        "total": "Total",
+        "period": "Periodo",
+        "negotiable": "Negociable",
+        "breakdownTitle": "Desglose de estancia",
+        "breakdown": {
+          "years": "Años",
+          "months": "Meses",
+          "weeks": "Semanas",
+          "nights": "Noches"
+        },
+        "priceComponents": "Componentes de precio",
+        "unitsAtPrice": "{{units}} unidades a {{unitPrice}}"
+      },
+      "actions": {
+        "cancel": "Cancelar",
+        "confirm": "Confirmar renta",
+        "confirmLoading": "Confirmando renta..."
+      },
+      "errors": {
+        "authRequired": "Necesitas iniciar sesión como cliente para rentar esta propiedad.",
+        "invalidPeriod": "El periodo seleccionado no está disponible para esta propiedad.",
+        "invalidStartDate": "La fecha de inicio debe tener formato YYYY-MM-DD.",
+        "invalidEndDate": "La fecha de fin debe tener formato YYYY-MM-DD.",
+        "dateOrder": "La fecha de fin debe ser posterior o igual a la fecha de inicio.",
+        "periodDateMismatch": "El rango de fechas no se puede resolver con el periodo {{period}} seleccionado y los periodos menores disponibles para esta propiedad.",
+        "previewFallback": "No pudimos calcular la vista previa de la renta.",
+        "confirmFallback": "No pudimos confirmar la renta. Inténtalo nuevamente."
+      },
+      "toast": {
+        "successTitle": "Propiedad reservada",
+        "successDescription": "{{propertyTitle}} quedó reservada y está pendiente de pago."
+      }
     }
   }
 }
