@@ -29,7 +29,9 @@ export function VisitConfirmAlertDialog({
             <AlertDialog.Icon status="success">
               <HugeiconsIcon icon={Tick01Icon} size={20} strokeWidth={1.8} />
             </AlertDialog.Icon>
-            <AlertDialog.Heading>{t("confirmDialog.title")}</AlertDialog.Heading>
+            <AlertDialog.Heading>
+              {t("confirmDialog.title")}
+            </AlertDialog.Heading>
           </AlertDialog.Header>
           <AlertDialog.Body>
             <p>{t("confirmDialog.body")}</p>
@@ -39,9 +41,9 @@ export function VisitConfirmAlertDialog({
               {t("confirmDialog.cancel")}
             </Button>
             <Button
-              color="success"
+              variant="primary"
               isDisabled={isLoading}
-              onPress={onConfirm}
+              onClick={onConfirm}
             >
               {t("confirmDialog.confirm")}
             </Button>

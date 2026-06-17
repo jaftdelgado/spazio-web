@@ -2,11 +2,7 @@
 
 import * as React from "react";
 import { format, parse, setHours, setMinutes, setSeconds } from "date-fns";
-import { 
-  Calendar03Icon, 
-  Clock01Icon, 
-  Home01Icon 
-} from "@hugeicons/core-free-icons";
+import { Home01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { 
   Button, 
@@ -16,6 +12,7 @@ import {
   Skeleton
 } from "@heroui/react";
 
+import { HttpError } from "@lib/http/http-errors";
 import { useAvailableSlots, useVisitsMutations } from "../application/hooks/useVisits";
 import { useVisitsTranslation } from "../i18n/useVisitsTranslation";
 import type { VisitEntity } from "../domain/visits.entity";
@@ -25,6 +22,26 @@ type RescheduleVisitModalProps = {
   onOpenChange: (isOpen: boolean) => void;
   visit: VisitEntity | null;
   onSuccess: () => void;
+};
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (error instanceof HttpError) {
+    const body = error.body;
+    if (
+      typeof body === "object" &&
+      body !== null &&
+      "error" in body &&
+      typeof body.error === "string"
+    ) {
+      return body.error;
+    }
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return fallback;
 };
 
 export function RescheduleVisitModal({ isOpen, onOpenChange, visit, onSuccess }: RescheduleVisitModalProps) {
@@ -74,10 +91,10 @@ export function RescheduleVisitModal({ isOpen, onOpenChange, visit, onSuccess }:
         setSelectedDate("");
         setSelectedSlot(null);
       },
-      onError: (err: any) => {
-        const errorMsg = err.body?.error || err.message || "Error desconocido";
+      onError: (error: unknown) => {
+        const errorMsg = getErrorMessage(error, "Error desconocido");
         alert(`No se pudo reagendar la visita: ${errorMsg}`);
-      }
+      },
     });
   };
 

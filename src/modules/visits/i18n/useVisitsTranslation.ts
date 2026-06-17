@@ -18,8 +18,16 @@ type NestedKeyOf<ObjectType extends object> = {
 
 type TranslationKeys = NestedKeyOf<typeof es>;
 
-function getNestedValue(obj: any, path: string): string {
-  return path.split(".").reduce((acc, part) => acc && acc[part], obj) as any;
+function getNestedValue(obj: unknown, path: string): string | undefined {
+  const value = path.split(".").reduce<unknown>((accumulator, part) => {
+    if (typeof accumulator !== "object" || accumulator === null) {
+      return undefined;
+    }
+
+    return (accumulator as Record<string, unknown>)[part];
+  }, obj);
+
+  return typeof value === "string" ? value : undefined;
 }
 
 export function useVisitsTranslation() {
