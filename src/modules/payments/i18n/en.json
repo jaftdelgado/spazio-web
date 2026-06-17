@@ -1,0 +1,77 @@
+{
+  "page": {
+    "title": "Payments",
+    "description": "Review billing periods, statuses, and payment details for managed contracts."
+  },
+  "filters": {
+    "propertyId": "Property",
+    "propertyIdPlaceholder": "Filter property",
+    "statusId": "Status",
+    "statusIdPlaceholder": "Filter status",
+    "dateFrom": "Date from",
+    "dateTo": "Date to",
+    "apply": "Apply filters",
+    "clear": "Clear"
+  },
+  "columns": {
+    "property": "Property",
+    "billingPeriod": "Billing period",
+    "dueDate": "Due date",
+    "amount": "Amount",
+    "currency": "Currency",
+    "paymentMethod": "Method",
+    "gateway": "Gateway",
+    "status": "Status",
+    "paymentDate": "Payment date",
+    "actions": "Actions"
+  },
+  "actions": {
+    "ariaLabel": "Payment actions",
+    "viewDetails": "View details",
+    "close": "Close"
+  },
+  "labels": {
+    "property": "Property",
+    "propertyFallback": "Property unavailable",
+    "notAvailable": "Not available",
+    "unpaid": "Pending",
+    "emptyValue": "-"
+  },
+  "states": {
+    "loading": "Loading payments...",
+    "loadingRowLabel": "Loading payment",
+    "emptyTitle": "No payments found",
+    "emptyDescription": "Try adjusting the filters to find matching payment records.",
+    "loadErrorTitle": "We could not load the payments",
+    "retry": "Retry"
+  },
+  "errors": {
+    "unauthorized": "Your session no longer allows loading payments. Sign in again and try once more.",
+    "forbidden": "You do not have permission to view these payments.",
+    "notFound": "We could not find the requested payment record.",
+    "server": "We had a server issue while loading payments. Try again in a few minutes.",
+    "network": "The connection appears to have been interrupted. Check your internet and try again.",
+    "unknown": "An unexpected issue occurred while loading payments."
+  },
+  "footer": {
+    "showing": "Showing {{visibleRowCount}} of {{totalCount}} payments"
+  },
+  "detail": {
+    "title": "Payment detail",
+    "description": "Review the complete payment record for this contract movement.",
+    "fields": {
+      "transactionType": "Transaction type",
+      "billingPeriod": "Billing period",
+      "dueDate": "Due date",
+      "agreedAmount": "Agreed amount",
+      "amount": "Paid amount",
+      "currency": "Currency",
+      "paymentMethod": "Method",
+      "gateway": "Gateway",
+      "status": "Status",
+      "paymentDate": "Payment date"
+    },
+    "loading": "Loading payment detail...",
+    "loadErrorTitle": "We could not load the payment detail"
+  }
+}

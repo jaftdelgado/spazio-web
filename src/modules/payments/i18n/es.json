@@ -1,0 +1,77 @@
+{
+  "page": {
+    "title": "Pagos",
+    "description": "Consulta periodos de facturación, estados y detalle de pagos de los contratos administrados."
+  },
+  "filters": {
+    "propertyId": "Propiedad",
+    "propertyIdPlaceholder": "Filtrar propiedad",
+    "statusId": "Estado",
+    "statusIdPlaceholder": "Filtrar estado",
+    "dateFrom": "Fecha desde",
+    "dateTo": "Fecha hasta",
+    "apply": "Aplicar filtros",
+    "clear": "Limpiar"
+  },
+  "columns": {
+    "property": "Propiedad",
+    "billingPeriod": "Periodo de facturación",
+    "dueDate": "Fecha de vencimiento",
+    "amount": "Monto",
+    "currency": "Moneda",
+    "paymentMethod": "Método",
+    "gateway": "Gateway",
+    "status": "Estado",
+    "paymentDate": "Fecha de pago",
+    "actions": "Acciones"
+  },
+  "actions": {
+    "ariaLabel": "Acciones del pago",
+    "viewDetails": "Ver detalle",
+    "close": "Cerrar"
+  },
+  "labels": {
+    "property": "Propiedad",
+    "propertyFallback": "Propiedad no disponible",
+    "notAvailable": "No disponible",
+    "unpaid": "Pendiente",
+    "emptyValue": "-"
+  },
+  "states": {
+    "loading": "Cargando pagos...",
+    "loadingRowLabel": "Cargando pago",
+    "emptyTitle": "No encontramos pagos",
+    "emptyDescription": "Prueba ajustando los filtros para encontrar registros de pago.",
+    "loadErrorTitle": "No pudimos cargar los pagos",
+    "retry": "Reintentar"
+  },
+  "errors": {
+    "unauthorized": "Tu sesión ya no permite cargar pagos. Vuelve a iniciar sesión e inténtalo de nuevo.",
+    "forbidden": "No tienes permiso para consultar estos pagos.",
+    "notFound": "No encontramos el registro de pago solicitado.",
+    "server": "Tuvimos un problema del servidor al cargar los pagos. Inténtalo de nuevo en unos minutos.",
+    "network": "Parece que la conexión se interrumpió. Revisa tu internet e inténtalo nuevamente.",
+    "unknown": "Ocurrió un problema inesperado al cargar los pagos."
+  },
+  "footer": {
+    "showing": "Mostrando {{visibleRowCount}} de {{totalCount}} pagos"
+  },
+  "detail": {
+    "title": "Detalle del pago",
+    "description": "Consulta el registro completo del pago asociado a este movimiento del contrato.",
+    "fields": {
+      "transactionType": "Tipo de transacción",
+      "billingPeriod": "Periodo de facturación",
+      "dueDate": "Fecha de vencimiento",
+      "agreedAmount": "Monto acordado",
+      "amount": "Monto pagado",
+      "currency": "Moneda",
+      "paymentMethod": "Método",
+      "gateway": "Gateway",
+      "status": "Estado",
+      "paymentDate": "Fecha de pago"
+    },
+    "loading": "Cargando detalle del pago...",
+    "loadErrorTitle": "No pudimos cargar el detalle del pago"
+  }
+}

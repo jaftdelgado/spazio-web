@@ -1,7 +1,62 @@
-import type { PaymentsEntity } from "../domain/payments.entity";
+import { httpClient } from "@lib/http/http-client";
+
 import type { PaymentsRepository } from "../domain/payments.repository";
+import type {
+  PaymentDetail,
+  PaymentListFilters,
+  PaymentListResponse,
+} from "../domain/payments.entity";
+import {
+  mapPaymentDetail,
+  mapPaymentListResponse,
+} from "./payments.mapper";
+
+type PaymentListResponseDto = Parameters<typeof mapPaymentListResponse>[0];
+type PaymentDetailDto = Parameters<typeof mapPaymentDetail>[0];
 
 export const paymentsHttpAdapter = {
-  list: async () => Promise.resolve([] as PaymentsEntity[]),
-  getById: async () => Promise.resolve({} as PaymentsEntity),
+  async list(filters?: PaymentListFilters): Promise<PaymentListResponse> {
+    const params = new URLSearchParams();
+
+    if (filters?.propertyId !== undefined) {
+      params.set("property_id", String(filters.propertyId));
+    }
+
+    if (filters?.statusId !== undefined) {
+      params.set("status_id", String(filters.statusId));
+    }
+
+    if (filters?.dateFrom) {
+      params.set("date_from", filters.dateFrom);
+    }
+
+    if (filters?.dateTo) {
+      params.set("date_to", filters.dateTo);
+    }
+
+    if (filters?.limit !== undefined) {
+      params.set("limit", String(filters.limit));
+    }
+
+    if (filters?.offset !== undefined) {
+      params.set("offset", String(filters.offset));
+    }
+
+    const queryString = params.toString();
+    const response = await httpClient.get<PaymentListResponseDto>(
+      queryString
+        ? `/api/v1/payments?${queryString}`
+        : "/api/v1/payments",
+    );
+
+    return mapPaymentListResponse(response);
+  },
+
+  async getById(paymentUuid: string): Promise<PaymentDetail> {
+    const response = await httpClient.get<PaymentDetailDto>(
+      `/api/v1/payments/${paymentUuid}`,
+    );
+
+    return mapPaymentDetail(response);
+  },
 } satisfies PaymentsRepository;

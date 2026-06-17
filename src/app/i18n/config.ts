@@ -1,5 +1,11 @@
 export const SUPPORTED_LOCALES = ["es", "en"] as const;
-export const APP_NAMESPACES = ["app", "properties", "users", "clauses"] as const;
+export const APP_NAMESPACES = [
+  "app",
+  "properties",
+  "users",
+  "clauses",
+  "payments",
+] as const;
 export const DEFAULT_LOCALE = "es";
 export const APP_LOCALE_STORAGE_KEY = "spazio.locale";
 
