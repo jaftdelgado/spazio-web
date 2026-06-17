@@ -1,21 +1,22 @@
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
+import type { PaymentListFilters } from "../../domain/payments.entity";
 import { paymentsHttpAdapter } from "../../infra/payments.http-adapter";
 
-export function usePayments() {
-  const paymentsQuery = useQuery({
-    queryKey: ["payments"],
-    queryFn: () => paymentsHttpAdapter.list(),
+export function usePaymentsList(filters: PaymentListFilters) {
+  return useQuery({
+    queryKey: ["payments", "list", filters],
+    queryFn: () => paymentsHttpAdapter.list(filters),
+    placeholderData: (previousData) => previousData,
   });
+}
 
-  const createPaymentsMutation = useMutation({
-    mutationFn: () => Promise.resolve({}),
+export function usePaymentDetail(paymentUuid: string, enabled = true) {
+  return useQuery({
+    queryKey: ["payments", "detail", paymentUuid],
+    queryFn: () => paymentsHttpAdapter.getById(paymentUuid),
+    enabled: enabled && paymentUuid.length > 0,
   });
-
-  return {
-    paymentsQuery,
-    createPaymentsMutation,
-  };
 }

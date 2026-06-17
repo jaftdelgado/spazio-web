@@ -6,6 +6,8 @@ import enClauses from "@clauses/i18n/en.json";
 import esClauses from "@clauses/i18n/es.json";
 import enProperties from "@properties/i18n/en.json";
 import esProperties from "@properties/i18n/es.json";
+import enPayments from "@payments/i18n/en.json";
+import esPayments from "@payments/i18n/es.json";
 import enUsers from "@users/i18n/en.json";
 import esUsers from "@users/i18n/es.json";
 
@@ -13,12 +15,14 @@ export const appResources: Resource = {
   es: {
     app: esApp,
     clauses: esClauses,
+    payments: esPayments,
     properties: esProperties,
     users: esUsers,
   },
   en: {
     app: enApp,
     clauses: enClauses,
+    payments: enPayments,
     properties: enProperties,
     users: enUsers,
   },
