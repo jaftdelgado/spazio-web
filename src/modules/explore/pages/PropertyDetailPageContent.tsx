@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 
 import {
   ArrowLeft02Icon,
@@ -30,6 +30,7 @@ import { usePropertyPrices } from "@/modules/properties/application/prices/hooks
 import { usePropertyClauses } from "@/modules/properties/application/clauses/hooks/usePropertyClauses";
 import { usePropertiesTranslation } from "@/modules/properties/i18n/usePropertiesTranslation";
 import { PropertyLocationMap } from "@/modules/properties/components/show/components/PropertyLocationMap";
+import { RentPropertyModal } from "@/modules/rentals/components/RentPropertyModal";
 import {
   exploreTypeMeta,
   type ExploreListingType,
@@ -227,8 +228,9 @@ function getClauseLabel(clauseId: number, t: TranslationFn) {
 export function PropertyDetailPageContent({
   uuid,
 }: PropertyDetailPageContentProps) {
-  const { role } = useAuth();
+  const { role, user } = useAuth();
   const { intlLocale, t } = usePropertiesTranslation();
+  const [isRentModalOpen, setIsRentModalOpen] = useState(false);
 
   const propertyQuery = useProperty(uuid);
   const pricesQuery = usePropertyPrices(uuid);
@@ -261,6 +263,9 @@ export function PropertyDetailPageContent({
 
   const rentPrice =
     pricesQuery.data?.rentPrices.find((price) => price.rentPrice > 0) ?? null;
+  const availableRentPeriodIds = Array.from(
+    new Set(pricesQuery.data?.rentPrices.map((price) => price.periodId) ?? []),
+  );
 
   const salePrice = pricesQuery.data?.salePrice ?? null;
 
@@ -301,6 +306,11 @@ export function PropertyDetailPageContent({
   const canShowMap =
     typeof location?.latitude === "number" &&
     typeof location?.longitude === "number";
+  const canOpenRentModal =
+    preferredMode === "rent" &&
+    isClient &&
+    user?.userUuid !== undefined &&
+    availableRentPeriodIds.length > 0;
 
   if (propertyQuery.isLoading) {
     return (
@@ -652,7 +662,15 @@ export function PropertyDetailPageContent({
               />
             </div>
 
-            <Button className="mt-6 w-full rounded-full">
+            <Button
+              className="mt-6 w-full rounded-full"
+              disabled={preferredMode === "rent" && !canOpenRentModal}
+              onClick={() => {
+                if (canOpenRentModal) {
+                  setIsRentModalOpen(true);
+                }
+              }}
+            >
               {getActionLabel({
                 isClient,
                 mode: preferredMode,
@@ -732,6 +750,15 @@ export function PropertyDetailPageContent({
           </Card>
         </aside>
       </section>
+
+      <RentPropertyModal
+        availablePeriodIds={availableRentPeriodIds}
+        clientUuid={user?.userUuid ?? null}
+        isOpen={isRentModalOpen}
+        propertyTitle={property.title}
+        propertyUuid={property.propertyUuid}
+        onOpenChange={setIsRentModalOpen}
+      />
     </main>
   );
 }
