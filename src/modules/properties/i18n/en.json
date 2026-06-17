@@ -885,6 +885,56 @@
     },
     "important": {
       "description": "Property information may change. Confirm price, availability, and conditions before starting the process."
+    },
+    "rentalFlow": {
+      "title": "Request rental",
+      "description": "Complete the details to calculate the rental for {{propertyTitle}}.",
+      "fields": {
+        "startDate": "Start date",
+        "endDate": "End date",
+        "period": "Rental period",
+        "periodPlaceholder": "Select a period",
+        "periodFallback": "Period {{periodId}}",
+        "noPeriods": "There are no available periods for this property."
+      },
+      "preview": {
+        "loading": "Calculating rental preview...",
+        "title": "Rental preview",
+        "description": "Review the price breakdown before confirming the operation.",
+        "subtotal": "Subtotal",
+        "deposit": "Deposit",
+        "total": "Total",
+        "period": "Period",
+        "negotiable": "Negotiable",
+        "breakdownTitle": "Stay breakdown",
+        "breakdown": {
+          "years": "Years",
+          "months": "Months",
+          "weeks": "Weeks",
+          "nights": "Nights"
+        },
+        "priceComponents": "Price components",
+        "unitsAtPrice": "{{units}} units at {{unitPrice}}"
+      },
+      "actions": {
+        "cancel": "Cancel",
+        "confirm": "Confirm rental",
+        "confirmLoading": "Confirming rental..."
+      },
+      "errors": {
+        "authRequired": "You need to sign in as a client to rent this property.",
+        "invalidPeriod": "The selected period is not available for this property.",
+        "invalidStartDate": "The start date must use the YYYY-MM-DD format.",
+        "invalidEndDate": "The end date must use the YYYY-MM-DD format.",
+        "dateOrder": "The end date must be on or after the start date.",
+        "periodDateMismatch": "The date range cannot be resolved with the selected {{period}} period and the smaller periods available for this property.",
+        "previewFallback": "We could not calculate the rental preview.",
+        "confirmFallback": "We could not confirm the rental. Please try again."
+      },
+      "toast": {
+        "successTitle": "Property reserved",
+        "successDescription": "{{propertyTitle}} has been reserved and is pending payment."
+      }
     }
   }
 }
