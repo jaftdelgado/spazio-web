@@ -46,6 +46,7 @@ type ForgotPasswordState = {
 };
 
 const STORAGE_KEY = "spazio:forgot-password";
+const OTP_SLOT_CLASSNAME = "size-11 text-base data-[active=true]:ring-ring/30";
 
 function readStoredState(): ForgotPasswordState | null {
   if (typeof window === "undefined") return null;
@@ -142,7 +143,7 @@ function ForgotPasswordEmailStep({
           type="email"
           autoComplete="email"
           placeholder={t("auth.common.emailPlaceholder")}
-          className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+          className="h-11 border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
           {...form.register("email")}
         />
         {form.formState.errors.email?.message ? (
@@ -152,10 +153,6 @@ function ForgotPasswordEmailStep({
         ) : null}
       </div>
 
-      <div className="rounded-2xl border bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
-        {t("auth.forgotPassword.email.genericNotice")}
-      </div>
-
       {form.formState.errors.root?.message ? (
         <p className="text-sm text-destructive">
           {form.formState.errors.root.message}
@@ -163,7 +160,7 @@ function ForgotPasswordEmailStep({
       ) : null}
 
       <Button
-        className="h-11 w-full rounded-2xl text-[15px]"
+        className="h-11 w-full text-[15px]"
         disabled={mutation.isPending}
         type="submit"
       >
@@ -242,7 +239,7 @@ function ForgotPasswordOtpStep({
         description={
           <>
             {t("auth.forgotPassword.otp.descriptionPrefix")}{" "}
-            <span className="font-medium text-black/75">{email}</span>.{" "}
+            <span className="font-medium text-foreground">{email}</span>.{" "}
             {t("auth.forgotPassword.otp.descriptionSuffix")}
           </>
         }
@@ -267,7 +264,7 @@ function ForgotPasswordOtpStep({
               <InputOTPSlot
                 key={index}
                 index={index}
-                className="size-11 border-black/10 bg-[#f5f5f7] text-base data-[active=true]:border-black/25 data-[active=true]:ring-black/10"
+                className={OTP_SLOT_CLASSNAME}
               />
             ))}
           </InputOTPGroup>
@@ -277,7 +274,7 @@ function ForgotPasswordOtpStep({
               <InputOTPSlot
                 key={index}
                 index={index}
-                className="size-11 border-black/10 bg-[#f5f5f7] text-base data-[active=true]:border-black/25 data-[active=true]:ring-black/10"
+                className={OTP_SLOT_CLASSNAME}
               />
             ))}
           </InputOTPGroup>
@@ -301,7 +298,7 @@ function ForgotPasswordOtpStep({
 
       <div className="flex items-center justify-between">
         <Button
-          className="h-9 rounded-full px-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="h-9 px-2 text-muted-foreground hover:bg-muted hover:text-foreground"
           type="button"
           variant="ghost"
           onClick={onBack}
@@ -310,7 +307,7 @@ function ForgotPasswordOtpStep({
           {t("auth.common.actions.back")}
         </Button>
         <Button
-          className="h-9 rounded-full px-3 text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="h-9 px-3 text-muted-foreground hover:bg-muted hover:text-foreground"
           disabled={resendSeconds > 0 || resendMutation.isPending}
           type="button"
           variant="ghost"
@@ -389,7 +386,7 @@ function ForgotPasswordResetStep({
               ? "auth.signUp.password.fields.password.placeholder"
               : "auth.signUp.password.fields.confirmPassword.placeholder",
           )}
-          className="h-11 rounded-2xl border-input bg-background pl-10 pr-10 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+          className="h-11 border-input bg-background pl-10 pr-10 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
           {...form.register(fieldName)}
         />
         <button
@@ -452,7 +449,7 @@ function ForgotPasswordResetStep({
 
       <div className="flex items-center justify-between pt-1">
         <Button
-          className="h-9 rounded-full px-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="h-9 px-2 text-muted-foreground hover:bg-muted hover:text-foreground"
           type="button"
           variant="ghost"
           onClick={onBack}

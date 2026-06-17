@@ -137,7 +137,7 @@ export function AdminUsersPageContent() {
                   })
                 }
               >
-                <SelectTrigger id="staff-role" className="h-11 rounded-2xl">
+                <SelectTrigger id="staff-role" className="h-11">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

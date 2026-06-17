@@ -58,7 +58,7 @@ export function ServicesLoadError({
       </EmptyHeader>
       <EmptyContent>
         <Button
-          className="rounded-2xl"
+          className=""
           disabled={isRetrying}
           size="sm"
           type="button"

@@ -122,7 +122,7 @@ export function SelectedClausesTable({
                     aria-label={t("create.clauses.removeAriaLabel", {
                       clause: tClause(row.clause.code),
                     })}
-                    className="rounded-2xl"
+                    className=""
                     size="icon-sm"
                     type="button"
                     variant="destructive"

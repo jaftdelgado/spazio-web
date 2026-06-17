@@ -21,7 +21,7 @@ export default function AdminPropertiesPage() {
         description={t("page.description")}
         actions={role === 1 ? (
           <Button
-            className="h-10 rounded-2xl px-4"
+            className="h-10 px-4"
             onClick={() => router.push(ROUTES.admin.propertiesCreate)}
           >
             {t("page.addProperty")}

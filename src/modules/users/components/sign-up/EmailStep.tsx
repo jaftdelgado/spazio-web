@@ -90,7 +90,7 @@ export function EmailStep({ onSuccess }: EmailStepProps) {
             Boolean(emailForm.formState.errors.email) ||
             Boolean(emailForm.formState.errors.root?.message)
           }
-          className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+          className="h-11 border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
           {...emailForm.register("email")}
         />
         {emailForm.formState.errors.email?.message ? (

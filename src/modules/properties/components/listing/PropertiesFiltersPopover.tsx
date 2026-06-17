@@ -34,7 +34,7 @@ export function PropertiesFiltersPopover({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button className="h-10 rounded-2xl" type="button" variant="outline">
+        <Button className="h-10" type="button" variant="outline">
           <HugeiconsIcon
             icon={FilterHorizontalIcon}
             size={16}

@@ -27,7 +27,7 @@ export function SelectSearchInput({
           strokeWidth={1.8}
         />
         <Input
-          className="h-10 rounded-2xl border-input bg-background pl-9 text-sm shadow-none"
+          className="h-10 border-input bg-background pl-9 text-sm shadow-none"
           placeholder={placeholder}
           value={value}
           onChange={(event) => onChange(event.target.value)}
