@@ -28,14 +28,19 @@ export interface PropertyCard {
   propertyUuid: string;
   title: string;
   coverPhotoUrl: string | null;
+  isFeatured: boolean;
+  petFriendly: boolean;
   propertyType: PropertyCardType;
   modality: PropertyCardModality;
   status: PropertyCardStatus;
   price: PropertyCardPrice | null;
   location: PropertyCardLocation | null;
+  city: string | null;
+  neighborhood: string | null;
   addressSummary: string | null;
   bedrooms: number | null;
   bathrooms: number | null;
+  parkingSpots: number | null;
   builtArea: number | null;
 }
 

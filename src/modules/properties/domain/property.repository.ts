@@ -33,6 +33,9 @@ export interface PropertyListFilters {
   minPrice?: number;
   maxPrice?: number;
   minBedrooms?: number;
+  isFeatured?: boolean;
+  minParkingSpots?: number;
+  petFriendly?: boolean;
   sort?: "created_at" | "title" | "price";
   order?: "asc" | "desc";
 }

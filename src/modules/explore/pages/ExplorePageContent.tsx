@@ -85,15 +85,23 @@ export function ExplorePageContent() {
     propertyTypesQuery.data,
   );
 
+  const propertyTypeId =
+    propertyTypeIds && propertyTypeIds.length === 1
+      ? propertyTypeIds[0]
+      : undefined;
+
   const modalityId = mapExploreModeToModalityId(filters.mode);
 
   const propertiesQuery = usePropertyList({
     page: 1,
     pageSize: 20,
     q: filters.search.trim() || undefined,
-    propertyTypeId: propertyTypeIds,
+    propertyTypeId,
     modalityId,
     maxPrice: filters.priceCap === "all" ? undefined : filters.priceCap,
+    isFeatured: filters.featuredOnly ? true : undefined,
+    minParkingSpots: filters.parkingOnly ? 1 : undefined,
+    petFriendly: filters.petFriendlyOnly ? true : undefined,
     sort: "created_at",
     order: "desc",
   });
@@ -102,21 +110,24 @@ export function ExplorePageContent() {
     () =>
       propertiesQuery.data?.data.map((property) => {
         const type = mapPropertyTypeToExploreType(property.propertyType.name);
+        const city = property.city ?? property.location?.cityName ?? "Sin ciudad";
+        const neighborhood = property.neighborhood ?? "Sin colonia";
+        const hasParking = (property.parkingSpots ?? 0) > 0;
 
         return {
           id: property.propertyUuid,
           title: property.title,
           type,
           mode: property.price?.priceType === "rent" ? "rent" : "sale",
-          city: "Sin ciudad",
-          neighborhood: "Sin colonia",
+          city,
+          neighborhood,
           price: property.price?.amount ?? 0,
           bedrooms: property.bedrooms,
           bathrooms: property.bathrooms,
           area: property.builtArea ?? 0,
-          featured: false,
-          parking: false,
-          petFriendly: false,
+          featured: property.isFeatured,
+          parking: hasParking,
+          petFriendly: property.petFriendly,
           imageSrc: exploreTypeMeta[type].imageSrc,
         };
       }) ?? [],
@@ -148,7 +159,7 @@ export function ExplorePageContent() {
             search: heroSearch,
           }))
         }
-        totalCount={backendListings.length}
+        totalCount={propertiesQuery.data?.meta.totalCount ?? backendListings.length}
       />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]">
@@ -165,7 +176,7 @@ export function ExplorePageContent() {
           isLoading={propertiesQuery.isLoading}
           listings={listings}
           onReset={resetFilters}
-          totalCount={backendListings.length}
+          totalCount={propertiesQuery.data?.meta.totalCount ?? backendListings.length}
         />
       </div>
     </ExploreShell>
