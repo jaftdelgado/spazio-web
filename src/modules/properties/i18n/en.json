@@ -586,6 +586,57 @@
   "footer": {
     "showing": "Showing {{visibleRowCount}} of {{totalCount}} properties"
   },
+  "show": {
+    "actions": {
+      "backToList": "Back to properties",
+      "edit": "Edit"
+    },
+    "hero": {
+      "registeredBy": "Registered by {{user}}"
+    },
+    "states": {
+      "loadErrorTitle": "We couldn't load the property"
+    },
+    "sections": {
+      "descriptionTitle": "Description",
+      "descriptionDescription": "Context and property details as captured for internal publishing.",
+      "servicesTitle": "Services and amenities",
+      "servicesDescription": "Equipment and services available in the property.",
+      "clausesTitle": "Clauses and restrictions",
+      "clausesDescription": "Active conditions configured for this property.",
+      "locationTitle": "Location",
+      "locationDescription": "Map and geographic reference for the property.",
+      "pricingTitle": "Active pricing",
+      "summaryTitle": "Property summary"
+    },
+    "descriptionEmpty": "This property does not have a description yet.",
+    "photosEmpty": "This property does not have photos available.",
+    "servicesEmpty": "This property does not have associated services.",
+    "clausesEmpty": "This property does not have configured clauses.",
+    "locationEmpty": "No location is available for this property.",
+    "pricingEmpty": "There are no active prices for this property.",
+    "pricing": {
+      "sale": "Sale",
+      "rent": "Rent",
+      "rentPeriod": "Period",
+      "deposit": "Deposit",
+      "negotiable": "Negotiable"
+    },
+    "locationCard": {
+      "title": "Address",
+      "address": "Reference",
+      "visibility": "Visibility",
+      "public": "Public address",
+      "private": "Private address"
+    },
+    "values": {
+      "yes": "Yes",
+      "no": "No",
+      "from": "From",
+      "to": "Up to",
+      "notAvailable": "Not available"
+    }
+  },
   "deleteDialog": {
     "title": "Delete property",
     "bodyPrefix": "This action will delete",
