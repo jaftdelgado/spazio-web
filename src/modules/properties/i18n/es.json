@@ -583,7 +583,9 @@
   "show": {
     "actions": {
       "backToList": "Volver a propiedades",
-      "edit": "Modificar"
+      "edit": "Modificar",
+      "show": "Mostrar",
+      "hide": "Ocultar"
     },
     "hero": {
       "registeredBy": "Registrada por {{user}}"
@@ -594,6 +596,7 @@
     "sections": {
       "descriptionTitle": "Descripción",
       "descriptionDescription": "Contexto y detalles del inmueble tal como se publican internamente.",
+      "detailsTitle": "Características",
       "servicesTitle": "Servicios y amenidades",
       "servicesDescription": "Equipamiento y servicios disponibles en la propiedad.",
       "clausesTitle": "Cláusulas y restricciones",

@@ -10,14 +10,21 @@ type PropertyOverviewFactsProps = {
 
 export function PropertyOverviewFacts({ facts }: PropertyOverviewFactsProps) {
   return (
-    <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <section className="overflow-hidden rounded-none border-y border-border/60 bg-transparent">
       {facts.map((fact) => (
-        <div key={fact.key} className="rounded-[24px] bg-muted/35 px-4 py-4">
-          <div className="mb-3 flex size-10 items-center justify-center rounded-2xl bg-background text-foreground ring-1 ring-border/60">
-            <HugeiconsIcon icon={fact.icon} size={18} strokeWidth={1.8} />
+        <div
+          key={fact.key}
+          className="grid grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-3 border-b border-border/60 py-4 last:border-b-0"
+        >
+          <div className="flex size-7 items-center justify-center text-[#222222]">
+            <HugeiconsIcon icon={fact.icon} size={20} strokeWidth={1.8} />
           </div>
-          <p className="text-xs text-muted-foreground">{fact.label}</p>
-          <p className="mt-1 text-sm font-medium text-foreground">{fact.value}</p>
+          <p className="m-0 text-[15px] font-normal leading-[1.4] text-[#222222]">
+            {fact.label}
+          </p>
+          <p className="m-0 text-right text-[15px] font-normal leading-[1.4] text-[#222222]">
+            {fact.value}
+          </p>
         </div>
       ))}
     </section>

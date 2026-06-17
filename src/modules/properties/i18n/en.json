@@ -589,7 +589,9 @@
   "show": {
     "actions": {
       "backToList": "Back to properties",
-      "edit": "Edit"
+      "edit": "Edit",
+      "show": "Show",
+      "hide": "Hide"
     },
     "hero": {
       "registeredBy": "Registered by {{user}}"
@@ -600,6 +602,7 @@
     "sections": {
       "descriptionTitle": "Description",
       "descriptionDescription": "Context and property details as captured for internal publishing.",
+      "detailsTitle": "Details",
       "servicesTitle": "Services and amenities",
       "servicesDescription": "Equipment and services available in the property.",
       "clausesTitle": "Clauses and restrictions",

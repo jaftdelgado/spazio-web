@@ -68,23 +68,27 @@ export function PropertySummaryCard({
           {t("show.sections.summaryTitle")}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent>
+        <div className="overflow-hidden rounded-none border-y border-border/60 bg-transparent">
         {items.map((item) => (
           <div
             key={item.label}
-            className="flex items-start gap-3 rounded-[22px] bg-muted/25 px-4 py-4"
+            className="grid grid-cols-[28px_minmax(0,1fr)] items-start gap-3 border-b border-border/60 py-4 last:border-b-0"
           >
-            <div className="flex size-9 items-center justify-center rounded-2xl bg-background text-foreground ring-1 ring-border/60">
-              <HugeiconsIcon icon={item.icon} size={16} strokeWidth={1.8} />
+            <div className="flex size-7 items-center justify-center text-[#222222]">
+              <HugeiconsIcon icon={item.icon} size={20} strokeWidth={1.8} />
             </div>
             <div className="min-w-0">
-              <p className="text-xs text-muted-foreground">{item.label}</p>
-              <p className="mt-1 text-sm font-medium text-foreground">
+              <p className="m-0 text-[15px] font-normal leading-[1.4] text-[#222222]">
+                {item.label}
+              </p>
+              <p className="mt-1 text-[15px] font-normal leading-[1.4] text-muted-foreground">
                 {item.value}
               </p>
             </div>
           </div>
         ))}
+        </div>
       </CardContent>
     </Card>
   );

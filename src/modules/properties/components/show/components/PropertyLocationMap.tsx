@@ -40,7 +40,7 @@ export function PropertyLocationMap({
   }, [latitude, longitude]);
 
   return (
-    <div className="overflow-hidden rounded-[28px] border border-border/60 bg-card">
+    <div className="overflow-hidden rounded-[28px] border border-border/60 bg-transparent">
       <Map
         ref={mapRef}
         attributionControl={false}
@@ -52,7 +52,7 @@ export function PropertyLocationMap({
         }}
         mapLib={maplibregl}
         mapStyle={MAP_STYLE}
-        style={{ height: 360, width: "100%" }}
+        style={{ height: 420, width: "100%" }}
         onLoad={() => {
           const map = mapRef.current?.getMap();
 
