@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { ExploreListingCard } from "@/modules/explore/components/ExploreListingCard";
 import type { ExploreListing } from "@/modules/explore/data/explore-listings";
+import { usePropertiesTranslation } from "@/modules/properties/i18n/usePropertiesTranslation";
 
 type ExploreListingsSectionProps = {
   listings: ExploreListing[];
@@ -21,6 +22,8 @@ export function ExploreListingsSection({
   isError = false,
   activeFilterCount = 0,
 }: ExploreListingsSectionProps) {
+  const { t } = usePropertiesTranslation();
+
   const highlightedListings = listings.slice(0, 3);
   const remainingListings = listings.slice(highlightedListings.length);
   const hasActiveFilters = activeFilterCount > 0;
@@ -30,21 +33,24 @@ export function ExploreListingsSection({
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-xl font-medium text-foreground">
-            Propiedades disponibles
+            {t("explore.listings.title")}
           </h2>
           <p className="text-sm text-muted-foreground">
             {isLoading
-              ? "Buscando espacios disponibles..."
-              : `Mostrando ${listings.length} de ${totalCount} espacios.`}
+              ? t("explore.listings.loadingSummary")
+              : t("explore.listings.showing", {
+                  visibleCount: String(listings.length),
+                  totalCount: String(totalCount),
+                })}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <span className="rounded-full border bg-card px-3 py-1 text-xs text-muted-foreground">
-            Público
+            {t("explore.listings.publicBadge")}
           </span>
           <span className="rounded-full border bg-card px-3 py-1 text-xs text-muted-foreground">
-            Spazio Explore
+            {t("explore.listings.exploreBadge")}
           </span>
         </div>
       </header>
@@ -52,16 +58,16 @@ export function ExploreListingsSection({
       {isLoading ? (
         <div className="rounded-[2rem] border bg-card px-6 py-12 text-center">
           <p className="text-sm text-muted-foreground">
-            Cargando propiedades disponibles...
+            {t("explore.listings.loading")}
           </p>
         </div>
       ) : isError ? (
         <div className="rounded-[2rem] border border-dashed bg-card px-6 py-12 text-center">
           <p className="text-sm font-medium text-foreground">
-            No pudimos cargar las propiedades.
+            {t("explore.listings.errorTitle")}
           </p>
           <p className="mt-2 text-sm text-muted-foreground">
-            Intenta recargar la página o revisa tu conexión.
+            {t("explore.listings.errorDescription")}
           </p>
         </div>
       ) : listings.length > 0 ? (
@@ -71,10 +77,10 @@ export function ExploreListingsSection({
               <div key={listing.id} className="space-y-3">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium text-foreground">
-                    Selección Spazio
+                    {t("explore.listings.selectionTitle")}
                   </p>
                   <span className="rounded-full border bg-card px-2.5 py-1 text-[11px] text-muted-foreground">
-                    Curada
+                    {t("explore.listings.curatedBadge")}
                   </span>
                 </div>
                 <ExploreListingCard listing={listing} />
@@ -92,8 +98,8 @@ export function ExploreListingsSection({
         <div className="rounded-[2rem] border border-dashed bg-card px-6 py-12 text-center">
           <p className="text-sm text-muted-foreground">
             {hasActiveFilters
-              ? "No encontramos propiedades con esos filtros."
-              : "No hay propiedades disponibles por ahora."}
+              ? t("explore.listings.emptyWithFilters")
+              : t("explore.listings.emptyDefault")}
           </p>
 
           {hasActiveFilters ? (
@@ -103,7 +109,7 @@ export function ExploreListingsSection({
               className="mt-4"
               onClick={onReset}
             >
-              Reiniciar filtros
+              {t("explore.listings.resetFilters")}
             </Button>
           ) : null}
         </div>

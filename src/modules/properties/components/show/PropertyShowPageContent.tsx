@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ROUTES } from "@/config/routes";
 import { useAuth } from "@lib/auth/useAuth";
 import { saveEditingPropertyUuid } from "@properties/application/edit/property-edit-session";
+import { usePropertyHistory } from "@properties/application/get/hooks/useProperty";
 import { PropertyClausesList } from "./components/PropertyClausesList";
 import { PropertyPhotoCarousel } from "./components/PropertyPhotoCarousel";
 import { PropertyPricingCard } from "./components/PropertyPricingCard";
@@ -15,6 +16,7 @@ import { PropertySummaryCard } from "./components/PropertySummaryCard";
 import { PropertyShowHeader } from "./components/layout/PropertyShowHeader";
 import { PropertyDescriptionSection } from "./components/sections/PropertyDescriptionSection";
 import { PropertyFactsSection } from "./components/sections/PropertyFactsSection";
+import { PropertyHistorySection } from "./components/sections/PropertyHistorySection";
 import { PropertyLocationSection } from "./components/sections/PropertyLocationSection";
 import { PropertyShowSection } from "./components/common/PropertyShowSection";
 import { PropertyShowErrorState } from "./components/states/PropertyShowErrorState";
@@ -35,6 +37,9 @@ export function PropertyShowPageContent({
   const router = useRouter();
   const { role } = useAuth();
   const { intlLocale, t } = usePropertiesTranslation();
+
+  const historyQuery = usePropertyHistory(propertyUuid);
+
   const {
     detailQuery,
     pricesQuery,
@@ -56,6 +61,7 @@ export function PropertyShowPageContent({
 
   const detail = detailQuery.data;
   const prices = pricesQuery.data;
+  const history = historyQuery.data ?? [];
 
   const facts = React.useMemo(
     () =>
@@ -91,7 +97,7 @@ export function PropertyShowPageContent({
     return (
       <PropertyShowErrorState
         backLabel={t("show.actions.backToList")}
-        message={getFriendlyPropertyErrorMessage(error)}
+      message={getFriendlyPropertyErrorMessage(error, t)}
         onBack={() => router.push(ROUTES.admin.properties)}
         onRetry={() => {
           void detailQuery.refetch();
@@ -101,6 +107,7 @@ export function PropertyShowPageContent({
           void propertyClausesQuery.refetch();
           void servicesCatalogQuery.refetch();
           void clausesCatalogQuery.refetch();
+          void historyQuery.refetch();
         }}
         retryLabel={t("states.retry")}
         title={t("show.states.loadErrorTitle")}
@@ -155,6 +162,12 @@ export function PropertyShowPageContent({
           <PropertyShowSection title={t("show.sections.clausesTitle")}>
             <PropertyClausesList clauses={clauses} isLoading={clausesLoading} />
           </PropertyShowSection>
+
+          <PropertyHistorySection
+            history={history}
+            isLoading={historyQuery.isLoading}
+            locale={intlLocale}
+          />
 
           <PropertyLocationSection
             addressLine={locationAddressLine || null}

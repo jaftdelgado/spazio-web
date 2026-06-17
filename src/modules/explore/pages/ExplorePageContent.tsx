@@ -21,6 +21,7 @@ import {
 } from "@/modules/explore/lib/explore-filters";
 import { ExploreShell } from "@/modules/explore/layouts/ExploreShell";
 import { usePropertyList } from "@/modules/properties/application/get/hooks/useProperty";
+import { usePropertiesTranslation } from "@/modules/properties/i18n/usePropertiesTranslation";
 
 function mapPropertyTypeToExploreType(propertyTypeName?: string) {
   const normalizedName = propertyTypeName?.toLowerCase() ?? "";
@@ -103,6 +104,7 @@ export function ExplorePageContent() {
   const [filters, setFilters] = useState(initialExploreFilters);
   const [heroSearch, setHeroSearch] = useState("");
 
+  const { t } = usePropertiesTranslation();
   const { isLoading, role } = useAuth();
 
   const numericRole =
@@ -189,8 +191,11 @@ export function ExplorePageContent() {
         .map((property) => {
           const type = mapPropertyTypeToExploreType(property.propertyType.name);
           const city =
-            property.city ?? property.location?.cityName ?? "Sin ciudad";
-          const neighborhood = property.neighborhood ?? "Sin colonia";
+            property.city ??
+            property.location?.cityName ??
+            t("explore.values.noCity");
+          const neighborhood =
+            property.neighborhood ?? t("explore.values.noNeighborhood");
           const hasParking = (property.parkingSpots ?? 0) > 0;
 
           return {
@@ -212,10 +217,10 @@ export function ExplorePageContent() {
             parking: hasParking,
             petFriendly: property.petFriendly,
             imageSrc: exploreTypeMeta[type].imageSrc,
-coverPhotoUrl: property.coverPhotoUrl,
+            coverPhotoUrl: property.coverPhotoUrl,
           };
         }) ?? [],
-    [canSeeSaleOption, filters.mode, propertiesQuery.data],
+    [canSeeSaleOption, filters.mode, propertiesQuery.data, t],
   );
 
   const listings = useMemo(

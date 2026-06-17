@@ -17,46 +17,29 @@ import { useAuth } from "@lib/auth/useAuth";
 import type { ExploreListing } from "@/modules/explore/data/explore-listings";
 import { exploreTypeMeta } from "@/modules/explore/data/explore-listings";
 import { usePropertyPrices } from "@/modules/properties/application/prices/hooks/usePropertyPrices";
+import { usePropertiesTranslation } from "@/modules/properties/i18n/usePropertiesTranslation";
 
-function formatPrice(price: number, mode: ExploreListing["mode"]) {
-  const formatter = new Intl.NumberFormat("es-MX", {
+function formatPrice(
+  price: number,
+  mode: ExploreListing["mode"],
+  locale: string,
+  perMonthLabel: string,
+) {
+  const formatter = new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "MXN",
     maximumFractionDigits: 0,
   });
 
   return mode === "rent"
-    ? `${formatter.format(price)} / mes`
+    ? `${formatter.format(price)} / ${perMonthLabel}`
     : formatter.format(price);
-}
-
-function getModeLabel(mode: ExploreListing["mode"]) {
-  return mode === "rent" ? "Renta" : "Venta";
-}
-
-function getActionLabel({
-  isAuthenticated,
-  isClient,
-  mode,
-}: {
-  isAuthenticated: boolean;
-  isClient: boolean;
-  mode: ExploreListing["mode"];
-}) {
-  if (!isAuthenticated) {
-    return "Ver más";
-  }
-
-  if (!isClient) {
-    return "Gestionar";
-  }
-
-  return mode === "rent" ? "Rentar" : "Comprar";
 }
 
 export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
   const router = useRouter();
   const { isAuthenticated, role } = useAuth();
+  const { intlLocale, t } = usePropertiesTranslation();
 
   const pricesQuery = usePropertyPrices(listing.id);
 
@@ -68,7 +51,6 @@ export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
         : 0;
 
   const isClient = numericRole === 3 || numericRole === 0;
-
   const typeMeta = exploreTypeMeta[listing.type];
 
   const rentPrice =
@@ -82,8 +64,21 @@ export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
       ? rentPrice?.rentPrice ?? listing.price
       : listing.price;
 
-  const modeLabel = getModeLabel(displayMode);
+  const modeLabel =
+    displayMode === "rent"
+      ? t("explore.cards.modes.rent")
+      : t("explore.cards.modes.sale");
+
+  const typeLabel = t(`explore.cards.propertyTypes.${listing.type}`);
   const imageSrc = listing.coverPhotoUrl ?? listing.imageSrc;
+
+  const actionLabel = !isAuthenticated
+    ? t("explore.cards.viewMore")
+    : !isClient
+      ? t("explore.cards.manage")
+      : displayMode === "rent"
+        ? t("explore.cards.rent")
+        : t("explore.cards.buy");
 
   const handleAction = () => {
     if (!isAuthenticated) {
@@ -114,7 +109,7 @@ export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
         ) : (
           <div className="flex h-full items-center justify-center bg-muted">
             <Image
-              alt={typeMeta.label}
+              alt={typeLabel}
               className="size-28 object-contain opacity-90"
               src={typeMeta.imageSrc}
             />
@@ -123,7 +118,7 @@ export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
 
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
           <span className="rounded-full bg-background px-3 py-1 text-xs font-medium text-foreground shadow-sm">
-            {typeMeta.label}
+            {typeLabel}
           </span>
           <span className="rounded-full bg-background px-3 py-1 text-xs font-medium text-foreground shadow-sm">
             {modeLabel}
@@ -132,7 +127,7 @@ export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
 
         <button
           type="button"
-          aria-label="Ver opciones"
+          aria-label={t("explore.cards.viewOptions")}
           className="absolute top-3 right-3 flex size-8 items-center justify-center rounded-full bg-background text-lg leading-none text-foreground shadow-sm"
           onClick={handleAction}
         >
@@ -148,11 +143,11 @@ export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
 
           {listing.featured ? (
             <span className="shrink-0 rounded-full border px-2 py-0.5 text-[11px] text-muted-foreground">
-              Destacada
+              {t("explore.cards.featured")}
             </span>
           ) : (
             <span className="shrink-0 text-xs text-muted-foreground">
-              ☆ Disponible
+              ☆ {t("explore.cards.available")}
             </span>
           )}
         </div>
@@ -172,20 +167,29 @@ export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
           <div>
             <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <HugeiconsIcon icon={RulerIcon} size={14} />
-              <span>Área</span>
+              <span>{t("explore.cards.area")}</span>
             </p>
             <p className="mt-1 font-semibold text-foreground">
-              {listing.area > 0 ? `${listing.area} m2` : "-"}
+              {listing.area > 0
+                ? `${listing.area} m2`
+                : t("explore.cards.noValue")}
             </p>
           </div>
 
           <div>
             <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <HugeiconsIcon icon={DollarCircleIcon} size={14} />
-              <span>Precio</span>
+              <span>{t("explore.cards.price")}</span>
             </p>
             <p className="mt-1 font-semibold text-foreground">
-              {displayPrice > 0 ? formatPrice(displayPrice, displayMode) : "-"}
+              {displayPrice > 0
+                ? formatPrice(
+                    displayPrice,
+                    displayMode,
+                    intlLocale,
+                    t("explore.cards.perMonth"),
+                  )
+                : t("explore.cards.noValue")}
             </p>
           </div>
         </div>
@@ -194,7 +198,10 @@ export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <HugeiconsIcon icon={Building03Icon} size={14} />
             <span>
-              {listing.bedrooms ?? "-"} rec. · {listing.bathrooms ?? "-"} baños
+              {listing.bedrooms ?? t("explore.cards.noValue")}{" "}
+              {t("explore.cards.bedroomsShort")} ·{" "}
+              {listing.bathrooms ?? t("explore.cards.noValue")}{" "}
+              {t("explore.cards.bathroomsShort")}
             </span>
           </div>
 
@@ -204,11 +211,7 @@ export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
             className="h-8 rounded-full px-4 text-xs"
             onClick={handleAction}
           >
-            {getActionLabel({
-              isAuthenticated,
-              isClient,
-              mode: displayMode,
-            })}
+            {actionLabel}
           </Button>
         </div>
       </div>

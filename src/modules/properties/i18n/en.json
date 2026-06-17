@@ -563,7 +563,9 @@
     "loading": "Loading properties...",
     "loadingRowLabel": "Loading property",
     "loadErrorTitle": "We could not load the properties",
-    "retry": "Retry"
+    "retry": "Retry",
+    "connectionErrorDescription": "We could not connect right now. Check your connection and try again.",
+    "loadErrorDescription": "We could not load the properties right now. Try again in a moment."
   },
   "grid": {
     "price": "Price",
@@ -612,6 +614,7 @@
       "servicesDescription": "Equipment and services available in the property.",
       "clausesTitle": "Clauses and restrictions",
       "clausesDescription": "Active conditions configured for this property.",
+      "historyTitle": "Property history",
       "locationTitle": "Location",
       "locationDescription": "Map and geographic reference for the property.",
       "pricingTitle": "Active pricing",
@@ -633,6 +636,16 @@
       "deposit": "Deposit",
       "negotiable": "Negotiable"
     },
+    "history": {
+      "loading": "Loading property history...",
+      "empty": "This property does not have history records yet.",
+      "statusChange": "Status change",
+      "unknownPreviousStatus": "No previous status",
+      "unknownStatus": "No status",
+      "unavailableDate": "Date not available",
+      "changedBy": "Changed by",
+      "unknownUser": "User not available"
+    },
     "locationCard": {
       "title": "Address",
       "address": "Reference",
@@ -646,6 +659,10 @@
       "from": "From",
       "to": "Up to",
       "notAvailable": "Not available"
+    },
+    "errors": {
+      "connectionDescription": "We could not connect right now. Check your connection and try again.",
+      "loadDescription": "We could not load the property right now. Try again in a moment."
     }
   },
   "deleteDialog": {
@@ -660,5 +677,214 @@
     "successDescriptionFallback": "The property was deleted successfully.",
     "errorTitle": "We couldn't delete the property",
     "errorDescription": "We ran into a problem deleting the property. Please try again."
+  },
+  "explore": {
+    "hero": {
+      "eyebrow": "Public property view",
+      "title": "Find spaces ready to live, invest, or work.",
+      "description": "Explore featured Spazio properties through a clear, fast experience designed for clients.",
+      "searchPlaceholder": "Search by city, area, or type",
+      "searchButton": "Search",
+      "stats": {
+        "activeProperties": "Active properties",
+        "filteredResults": "Filtered results",
+        "activeFilters": "Active filters"
+      }
+    },
+    "filters": {
+      "title": "Filters",
+      "clear": "Clear",
+      "searchLabel": "Search",
+      "searchPlaceholder": "Location or title",
+      "propertyTypeTitle": "Property type",
+      "active": "Active",
+      "add": "Add",
+      "operationTitle": "Operation",
+      "budgetTitle": "Budget",
+      "preferencesTitle": "Preferences",
+      "selected": "Selected",
+      "cancel": "Cancel",
+      "seeResults": "View {{count}} results",
+      "modes": {
+        "all": "All",
+        "sale": "Sale",
+        "rent": "Rent",
+        "mixed": "Mixed"
+      },
+      "budgets": {
+        "any": "Any price",
+        "rent10k": "Up to $10k rent",
+        "rent20k": "Up to $20k rent",
+        "rent50k": "Up to $50k rent",
+        "sale3m": "Up to $3M sale",
+        "premium8m": "Up to $8M premium"
+      },
+      "preferences": {
+        "featuredOnly": "Featured only",
+        "parkingOnly": "With parking",
+        "petFriendlyOnly": "Pet friendly"
+      }
+    },
+    "cards": {
+      "viewOptions": "View options",
+      "featured": "Featured",
+      "available": "Available",
+      "area": "Area",
+      "price": "Price",
+      "bedroomsShort": "bd.",
+      "bathroomsShort": "baths",
+      "viewMore": "View more",
+      "manage": "Manage",
+      "rent": "Rent",
+      "buy": "Buy",
+      "perMonth": "month",
+      "noValue": "-",
+      "propertyTypes": {
+        "house": "House",
+        "apartment": "Apartment",
+        "commercial": "Commercial"
+      },
+      "modes": {
+        "sale": "Sale",
+        "rent": "Rent"
+      }
+    },
+    "listings": {
+      "title": "Available properties",
+      "loadingSummary": "Searching available spaces...",
+      "showing": "Showing {{visibleCount}} of {{totalCount}} spaces.",
+      "publicBadge": "Public",
+      "exploreBadge": "Spazio Explore",
+      "loading": "Loading available properties...",
+      "errorTitle": "We could not load the properties.",
+      "errorDescription": "Try reloading the page or check your connection.",
+      "selectionTitle": "Spazio selection",
+      "curatedBadge": "Curated",
+      "emptyWithFilters": "We could not find properties with those filters.",
+      "emptyDefault": "There are no available properties right now.",
+      "resetFilters": "Reset filters"
+    },
+    "values": {
+      "noCity": "No city",
+      "noNeighborhood": "No neighborhood"
+    },
+    "header": {
+      "subtitle": "Explore public properties"
+    }
+  },
+  "exploreDetail": {
+    "actions": {
+      "backToExplore": "Back to explore",
+      "manageProperty": "Manage property",
+      "rent": "Rent",
+      "buy": "Buy",
+      "contactAgent": "Contact agent"
+    },
+    "states": {
+      "loading": "Loading property detail...",
+      "errorTitle": "We could not load this property.",
+      "errorDescription": "It may no longer be available or you may not have permission to view it."
+    },
+    "badges": {
+      "featured": "Featured",
+      "spazioSelection": "Spazio selection"
+    },
+    "sections": {
+      "featuresTitle": "Main features",
+      "featuresDescription": "General property information.",
+      "clausesTitle": "Clauses and restrictions",
+      "clausesDescription": "Conditions configured for this property.",
+      "locationTitle": "Location",
+      "summaryTitle": "Property summary",
+      "importantTitle": "Important information"
+    },
+    "features": {
+      "bedrooms": "Bedrooms",
+      "bathrooms": "Bathrooms",
+      "parkingSpots": "Parking spots",
+      "construction": "Construction",
+      "floors": "Floors",
+      "year": "Year",
+      "furnished": "Furnished",
+      "offices": "Offices",
+      "ceilingHeight": "Height",
+      "landUse": "Land use",
+      "lotArea": "Lot area"
+    },
+    "clauses": {
+      "loading": "Loading clauses...",
+      "empty": "This property does not have configured clauses.",
+      "configured": "Configured",
+      "allowed": "Allowed",
+      "notAllowed": "Not allowed",
+      "noMin": "No minimum",
+      "noMax": "No maximum",
+      "range": "From {{min}} to {{max}}",
+      "fallbackLabel": "Clause {{id}}",
+      "labels": {
+        "pets": "Pets",
+        "smoking": "Smoking",
+        "children": "Children",
+        "guests": "Guests",
+        "minStay": "Minimum stay",
+        "maxStay": "Maximum stay"
+      }
+    },
+    "location": {
+      "unavailable": "Location not available",
+      "noPublicCoordinates": "No public coordinates are available to show the map.",
+      "neighborhood": "Neighborhood",
+      "street": "Street",
+      "exteriorNumber": "Exterior number",
+      "postalCode": "Postal code",
+      "interiorPrefix": "Unit",
+      "postalPrefix": "ZIP"
+    },
+    "pricing": {
+      "price": "Price",
+      "consult": "Ask for price",
+      "deposit": "Deposit",
+      "operation": "Operation",
+      "type": "Type",
+      "modality": "Modality",
+      "status": "Status",
+      "negotiable": "Negotiable",
+      "rent": "Rent",
+      "sale": "Sale",
+      "perMonth": "month"
+    },
+    "summary": {
+      "title": "Title",
+      "propertyType": "Property type",
+      "modality": "Modality",
+      "status": "Status",
+      "lotArea": "Lot area"
+    },
+    "propertyTypes": {
+      "house": "House",
+      "apartment": "Apartment",
+      "commercial": "Commercial"
+    },
+    "modalities": {
+      "sale": "Sale",
+      "rent": "Rent",
+      "mixed": "Mixed",
+      "available": "Available"
+    },
+    "statuses": {
+      "draft": "Draft",
+      "available": "Available",
+      "reserved": "Reserved",
+      "sold": "Sold",
+      "rented": "Rented"
+    },
+    "values": {
+      "yes": "Yes",
+      "no": "No",
+      "notSpecified": "Not specified"
+    },
+    "important": {
+      "description": "Property information may change. Confirm price, availability, and conditions before starting the process."
+    }
   }
 }

@@ -12,6 +12,7 @@ import {
   initialExploreFilters,
   type ExploreFilters,
 } from "@/modules/explore/lib/explore-filters";
+import { usePropertiesTranslation } from "@/modules/properties/i18n/usePropertiesTranslation";
 
 type ExploreFilterSidebarProps = {
   activeCount: number;
@@ -21,35 +22,6 @@ type ExploreFilterSidebarProps = {
   showSaleOption?: boolean;
 };
 
-const priceOptions: Array<{
-  label: string;
-  value: ExploreFilters["priceCap"];
-}> = [
-  { label: "Cualquier precio", value: "all" },
-  { label: "Hasta $50k renta", value: 50000 },
-  { label: "Hasta $3M venta", value: 3000000 },
-  { label: "Hasta $8M premium", value: 8000000 },
-];
-
-const clientPriceOptions: Array<{
-  label: string;
-  value: ExploreFilters["priceCap"];
-}> = [
-  { label: "Cualquier precio", value: "all" },
-  { label: "Hasta $10k renta", value: 10000 },
-  { label: "Hasta $20k renta", value: 20000 },
-  { label: "Hasta $50k renta", value: 50000 },
-];
-
-const modeOptions: Array<{
-  label: string;
-  value: ExploreFilters["mode"];
-}> = [
-  { label: "Todo", value: "all" },
-  { label: "Venta", value: "sale" },
-  { label: "Renta", value: "rent" },
-];
-
 export function ExploreFilterSidebar({
   activeCount,
   filters,
@@ -57,13 +29,44 @@ export function ExploreFilterSidebar({
   resultCount,
   showSaleOption = false,
 }: ExploreFilterSidebarProps) {
+  const { t } = usePropertiesTranslation();
+
   const reset = () => onChange(initialExploreFilters);
+
+  const priceOptions: Array<{
+    label: string;
+    value: ExploreFilters["priceCap"];
+  }> = [
+    { label: t("explore.filters.budgets.any"), value: "all" },
+    { label: t("explore.filters.budgets.rent50k"), value: 50000 },
+    { label: t("explore.filters.budgets.sale3m"), value: 3000000 },
+    { label: t("explore.filters.budgets.premium8m"), value: 8000000 },
+  ];
+
+  const clientPriceOptions: Array<{
+    label: string;
+    value: ExploreFilters["priceCap"];
+  }> = [
+    { label: t("explore.filters.budgets.any"), value: "all" },
+    { label: t("explore.filters.budgets.rent10k"), value: 10000 },
+    { label: t("explore.filters.budgets.rent20k"), value: 20000 },
+    { label: t("explore.filters.budgets.rent50k"), value: 50000 },
+  ];
+
+  const modeOptions: Array<{
+    label: string;
+    value: ExploreFilters["mode"];
+  }> = [
+    { label: t("explore.filters.modes.all"), value: "all" },
+    { label: t("explore.filters.modes.sale"), value: "sale" },
+    { label: t("explore.filters.modes.rent"), value: "rent" },
+  ];
 
   const visibleModeOptions = showSaleOption
     ? modeOptions
     : [
-        { label: "Mixta", value: "all" as const },
-        { label: "Renta", value: "rent" as const },
+        { label: t("explore.filters.modes.mixed"), value: "all" as const },
+        { label: t("explore.filters.modes.rent"), value: "rent" as const },
       ];
 
   const visiblePriceOptions = showSaleOption ? priceOptions : clientPriceOptions;
@@ -78,7 +81,9 @@ export function ExploreFilterSidebar({
               size={16}
               className="text-muted-foreground"
             />
-            <h2 className="text-sm font-medium text-foreground">Filtros</h2>
+            <h2 className="text-sm font-medium text-foreground">
+              {t("explore.filters.title")}
+            </h2>
             {activeCount > 0 ? (
               <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
                 {activeCount}
@@ -93,14 +98,14 @@ export function ExploreFilterSidebar({
             disabled={activeCount === 0}
             onClick={reset}
           >
-            Limpiar
+            {t("explore.filters.clear")}
           </Button>
         </header>
 
         <div className="flex-1 space-y-6 overflow-y-auto p-4">
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">
-              Buscar
+              {t("explore.filters.searchLabel")}
             </label>
             <div className="relative">
               <HugeiconsIcon
@@ -113,18 +118,17 @@ export function ExploreFilterSidebar({
                 onChange={(event) =>
                   onChange({ ...filters, search: event.target.value })
                 }
-                placeholder="Ubicación o título"
+                placeholder={t("explore.filters.searchPlaceholder")}
                 className="pl-9"
               />
             </div>
           </div>
 
-          <FilterSection title="Tipo de propiedad">
+          <FilterSection title={t("explore.filters.propertyTypeTitle")}>
             <div className="grid grid-cols-1 gap-2">
-              {Object.entries(exploreTypeMeta).map(([value, meta]) => {
-                const isActive = filters.types.includes(
-                  value as ExploreListingType,
-                );
+              {Object.entries(exploreTypeMeta).map(([value]) => {
+                const type = value as ExploreListingType;
+                const isActive = filters.types.includes(type);
 
                 return (
                   <button
@@ -133,7 +137,7 @@ export function ExploreFilterSidebar({
                     onClick={() => {
                       const nextTypes = isActive
                         ? filters.types.filter((item) => item !== value)
-                        : [...filters.types, value as ExploreListingType];
+                        : [...filters.types, type];
 
                       onChange({ ...filters, types: nextTypes });
                     }}
@@ -144,9 +148,11 @@ export function ExploreFilterSidebar({
                         : "border-border text-muted-foreground hover:bg-muted",
                     )}
                   >
-                    <span>{meta.label}</span>
+                    <span>{t(`explore.cards.propertyTypes.${type}`)}</span>
                     <span className="text-xs">
-                      {isActive ? "Activo" : "Agregar"}
+                      {isActive
+                        ? t("explore.filters.active")
+                        : t("explore.filters.add")}
                     </span>
                   </button>
                 );
@@ -154,7 +160,7 @@ export function ExploreFilterSidebar({
             </div>
           </FilterSection>
 
-          <FilterSection title="Operación">
+          <FilterSection title={t("explore.filters.operationTitle")}>
             <div
               className={cn(
                 "grid gap-2",
@@ -179,7 +185,7 @@ export function ExploreFilterSidebar({
             </div>
           </FilterSection>
 
-          <FilterSection title="Presupuesto">
+          <FilterSection title={t("explore.filters.budgetTitle")}>
             <div className="space-y-2">
               {visiblePriceOptions.map((option) => (
                 <button
@@ -197,18 +203,20 @@ export function ExploreFilterSidebar({
                 >
                   <span>{option.label}</span>
                   <span className="text-xs">
-                    {filters.priceCap === option.value ? "Seleccionado" : ""}
+                    {filters.priceCap === option.value
+                      ? t("explore.filters.selected")
+                      : ""}
                   </span>
                 </button>
               ))}
             </div>
           </FilterSection>
 
-          <FilterSection title="Preferencias">
+          <FilterSection title={t("explore.filters.preferencesTitle")}>
             <div className="space-y-2">
               <ToggleRow
                 checked={filters.featuredOnly}
-                label="Solo destacadas"
+                label={t("explore.filters.preferences.featuredOnly")}
                 onToggle={() =>
                   onChange({
                     ...filters,
@@ -218,7 +226,7 @@ export function ExploreFilterSidebar({
               />
               <ToggleRow
                 checked={filters.parkingOnly}
-                label="Con estacionamiento"
+                label={t("explore.filters.preferences.parkingOnly")}
                 onToggle={() =>
                   onChange({
                     ...filters,
@@ -228,7 +236,7 @@ export function ExploreFilterSidebar({
               />
               <ToggleRow
                 checked={filters.petFriendlyOnly}
-                label="Pet friendly"
+                label={t("explore.filters.preferences.petFriendlyOnly")}
                 onToggle={() =>
                   onChange({
                     ...filters,
@@ -242,10 +250,12 @@ export function ExploreFilterSidebar({
 
         <footer className="flex items-center gap-2 border-t bg-background p-3">
           <Button type="button" variant="ghost" className="flex-1" onClick={reset}>
-            Cancelar
+            {t("explore.filters.cancel")}
           </Button>
           <Button type="button" className="flex-1">
-            Ver {resultCount} resultados
+            {t("explore.filters.seeResults", {
+              count: String(resultCount),
+            })}
           </Button>
         </footer>
       </div>
