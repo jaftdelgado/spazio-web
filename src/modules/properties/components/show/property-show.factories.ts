@@ -5,8 +5,8 @@ import {
   BedBunkIcon,
   Building03Icon,
   Calendar03Icon,
-  Home04Icon,
-  Location01Icon,
+  BedDoubleIcon,
+  OrientationPotraitToLandscapeIcon,
   Note01Icon,
   ParkingAreaCircleIcon,
   RulerIcon,
@@ -48,7 +48,7 @@ export function buildPropertyFactItems(
       },
       {
         key: "beds",
-        icon: Home04Icon,
+        icon: BedDoubleIcon,
         label: t("create.fields.beds.label"),
         value: String(detail.residential.beds),
       },
@@ -78,7 +78,7 @@ export function buildPropertyFactItems(
       },
       {
         key: "orientation",
-        icon: Location01Icon,
+        icon: OrientationPotraitToLandscapeIcon,
         label: t("create.fields.orientation.label"),
         value: orientationLabel ?? t("show.values.notAvailable"),
       },
