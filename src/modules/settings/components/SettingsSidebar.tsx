@@ -24,7 +24,8 @@ export function SettingsSidebar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const source = searchParams.get("from");
-  const suffix = source === "admin" || source === "explore" ? `?from=${source}` : "";
+  const suffix =
+    source === "admin" || source === "explore" ? `?from=${source}` : "";
 
   return (
     <aside className="lg:sticky lg:top-[calc(var(--settings-topbar-height)+1.5rem)] lg:self-start">
@@ -39,8 +40,8 @@ export function SettingsSidebar() {
               className={cn(
                 "rounded-2xl px-3 py-2.5 transition-colors",
                 isActive
-                  ? "bg-foreground/[0.06] text-foreground"
-                  : "text-muted-foreground hover:bg-foreground/[0.03] hover:text-foreground",
+                  ? "bg-foreground/6 text-foreground"
+                  : "text-muted-foreground hover:bg-foreground/3 hover:text-foreground",
               )}
             >
               <div className="flex items-center gap-3">
@@ -52,7 +53,9 @@ export function SettingsSidebar() {
                     isActive ? "text-foreground" : "text-muted-foreground",
                   )}
                 />
-                <p className="min-w-0 truncate text-sm font-medium">{item.label}</p>
+                <p className="min-w-0 truncate text-sm font-medium">
+                  {item.label}
+                </p>
               </div>
             </Link>
           );

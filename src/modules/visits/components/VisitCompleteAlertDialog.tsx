@@ -26,10 +26,16 @@ export function VisitCompleteAlertDialog({
         <AlertDialog.Dialog className="sm:max-w-105">
           <AlertDialog.CloseTrigger />
           <AlertDialog.Header>
-            <AlertDialog.Icon status="info">
-              <HugeiconsIcon icon={TickDouble01Icon} size={20} strokeWidth={1.8} />
+            <AlertDialog.Icon status="success">
+              <HugeiconsIcon
+                icon={TickDouble01Icon}
+                size={20}
+                strokeWidth={1.8}
+              />
             </AlertDialog.Icon>
-            <AlertDialog.Heading>{t("completeDialog.title")}</AlertDialog.Heading>
+            <AlertDialog.Heading>
+              {t("completeDialog.title")}
+            </AlertDialog.Heading>
           </AlertDialog.Header>
           <AlertDialog.Body>
             <p>{t("completeDialog.body")}</p>
@@ -39,9 +45,9 @@ export function VisitCompleteAlertDialog({
               {t("completeDialog.cancel")}
             </Button>
             <Button
-              color="primary"
+              variant="primary"
               isDisabled={isLoading}
-              onPress={onComplete}
+              onClick={onComplete}
             >
               {t("completeDialog.confirm")}
             </Button>

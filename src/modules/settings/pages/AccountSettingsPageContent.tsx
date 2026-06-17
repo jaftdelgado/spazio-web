@@ -252,6 +252,11 @@ export function AccountSettingsPageContent() {
   };
 
   const submitPhoto = async () => {
+    if (!selectedPhoto) {
+      setPhotoError(t("profile.photo.validation.required"));
+      return;
+    }
+
     const validationError = validateProfilePhoto(selectedPhoto, t);
     if (validationError) {
       setPhotoError(validationError);

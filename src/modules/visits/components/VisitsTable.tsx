@@ -45,6 +45,20 @@ export function VisitsTable({
 }: VisitsTableProps) {
   const { t } = useVisitsTranslation();
 
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "Pending":
+      case "WaitingAgent":
+      case "WaitingClient":
+      case "Confirmed":
+      case "Cancelled":
+      case "Completed":
+        return t(`status.${status}`);
+      default:
+        return status;
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Pending": return "bg-warning/10 text-warning border-warning/20";
@@ -76,7 +90,7 @@ export function VisitsTable({
           {visits.length === 0 ? (
             <tr>
               <td colSpan={isAdmin ? 7 : 6} className="px-6 py-12 text-center text-muted-foreground font-medium italic">
-                No hay visitas registradas
+                {t("table.empty")}
               </td>
             </tr>
           ) : (
@@ -114,14 +128,16 @@ export function VisitsTable({
                       <div className="p-2 bg-muted/40 rounded-lg text-muted-foreground group-hover:bg-content1 group-hover:text-primary transition-colors">
                         <HugeiconsIcon icon={Location01Icon} size={18} />
                       </div>
-                      <span className="font-semibold text-foreground">{visit.propertyTitle || "Sin título"}</span>
+                      <span className="font-semibold text-foreground">
+                        {visit.propertyTitle || t("table.fallbacks.untitled")}
+                      </span>
                     </div>
                   </td>
                   {isAdmin && (
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <HugeiconsIcon icon={UserIcon} size={16} className="text-muted-foreground/60" />
-                        <span>{visit.agentName || "N/A"}</span>
+                        <span>{visit.agentName || t("table.fallbacks.notAvailable")}</span>
                       </div>
                     </td>
                   )}
@@ -129,7 +145,7 @@ export function VisitsTable({
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <HugeiconsIcon icon={UserIcon} size={16} className="text-muted-foreground/60" />
-                        <span>{visit.clientName || "N/A"}</span>
+                        <span>{visit.clientName || t("table.fallbacks.notAvailable")}</span>
                       </div>
                     </td>
                   )}
@@ -137,7 +153,7 @@ export function VisitsTable({
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <HugeiconsIcon icon={UserIcon} size={16} className="text-muted-foreground/60" />
-                        <span>{visit.agentName || "N/A"}</span>
+                        <span>{visit.agentName || t("table.fallbacks.notAvailable")}</span>
                       </div>
                     </td>
                   )}
@@ -155,7 +171,7 @@ export function VisitsTable({
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border shadow-sm uppercase tracking-tighter ${getStatusColor(visit.status)}`}>
-                      {t(`status.${visit.status}` as any) || visit.status}
+                      {getStatusLabel(visit.status)}
                     </span>
                   </td>
                   {!isAdmin && (
@@ -166,10 +182,10 @@ export function VisitsTable({
                             size="sm" 
                             variant="ghost" 
                             className="h-8 border-divider text-foreground font-medium"
-                            startContent={<HugeiconsIcon icon={Edit01Icon} size={14} />}
-                            onPress={() => onReschedule?.(visit.visitUuid)}
+                            onClick={() => onReschedule?.(visit.visitUuid)}
                             isDisabled={isProcessing}
                           >
+                            <HugeiconsIcon icon={Edit01Icon} size={14} />
                             {t("actions.reschedule")}
                           </Button>
                         )}
@@ -177,14 +193,12 @@ export function VisitsTable({
                         {canConfirm && (
                           <Button 
                             size="sm" 
-                            color="success" 
-                            variant="flat" 
+                            variant="primary" 
                             className="h-8 font-bold"
-                            startContent={!isConfirming && <HugeiconsIcon icon={Tick01Icon} size={14} />}
-                            onPress={() => onConfirm?.(visit.visitUuid)}
-                            isLoading={isConfirming}
+                            onClick={() => onConfirm?.(visit.visitUuid)}
                             isDisabled={isProcessing}
                           >
+                            {isConfirming ? null : <HugeiconsIcon icon={Tick01Icon} size={14} />}
                             {t("actions.confirm")}
                           </Button>
                         )}
@@ -192,14 +206,12 @@ export function VisitsTable({
                         {canComplete && (
                           <Button 
                             size="sm" 
-                            color="primary" 
-                            variant="flat" 
+                            variant="primary" 
                             className="h-8 font-bold"
-                            startContent={!isCompleting && <HugeiconsIcon icon={TickDouble01Icon} size={14} />}
-                            onPress={() => onComplete?.(visit.visitUuid)}
-                            isLoading={isCompleting}
+                            onClick={() => onComplete?.(visit.visitUuid)}
                             isDisabled={isProcessing}
                           >
+                            {isCompleting ? null : <HugeiconsIcon icon={TickDouble01Icon} size={14} />}
                             {t("actions.complete")}
                           </Button>
                         )}
@@ -207,14 +219,12 @@ export function VisitsTable({
                         {canCancel && (
                           <Button 
                             size="sm" 
-                            color="danger" 
-                            variant="flat" 
+                            variant="danger" 
                             className="h-8 font-bold"
-                            startContent={!isCancelling && <HugeiconsIcon icon={Cancel01Icon} size={14} />}
-                            onPress={() => onCancel?.(visit.visitUuid)}
-                            isLoading={isCancelling}
+                            onClick={() => onCancel?.(visit.visitUuid)}
                             isDisabled={isProcessing}
                           >
+                            {isCancelling ? null : <HugeiconsIcon icon={Cancel01Icon} size={14} />}
                             {t("actions.cancel")}
                           </Button>
                         )}

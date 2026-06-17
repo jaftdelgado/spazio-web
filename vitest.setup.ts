@@ -1,0 +1,12 @@
+import { cleanup } from "@testing-library/react";
+import { afterEach, beforeEach, vi } from "vitest";
+
+beforeEach(() => {
+  window.localStorage.clear();
+  window.sessionStorage.clear();
+});
+
+afterEach(() => {
+  cleanup();
+  vi.clearAllMocks();
+});

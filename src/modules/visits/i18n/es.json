@@ -17,6 +17,11 @@
   },
   "calendar": {
     "visitWith": "Visita con {{name}} a las {{time}}",
+    "today": "Hoy",
+    "totalVisits": "{{count}} visitas",
+    "loading": "Cargando calendario...",
+    "errorTitle": "Error de conexión",
+    "errorDescription": "No se pudo cargar el calendario de visitas. Por favor, intenta de nuevo más tarde.",
     "days": {
       "mon": "Lun",
       "tue": "Mar",
@@ -29,6 +34,14 @@
   },
   "table": {
     "title": "LISTA DE VISITAS",
+    "loading": "Cargando visitas...",
+    "errorTitle": "Error al obtener datos",
+    "errorDescription": "Ocurrió un problema de red y no pudimos recuperar la lista de visitas.",
+    "empty": "No hay visitas registradas",
+    "fallbacks": {
+      "untitled": "Sin título",
+      "notAvailable": "N/D"
+    },
     "columns": {
       "property": "Propiedad",
       "client": "Cliente",
@@ -66,6 +79,10 @@
     "confirm": "Sí, cancelar"
   },
   "toast": {
+    "scheduleSuccess": "Visita agendada",
+    "scheduleSuccessDescription": "Tu solicitud de visita ha sido enviada con éxito.",
+    "rescheduleSuccess": "Visita reagendada",
+    "rescheduleSuccessDescription": "La cita ha sido actualizada con el nuevo horario.",
     "confirmSuccess": "Visita confirmada",
     "confirmSuccessDescription": "El estado de la visita ha sido actualizado correctamente.",
     "confirmError": "Error al confirmar",

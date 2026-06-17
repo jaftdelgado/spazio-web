@@ -38,11 +38,7 @@ export function VisitCancelAlertDialog({
             <Button slot="close" variant="tertiary" isDisabled={isLoading}>
               {t("cancelDialog.cancel")}
             </Button>
-            <Button
-              color="danger"
-              isDisabled={isLoading}
-              onPress={onConfirm}
-            >
+            <Button variant="danger" isDisabled={isLoading} onClick={onConfirm}>
               {t("cancelDialog.confirm")}
             </Button>
           </AlertDialog.Footer>

@@ -4,7 +4,8 @@
     "schedule": "SCHEDULE VISIT",
     "reschedule": "Reschedule",
     "confirm": "Confirm",
-    "complete": "Complete"
+    "complete": "Complete",
+    "cancel": "Cancel"
   },
   "filters": {
     "status": "Status",
@@ -16,6 +17,11 @@
   },
   "calendar": {
     "visitWith": "Visit with {{name}} at {{time}}",
+    "today": "Today",
+    "totalVisits": "{{count}} visits",
+    "loading": "Loading calendar...",
+    "errorTitle": "Connection error",
+    "errorDescription": "We could not load the visits calendar. Please try again later.",
     "days": {
       "mon": "Mon",
       "tue": "Tue",
@@ -28,6 +34,14 @@
   },
   "table": {
     "title": "VISITS LIST",
+    "loading": "Loading visits...",
+    "errorTitle": "Failed to load data",
+    "errorDescription": "A network problem occurred and we could not retrieve the visits list.",
+    "empty": "No visits registered",
+    "fallbacks": {
+      "untitled": "Untitled",
+      "notAvailable": "N/A"
+    },
     "columns": {
       "property": "Property",
       "client": "Client",
@@ -58,7 +72,17 @@
     "cancel": "Cancel",
     "confirm": "Yes, complete"
   },
+  "cancelDialog": {
+    "title": "Cancel Visit",
+    "body": "Are you sure you want to cancel this visit? This action cannot be undone.",
+    "cancel": "No, keep it",
+    "confirm": "Yes, cancel"
+  },
   "toast": {
+    "scheduleSuccess": "Visit scheduled",
+    "scheduleSuccessDescription": "Your visit request has been submitted successfully.",
+    "rescheduleSuccess": "Visit rescheduled",
+    "rescheduleSuccessDescription": "The appointment has been updated with the new time.",
     "confirmSuccess": "Visit confirmed",
     "confirmSuccessDescription": "The visit status has been successfully updated.",
     "confirmError": "Confirmation error",
@@ -66,6 +90,10 @@
     "completeSuccess": "Visit completed",
     "completeSuccessDescription": "The visit has successfully finished.",
     "completeError": "Completion error",
-    "completeErrorDescription": "Could not mark the visit as completed."
+    "completeErrorDescription": "Could not mark the visit as completed.",
+    "cancelSuccess": "Visit cancelled",
+    "cancelSuccessDescription": "The visit was cancelled successfully.",
+    "cancelError": "Cancellation error",
+    "cancelErrorDescription": "Could not cancel the visit."
   }
 }
