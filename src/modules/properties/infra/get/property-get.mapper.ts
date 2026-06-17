@@ -46,6 +46,8 @@ type PropertyCardDTO = {
   property_uuid: string;
   title: string;
   cover_photo_url: string | null;
+  is_featured?: boolean;
+  pet_friendly?: boolean;
   property_type: PropertyCardTypeDTO;
   modality: PropertyCardModalityDTO;
   status: PropertyCardStatusDTO;
@@ -58,9 +60,12 @@ type PropertyCardDTO = {
     city_id: number;
     city_name: string;
   } | null;
+  city?: string | null;
+  neighborhood?: string | null;
   address_summary: string | null;
   bedrooms?: number | null;
   bathrooms?: number | null;
+  parking_spots?: number | null;
   built_area?: number | null;
 };
 
@@ -212,6 +217,18 @@ const mapPropertyCardLocation = (
   };
 };
 
+const resolvePropertyCardCity = (dto: PropertyCardDTO): string | null => {
+  if (dto.city && dto.city.trim() !== "") {
+    return dto.city;
+  }
+
+  if (dto.location?.city_name && dto.location.city_name.trim() !== "") {
+    return dto.location.city_name;
+  }
+
+  return null;
+};
+
 const mapPropertyCard = (dto: PropertyCardDTO): PropertyCard => ({
   propertyId: dto.property_id,
   propertyUuid: dto.property_uuid,
@@ -220,14 +237,19 @@ const mapPropertyCard = (dto: PropertyCardDTO): PropertyCard => ({
     dto.cover_photo_url,
     dto.property_uuid,
   ),
+  isFeatured: dto.is_featured ?? false,
+  petFriendly: dto.pet_friendly ?? false,
   propertyType: mapPropertyCardType(dto.property_type),
   modality: mapPropertyCardModality(dto.modality),
   status: mapPropertyCardStatus(dto.status),
   price: mapPropertyCardPrice(dto.price),
   location: mapPropertyCardLocation(dto.location),
+  city: resolvePropertyCardCity(dto),
+  neighborhood: dto.neighborhood ?? null,
   addressSummary: dto.address_summary,
   bedrooms: dto.bedrooms ?? null,
   bathrooms: dto.bathrooms ?? null,
+  parkingSpots: dto.parking_spots ?? null,
   builtArea: dto.built_area ?? null,
 });
 
