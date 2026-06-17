@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { useAuth } from "@lib/auth/useAuth";
 import {
   useModalities,
   usePropertyTypes,
@@ -73,12 +74,65 @@ function mapExploreModeToModalityId(mode: "all" | "sale" | "rent") {
   return undefined;
 }
 
+function isRentModality(modalityName?: string) {
+  const normalizedName = modalityName?.toLowerCase() ?? "";
+
+  return (
+    normalizedName.includes("rent") ||
+    normalizedName.includes("renta") ||
+    normalizedName.includes("rentar")
+  );
+}
+
+function isMixedModality(modalityName?: string) {
+  const normalizedName = modalityName?.toLowerCase() ?? "";
+
+  return (
+    normalizedName.includes("mixed") ||
+    normalizedName.includes("mixta") ||
+    normalizedName.includes("mixto") ||
+    normalizedName.includes("venta y renta")
+  );
+}
+
+function isSaleBudget(priceCap: ExploreListing["price"] | "all" | number) {
+  return priceCap === 3000000 || priceCap === 8000000;
+}
+
 export function ExplorePageContent() {
   const [filters, setFilters] = useState(initialExploreFilters);
   const [heroSearch, setHeroSearch] = useState("");
 
+  const { isLoading, role } = useAuth();
+
+  const numericRole =
+    typeof role === "number"
+      ? role
+      : typeof role === "string"
+        ? Number(role)
+        : 0;
+
+  const canSeeSaleOption = numericRole === 1 || numericRole === 2;
+
   const propertyTypesQuery = usePropertyTypes();
   useModalities();
+
+  useEffect(() => {
+    if (isLoading || canSeeSaleOption) {
+      return;
+    }
+
+    const shouldCleanSaleMode = filters.mode === "sale";
+    const shouldCleanSaleBudget = isSaleBudget(filters.priceCap);
+
+    if (shouldCleanSaleMode || shouldCleanSaleBudget) {
+      setFilters((current) => ({
+        ...current,
+        mode: current.mode === "sale" ? "all" : current.mode,
+        priceCap: isSaleBudget(current.priceCap) ? "all" : current.priceCap,
+      }));
+    }
+  }, [canSeeSaleOption, filters.mode, filters.priceCap, isLoading]);
 
   const propertyTypeIds = mapExploreTypesToPropertyTypeIds(
     filters.types,
@@ -90,7 +144,16 @@ export function ExplorePageContent() {
       ? propertyTypeIds[0]
       : undefined;
 
-  const modalityId = mapExploreModeToModalityId(filters.mode);
+  const modalityId = canSeeSaleOption
+    ? mapExploreModeToModalityId(filters.mode)
+    : undefined;
+
+  const maxPrice =
+    !canSeeSaleOption && isSaleBudget(filters.priceCap)
+      ? undefined
+      : filters.priceCap === "all"
+        ? undefined
+        : filters.priceCap;
 
   const propertiesQuery = usePropertyList({
     page: 1,
@@ -98,7 +161,7 @@ export function ExplorePageContent() {
     q: filters.search.trim() || undefined,
     propertyTypeId,
     modalityId,
-    maxPrice: filters.priceCap === "all" ? undefined : filters.priceCap,
+    maxPrice,
     isFeatured: filters.featuredOnly ? true : undefined,
     minParkingSpots: filters.parkingOnly ? 1 : undefined,
     petFriendly: filters.petFriendlyOnly ? true : undefined,
@@ -108,30 +171,51 @@ export function ExplorePageContent() {
 
   const backendListings = useMemo<ExploreListing[]>(
     () =>
-      propertiesQuery.data?.data.map((property) => {
-        const type = mapPropertyTypeToExploreType(property.propertyType.name);
-        const city = property.city ?? property.location?.cityName ?? "Sin ciudad";
-        const neighborhood = property.neighborhood ?? "Sin colonia";
-        const hasParking = (property.parkingSpots ?? 0) > 0;
+      propertiesQuery.data?.data
+        .filter((property) => {
+          if (canSeeSaleOption) {
+            return true;
+          }
 
-        return {
-          id: property.propertyUuid,
-          title: property.title,
-          type,
-          mode: property.price?.priceType === "rent" ? "rent" : "sale",
-          city,
-          neighborhood,
-          price: property.price?.amount ?? 0,
-          bedrooms: property.bedrooms,
-          bathrooms: property.bathrooms,
-          area: property.builtArea ?? 0,
-          featured: property.isFeatured,
-          parking: hasParking,
-          petFriendly: property.petFriendly,
-          imageSrc: exploreTypeMeta[type].imageSrc,
-        };
-      }) ?? [],
-    [propertiesQuery.data],
+          const isRent = isRentModality(property.modality.name);
+          const isMixed = isMixedModality(property.modality.name);
+
+          if (filters.mode === "rent") {
+            return isRent && !isMixed;
+          }
+
+          return isMixed;
+        })
+        .map((property) => {
+          const type = mapPropertyTypeToExploreType(property.propertyType.name);
+          const city =
+            property.city ?? property.location?.cityName ?? "Sin ciudad";
+          const neighborhood = property.neighborhood ?? "Sin colonia";
+          const hasParking = (property.parkingSpots ?? 0) > 0;
+
+          return {
+            id: property.propertyUuid,
+            title: property.title,
+            type,
+            mode: canSeeSaleOption
+              ? property.price?.priceType === "rent"
+                ? "rent"
+                : "sale"
+              : "rent",
+            city,
+            neighborhood,
+            price: property.price?.amount ?? 0,
+            bedrooms: property.bedrooms,
+            bathrooms: property.bathrooms,
+            area: property.builtArea ?? 0,
+            featured: property.isFeatured,
+            parking: hasParking,
+            petFriendly: property.petFriendly,
+            imageSrc: exploreTypeMeta[type].imageSrc,
+coverPhotoUrl: property.coverPhotoUrl,
+          };
+        }) ?? [],
+    [canSeeSaleOption, filters.mode, propertiesQuery.data],
   );
 
   const listings = useMemo(
@@ -159,7 +243,7 @@ export function ExplorePageContent() {
             search: heroSearch,
           }))
         }
-        totalCount={propertiesQuery.data?.meta.totalCount ?? backendListings.length}
+        totalCount={backendListings.length}
       />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]">
@@ -168,6 +252,7 @@ export function ExplorePageContent() {
           filters={filters}
           onChange={setFilters}
           resultCount={listings.length}
+          showSaleOption={canSeeSaleOption}
         />
 
         <ExploreListingsSection
@@ -176,7 +261,7 @@ export function ExplorePageContent() {
           isLoading={propertiesQuery.isLoading}
           listings={listings}
           onReset={resetFilters}
-          totalCount={propertiesQuery.data?.meta.totalCount ?? backendListings.length}
+          totalCount={backendListings.length}
         />
       </div>
     </ExploreShell>

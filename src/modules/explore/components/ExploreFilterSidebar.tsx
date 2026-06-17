@@ -6,9 +6,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import type {
-  ExploreListingType,
-} from "@/modules/explore/data/explore-listings";
+import type { ExploreListingType } from "@/modules/explore/data/explore-listings";
 import { exploreTypeMeta } from "@/modules/explore/data/explore-listings";
 import {
   initialExploreFilters,
@@ -20,6 +18,7 @@ type ExploreFilterSidebarProps = {
   filters: ExploreFilters;
   onChange: (filters: ExploreFilters) => void;
   resultCount: number;
+  showSaleOption?: boolean;
 };
 
 const priceOptions: Array<{
@@ -30,6 +29,16 @@ const priceOptions: Array<{
   { label: "Hasta $50k renta", value: 50000 },
   { label: "Hasta $3M venta", value: 3000000 },
   { label: "Hasta $8M premium", value: 8000000 },
+];
+
+const clientPriceOptions: Array<{
+  label: string;
+  value: ExploreFilters["priceCap"];
+}> = [
+  { label: "Cualquier precio", value: "all" },
+  { label: "Hasta $10k renta", value: 10000 },
+  { label: "Hasta $20k renta", value: 20000 },
+  { label: "Hasta $50k renta", value: 50000 },
 ];
 
 const modeOptions: Array<{
@@ -46,8 +55,18 @@ export function ExploreFilterSidebar({
   filters,
   onChange,
   resultCount,
+  showSaleOption = false,
 }: ExploreFilterSidebarProps) {
   const reset = () => onChange(initialExploreFilters);
+
+  const visibleModeOptions = showSaleOption
+    ? modeOptions
+    : [
+        { label: "Mixta", value: "all" as const },
+        { label: "Renta", value: "rent" as const },
+      ];
+
+  const visiblePriceOptions = showSaleOption ? priceOptions : clientPriceOptions;
 
   return (
     <aside className="lg:sticky lg:top-24 lg:h-[calc(100svh-7rem)]">
@@ -94,7 +113,7 @@ export function ExploreFilterSidebar({
                 onChange={(event) =>
                   onChange({ ...filters, search: event.target.value })
                 }
-                placeholder="Ubicacion o titulo"
+                placeholder="Ubicación o título"
                 className="pl-9"
               />
             </div>
@@ -135,9 +154,14 @@ export function ExploreFilterSidebar({
             </div>
           </FilterSection>
 
-          <FilterSection title="Operacion">
-            <div className="grid grid-cols-3 gap-2">
-              {modeOptions.map((option) => (
+          <FilterSection title="Operación">
+            <div
+              className={cn(
+                "grid gap-2",
+                showSaleOption ? "grid-cols-3" : "grid-cols-2",
+              )}
+            >
+              {visibleModeOptions.map((option) => (
                 <button
                   key={option.value}
                   type="button"
@@ -157,7 +181,7 @@ export function ExploreFilterSidebar({
 
           <FilterSection title="Presupuesto">
             <div className="space-y-2">
-              {priceOptions.map((option) => (
+              {visiblePriceOptions.map((option) => (
                 <button
                   key={option.label}
                   type="button"
