@@ -557,7 +557,9 @@
     "loading": "Cargando propiedades...",
     "loadingRowLabel": "Cargando propiedad",
     "loadErrorTitle": "No pudimos cargar las propiedades",
-    "retry": "Reintentar"
+    "retry": "Reintentar",
+    "connectionErrorDescription": "No pudimos conectarnos en este momento. Revisa tu conexión e intenta nuevamente.",
+    "loadErrorDescription": "No fue posible cargar las propiedades por ahora. Intenta de nuevo en un momento."
   },
   "grid": {
     "price": "Precio",
@@ -606,6 +608,7 @@
       "servicesDescription": "Equipamiento y servicios disponibles en la propiedad.",
       "clausesTitle": "Cláusulas y restricciones",
       "clausesDescription": "Condiciones activas configuradas para este inmueble.",
+      "historyTitle": "Historial de la propiedad",
       "locationTitle": "Ubicación",
       "locationDescription": "Mapa y referencia geográfica del inmueble.",
       "pricingTitle": "Precios activos",
@@ -627,6 +630,16 @@
       "deposit": "Depósito",
       "negotiable": "Negociable"
     },
+    "history": {
+      "loading": "Cargando historial de la propiedad...",
+      "empty": "Esta propiedad aún no tiene historial registrado.",
+      "statusChange": "Cambio de estado",
+      "unknownPreviousStatus": "Sin estado previo",
+      "unknownStatus": "Sin estado",
+      "unavailableDate": "Fecha no disponible",
+      "changedBy": "Realizado por",
+      "unknownUser": "Usuario no disponible"
+    },
     "locationCard": {
       "title": "Dirección",
       "address": "Referencia",
@@ -640,6 +653,10 @@
       "from": "Desde",
       "to": "Hasta",
       "notAvailable": "No disponible"
+    },
+    "errors": {
+      "connectionDescription": "No pudimos conectarnos en este momento. Revisa tu conexión e intenta nuevamente.",
+      "loadDescription": "No fue posible cargar la propiedad por ahora. Intenta de nuevo en un momento."
     }
   },
   "deleteDialog": {
@@ -654,5 +671,214 @@
     "successDescriptionFallback": "La propiedad fue eliminada correctamente.",
     "errorTitle": "No pudimos eliminar la propiedad",
     "errorDescription": "Tuvimos un problema al eliminar la propiedad. Intentalo de nuevo."
+  },
+  "explore": {
+    "hero": {
+      "eyebrow": "Vista pública de propiedades",
+      "title": "Encuentra espacios listos para vivir, invertir o trabajar.",
+      "description": "Explora propiedades destacadas de Spazio con una experiencia clara, rápida y pensada para clientes.",
+      "searchPlaceholder": "Buscar por ciudad, zona o tipo",
+      "searchButton": "Buscar",
+      "stats": {
+        "activeProperties": "Propiedades activas",
+        "filteredResults": "Resultados filtrados",
+        "activeFilters": "Filtros activos"
+      }
+    },
+    "filters": {
+      "title": "Filtros",
+      "clear": "Limpiar",
+      "searchLabel": "Buscar",
+      "searchPlaceholder": "Ubicación o título",
+      "propertyTypeTitle": "Tipo de propiedad",
+      "active": "Activo",
+      "add": "Agregar",
+      "operationTitle": "Operación",
+      "budgetTitle": "Presupuesto",
+      "preferencesTitle": "Preferencias",
+      "selected": "Seleccionado",
+      "cancel": "Cancelar",
+      "seeResults": "Ver {{count}} resultados",
+      "modes": {
+        "all": "Todo",
+        "sale": "Venta",
+        "rent": "Renta",
+        "mixed": "Mixta"
+      },
+      "budgets": {
+        "any": "Cualquier precio",
+        "rent10k": "Hasta $10k renta",
+        "rent20k": "Hasta $20k renta",
+        "rent50k": "Hasta $50k renta",
+        "sale3m": "Hasta $3M venta",
+        "premium8m": "Hasta $8M premium"
+      },
+      "preferences": {
+        "featuredOnly": "Solo destacadas",
+        "parkingOnly": "Con estacionamiento",
+        "petFriendlyOnly": "Pet friendly"
+      }
+    },
+    "cards": {
+      "viewOptions": "Ver opciones",
+      "featured": "Destacada",
+      "available": "Disponible",
+      "area": "Área",
+      "price": "Precio",
+      "bedroomsShort": "rec.",
+      "bathroomsShort": "baños",
+      "viewMore": "Ver más",
+      "manage": "Gestionar",
+      "rent": "Rentar",
+      "buy": "Comprar",
+      "perMonth": "mes",
+      "noValue": "-",
+      "propertyTypes": {
+        "house": "Casa",
+        "apartment": "Departamento",
+        "commercial": "Comercial"
+      },
+      "modes": {
+        "sale": "Venta",
+        "rent": "Renta"
+      }
+    },
+    "listings": {
+      "title": "Propiedades disponibles",
+      "loadingSummary": "Buscando espacios disponibles...",
+      "showing": "Mostrando {{visibleCount}} de {{totalCount}} espacios.",
+      "publicBadge": "Público",
+      "exploreBadge": "Spazio Explore",
+      "loading": "Cargando propiedades disponibles...",
+      "errorTitle": "No pudimos cargar las propiedades.",
+      "errorDescription": "Intenta recargar la página o revisa tu conexión.",
+      "selectionTitle": "Selección Spazio",
+      "curatedBadge": "Curada",
+      "emptyWithFilters": "No encontramos propiedades con esos filtros.",
+      "emptyDefault": "No hay propiedades disponibles por ahora.",
+      "resetFilters": "Reiniciar filtros"
+    },
+    "values": {
+      "noCity": "Sin ciudad",
+      "noNeighborhood": "Sin colonia"
+    },
+    "header": {
+      "subtitle": "Explora propiedades públicas"
+    }
+  },
+  "exploreDetail": {
+    "actions": {
+      "backToExplore": "Volver a explorar",
+      "manageProperty": "Gestionar propiedad",
+      "rent": "Rentar",
+      "buy": "Comprar",
+      "contactAgent": "Contactar agente"
+    },
+    "states": {
+      "loading": "Cargando detalle de la propiedad...",
+      "errorTitle": "No pudimos cargar esta propiedad.",
+      "errorDescription": "Puede que ya no esté disponible o que no tengas permiso para verla."
+    },
+    "badges": {
+      "featured": "Destacada",
+      "spazioSelection": "Selección Spazio"
+    },
+    "sections": {
+      "featuresTitle": "Características principales",
+      "featuresDescription": "Información general del inmueble.",
+      "clausesTitle": "Cláusulas y restricciones",
+      "clausesDescription": "Condiciones configuradas para esta propiedad.",
+      "locationTitle": "Ubicación",
+      "summaryTitle": "Resumen de la propiedad",
+      "importantTitle": "Información importante"
+    },
+    "features": {
+      "bedrooms": "Recámaras",
+      "bathrooms": "Baños",
+      "parkingSpots": "Estacionamientos",
+      "construction": "Construcción",
+      "floors": "Pisos",
+      "year": "Año",
+      "furnished": "Amueblada",
+      "offices": "Oficinas",
+      "ceilingHeight": "Altura",
+      "landUse": "Uso de suelo",
+      "lotArea": "Terreno"
+    },
+    "clauses": {
+      "loading": "Cargando cláusulas...",
+      "empty": "Esta propiedad no tiene cláusulas configuradas.",
+      "configured": "Configurada",
+      "allowed": "Permitido",
+      "notAllowed": "No permitido",
+      "noMin": "Sin mínimo",
+      "noMax": "Sin máximo",
+      "range": "De {{min}} a {{max}}",
+      "fallbackLabel": "Cláusula {{id}}",
+      "labels": {
+        "pets": "Mascotas",
+        "smoking": "Fumar",
+        "children": "Niños",
+        "guests": "Huéspedes",
+        "minStay": "Estancia mínima",
+        "maxStay": "Estancia máxima"
+      }
+    },
+    "location": {
+      "unavailable": "Ubicación no disponible",
+      "noPublicCoordinates": "No hay coordenadas públicas disponibles para mostrar el mapa.",
+      "neighborhood": "Colonia",
+      "street": "Calle",
+      "exteriorNumber": "Número exterior",
+      "postalCode": "Código postal",
+      "interiorPrefix": "Int.",
+      "postalPrefix": "C.P."
+    },
+    "pricing": {
+      "price": "Precio",
+      "consult": "Consultar",
+      "deposit": "Depósito",
+      "operation": "Operación",
+      "type": "Tipo",
+      "modality": "Modalidad",
+      "status": "Estado",
+      "negotiable": "Negociable",
+      "rent": "Renta",
+      "sale": "Venta",
+      "perMonth": "mes"
+    },
+    "summary": {
+      "title": "Título",
+      "propertyType": "Tipo de propiedad",
+      "modality": "Modalidad",
+      "status": "Estado",
+      "lotArea": "Superficie de terreno"
+    },
+    "propertyTypes": {
+      "house": "Casa",
+      "apartment": "Departamento",
+      "commercial": "Comercial"
+    },
+    "modalities": {
+      "sale": "Venta",
+      "rent": "Renta",
+      "mixed": "Mixta",
+      "available": "Disponible"
+    },
+    "statuses": {
+      "draft": "Borrador",
+      "available": "Disponible",
+      "reserved": "Reservada",
+      "sold": "Vendida",
+      "rented": "Rentada"
+    },
+    "values": {
+      "yes": "Sí",
+      "no": "No",
+      "notSpecified": "No indicado"
+    },
+    "important": {
+      "description": "La información de la propiedad puede cambiar. Confirma precio, disponibilidad y condiciones antes de iniciar el proceso."
+    }
   }
 }

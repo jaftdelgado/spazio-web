@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 
 import {
   ArrowLeft02Icon,
@@ -22,10 +22,13 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@lib/auth/useAuth";
-import { useProperty } from "@/modules/properties/application/get/hooks/useProperty";
-import { usePropertyList } from "@/modules/properties/application/get/hooks/useProperty";
+import {
+  useProperty,
+  usePropertyList,
+} from "@/modules/properties/application/get/hooks/useProperty";
 import { usePropertyPrices } from "@/modules/properties/application/prices/hooks/usePropertyPrices";
 import { usePropertyClauses } from "@/modules/properties/application/clauses/hooks/usePropertyClauses";
+import { usePropertiesTranslation } from "@/modules/properties/i18n/usePropertiesTranslation";
 import { PropertyLocationMap } from "@/modules/properties/components/show/components/PropertyLocationMap";
 import {
   exploreTypeMeta,
@@ -36,29 +39,32 @@ type PropertyDetailPageContentProps = {
   uuid: string;
 };
 
-function formatPrice(price: number, mode: "rent" | "sale") {
-  const formatter = new Intl.NumberFormat("es-MX", {
+type TranslationFn = (
+  key: string,
+  params?: Record<string, string | number>,
+) => string;
+
+function formatPrice(
+  price: number,
+  mode: "rent" | "sale",
+  locale: string,
+  perMonthLabel: string,
+) {
+  const formatter = new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "MXN",
     maximumFractionDigits: 0,
   });
 
   return mode === "rent"
-    ? `${formatter.format(price)} / mes`
+    ? `${formatter.format(price)} / ${perMonthLabel}`
     : formatter.format(price);
 }
 
-function formatNumber(value: number) {
-  return new Intl.NumberFormat("es-MX", {
+function formatNumber(value: number, locale: string) {
+  return new Intl.NumberFormat(locale, {
     maximumFractionDigits: 2,
   }).format(value);
-}
-
-function getPropertyTypeLabel(propertyTypeId?: number) {
-  if (propertyTypeId === 2) return "Departamento";
-  if (propertyTypeId === 3) return "Comercial";
-
-  return "Casa";
 }
 
 function getPropertyTypeKey(propertyTypeId?: number): ExploreListingType {
@@ -68,83 +74,116 @@ function getPropertyTypeKey(propertyTypeId?: number): ExploreListingType {
   return "house";
 }
 
-function getModalityLabel(modalityId?: number) {
-  if (modalityId === 1) return "Venta";
-  if (modalityId === 2) return "Renta";
-  if (modalityId === 3) return "Mixta";
+function getPropertyTypeLabel(propertyTypeId: number | undefined, t: TranslationFn) {
+  const typeKey = getPropertyTypeKey(propertyTypeId);
 
-  return "Disponible";
+  return t(`exploreDetail.propertyTypes.${typeKey}`);
 }
 
-function getStatusLabel(statusId?: number) {
-  if (statusId === 1) return "Borrador";
-  if (statusId === 2) return "Disponible";
-  if (statusId === 3) return "Reservada";
-  if (statusId === 4) return "Vendida";
-  if (statusId === 5) return "Rentada";
+function getModalityLabel(modalityId: number | undefined, t: TranslationFn) {
+  if (modalityId === 1) return t("exploreDetail.modalities.sale");
+  if (modalityId === 2) return t("exploreDetail.modalities.rent");
+  if (modalityId === 3) return t("exploreDetail.modalities.mixed");
 
-  return "Disponible";
+  return t("exploreDetail.modalities.available");
+}
+
+function getStatusLabel(statusId: number | undefined, t: TranslationFn) {
+  if (statusId === 1) return t("exploreDetail.statuses.draft");
+  if (statusId === 2) return t("exploreDetail.statuses.available");
+  if (statusId === 3) return t("exploreDetail.statuses.reserved");
+  if (statusId === 4) return t("exploreDetail.statuses.sold");
+  if (statusId === 5) return t("exploreDetail.statuses.rented");
+
+  return t("exploreDetail.statuses.available");
 }
 
 function getActionLabel({
   isClient,
   mode,
+  t,
 }: {
   isClient: boolean;
   mode: "rent" | "sale";
+  t: TranslationFn;
 }) {
-  if (!isClient) return "Gestionar propiedad";
+  if (!isClient) return t("exploreDetail.actions.manageProperty");
 
-  return mode === "rent" ? "Rentar" : "Comprar";
+  return mode === "rent"
+    ? t("exploreDetail.actions.rent")
+    : t("exploreDetail.actions.buy");
 }
 
-function getShortAddress(location?: {
-  neighborhood?: string | null;
-  street?: string | null;
-  exteriorNumber?: string | null;
-} | null) {
-  if (!location) return "Ubicación no disponible";
+function getShortAddress(
+  location:
+    | {
+        neighborhood?: string | null;
+        street?: string | null;
+        exteriorNumber?: string | null;
+      }
+    | null
+    | undefined,
+  t: TranslationFn,
+) {
+  if (!location) return t("exploreDetail.location.unavailable");
 
   const street = [location.street, location.exteriorNumber]
     .filter(Boolean)
     .join(" ");
 
-  return [street, location.neighborhood].filter(Boolean).join(", ");
+  const address = [street, location.neighborhood].filter(Boolean).join(", ");
+
+  return address || t("exploreDetail.location.unavailable");
 }
 
-function getFullAddress(location?: {
-  neighborhood?: string | null;
-  street?: string | null;
-  exteriorNumber?: string | null;
-  interiorNumber?: string | null;
-  postalCode?: string | null;
-} | null) {
-  if (!location) return "Ubicación no disponible";
+function getFullAddress(
+  location:
+    | {
+        neighborhood?: string | null;
+        street?: string | null;
+        exteriorNumber?: string | null;
+        interiorNumber?: string | null;
+        postalCode?: string | null;
+      }
+    | null
+    | undefined,
+  t: TranslationFn,
+) {
+  if (!location) return t("exploreDetail.location.unavailable");
 
   const street = [location.street, location.exteriorNumber]
     .filter(Boolean)
     .join(" ");
 
   const interior = location.interiorNumber
-    ? `Int. ${location.interiorNumber}`
+    ? `${t("exploreDetail.location.interiorPrefix")} ${location.interiorNumber}`
     : "";
 
-  const postalCode = location.postalCode ? `C.P. ${location.postalCode}` : "";
+  const postalCode = location.postalCode
+    ? `${t("exploreDetail.location.postalPrefix")} ${location.postalCode}`
+    : "";
 
-  return [street, interior, location.neighborhood, postalCode]
+  const address = [street, interior, location.neighborhood, postalCode]
     .filter(Boolean)
     .join(", ");
+
+  return address || t("exploreDetail.location.unavailable");
 }
 
-function getClauseText(clause: {
-  clauseId: number;
-  booleanValue: boolean | null;
-  integerValue: number | null;
-  minValue: number | null;
-  maxValue: number | null;
-}) {
+function getClauseText(
+  clause: {
+    clauseId: number;
+    booleanValue: boolean | null;
+    integerValue: number | null;
+    minValue: number | null;
+    maxValue: number | null;
+  },
+  t: TranslationFn,
+) {
   if (clause.booleanValue !== null) {
-    return clause.booleanValue ? "Permitido" : "No permitido";
+    return clause.booleanValue
+      ? t("exploreDetail.clauses.allowed")
+      : t("exploreDetail.clauses.notAllowed");
   }
 
   if (clause.integerValue !== null) {
@@ -152,32 +191,44 @@ function getClauseText(clause: {
   }
 
   if (clause.minValue !== null || clause.maxValue !== null) {
-    const min = clause.minValue ?? "Sin mínimo";
-    const max = clause.maxValue ?? "Sin máximo";
+    const min = clause.minValue ?? t("exploreDetail.clauses.noMin");
+    const max = clause.maxValue ?? t("exploreDetail.clauses.noMax");
 
-    return `De ${min} a ${max}`;
+    return t("exploreDetail.clauses.range", {
+      min,
+      max,
+    });
   }
 
-  return "Configurada";
+  return t("exploreDetail.clauses.configured");
 }
 
-function getClauseLabel(clauseId: number) {
+function getClauseLabel(clauseId: number, t: TranslationFn) {
   const knownLabels: Record<number, string> = {
-    1: "Mascotas",
-    2: "Fumar",
-    3: "Niños",
-    4: "Huéspedes",
-    5: "Estancia mínima",
-    6: "Estancia máxima",
+    1: "pets",
+    2: "smoking",
+    3: "children",
+    4: "guests",
+    5: "minStay",
+    6: "maxStay",
   };
 
-  return knownLabels[clauseId] ?? `Cláusula ${clauseId}`;
+  const clauseKey = knownLabels[clauseId];
+
+  if (!clauseKey) {
+    return t("exploreDetail.clauses.fallbackLabel", {
+      id: clauseId,
+    });
+  }
+
+  return t(`exploreDetail.clauses.labels.${clauseKey}`);
 }
 
 export function PropertyDetailPageContent({
   uuid,
 }: PropertyDetailPageContentProps) {
   const { role } = useAuth();
+  const { intlLocale, t } = usePropertiesTranslation();
 
   const propertyQuery = useProperty(uuid);
   const pricesQuery = usePropertyPrices(uuid);
@@ -228,11 +279,13 @@ export function PropertyDetailPageContent({
       : salePrice?.salePrice ?? cardProperty?.price?.amount ?? 0;
 
   const typeKey = getPropertyTypeKey(property?.propertyTypeId);
-  const typeLabel = getPropertyTypeLabel(property?.propertyTypeId);
-  const modalityLabel = getModalityLabel(property?.modalityId);
+  const typeLabel = getPropertyTypeLabel(property?.propertyTypeId, t);
+  const modalityLabel = getModalityLabel(property?.modalityId, t);
   const publicModalityLabel =
-    isClient && property?.modalityId === 3 ? "Renta" : modalityLabel;
-  const statusLabel = getStatusLabel(property?.statusId);
+    isClient && property?.modalityId === 3
+      ? t("exploreDetail.modalities.rent")
+      : modalityLabel;
+  const statusLabel = getStatusLabel(property?.statusId, t);
   const fallbackImage = exploreTypeMeta[typeKey].imageSrc;
   const coverPhotoUrl = cardProperty?.coverPhotoUrl ?? null;
 
@@ -240,6 +293,10 @@ export function PropertyDetailPageContent({
   const commercial = property?.commercial ?? null;
   const location = property?.location ?? null;
   const clauses = clausesQuery.data?.clauses ?? [];
+
+  const yesText = t("exploreDetail.values.yes");
+  const noText = t("exploreDetail.values.no");
+  const notSpecifiedText = t("exploreDetail.values.notSpecified");
 
   const canShowMap =
     typeof location?.latitude === "number" &&
@@ -250,7 +307,7 @@ export function PropertyDetailPageContent({
       <main className="mx-auto w-full max-w-6xl px-4 py-8">
         <div className="rounded-[2rem] border bg-card px-6 py-16 text-center">
           <p className="text-sm text-muted-foreground">
-            Cargando detalle de la propiedad...
+            {t("exploreDetail.states.loading")}
           </p>
         </div>
       </main>
@@ -262,13 +319,13 @@ export function PropertyDetailPageContent({
       <main className="mx-auto w-full max-w-6xl px-4 py-8">
         <Card className="rounded-[2rem] p-8 text-center">
           <p className="text-base font-semibold text-foreground">
-            No pudimos cargar esta propiedad.
+            {t("exploreDetail.states.errorTitle")}
           </p>
           <p className="mt-2 text-sm text-muted-foreground">
-            Puede que ya no esté disponible o que no tengas permiso para verla.
+            {t("exploreDetail.states.errorDescription")}
           </p>
           <Button asChild className="mt-6 rounded-full">
-            <Link href="/explore">Volver a explorar</Link>
+            <Link href="/explore">{t("exploreDetail.actions.backToExplore")}</Link>
           </Button>
         </Card>
       </main>
@@ -281,7 +338,7 @@ export function PropertyDetailPageContent({
         <Button asChild variant="ghost" className="rounded-full px-0">
           <Link href="/explore" className="inline-flex items-center gap-2">
             <HugeiconsIcon icon={ArrowLeft02Icon} size={18} />
-            Volver a explorar
+            {t("exploreDetail.actions.backToExplore")}
           </Link>
         </Button>
       </div>
@@ -320,7 +377,7 @@ export function PropertyDetailPageContent({
                 {property.isFeatured ? (
                   <span className="inline-flex items-center gap-1 rounded-full bg-background px-4 py-2 text-xs font-medium text-foreground shadow-sm">
                     <HugeiconsIcon icon={StarIcon} size={14} />
-                    Destacada
+                    {t("exploreDetail.badges.featured")}
                   </span>
                 ) : null}
               </div>
@@ -334,7 +391,7 @@ export function PropertyDetailPageContent({
                   </span>
                   {property.isFeatured ? (
                     <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
-                      Selección Spazio
+                      {t("exploreDetail.badges.spazioSelection")}
                     </span>
                   ) : null}
                 </div>
@@ -349,7 +406,7 @@ export function PropertyDetailPageContent({
                     size={17}
                     className="mt-0.5 shrink-0"
                   />
-                  <span>{getShortAddress(location)}</span>
+                  <span>{getShortAddress(location, t)}</span>
                 </p>
               </div>
 
@@ -364,10 +421,10 @@ export function PropertyDetailPageContent({
           <Card className="rounded-[2rem] p-6">
             <div className="mb-5">
               <h2 className="text-lg font-semibold text-foreground">
-                Características principales
+                {t("exploreDetail.sections.featuresTitle")}
               </h2>
               <p className="text-sm text-muted-foreground">
-                Información general del inmueble.
+                {t("exploreDetail.sections.featuresDescription")}
               </p>
             </div>
 
@@ -376,38 +433,38 @@ export function PropertyDetailPageContent({
                 <>
                   <FeatureCard
                     icon={BedSingle01Icon}
-                    label="Recámaras"
+                    label={t("exploreDetail.features.bedrooms")}
                     value={residential.bedrooms}
                   />
                   <FeatureCard
                     icon={Bathtub01Icon}
-                    label="Baños"
+                    label={t("exploreDetail.features.bathrooms")}
                     value={residential.bathrooms}
                   />
                   <FeatureCard
                     icon={Car01Icon}
-                    label="Estacionamientos"
+                    label={t("exploreDetail.features.parkingSpots")}
                     value={residential.parkingSpots}
                   />
                   <FeatureCard
                     icon={RulerIcon}
-                    label="Construcción"
-                    value={`${formatNumber(residential.builtArea)} m2`}
+                    label={t("exploreDetail.features.construction")}
+                    value={`${formatNumber(residential.builtArea, intlLocale)} m2`}
                   />
                   <FeatureCard
                     icon={Building03Icon}
-                    label="Pisos"
+                    label={t("exploreDetail.features.floors")}
                     value={residential.floors}
                   />
                   <FeatureCard
                     icon={Calendar03Icon}
-                    label="Año"
-                    value={residential.constructionYear || "No indicado"}
+                    label={t("exploreDetail.features.year")}
+                    value={residential.constructionYear || notSpecifiedText}
                   />
                   <FeatureCard
                     icon={Home01Icon}
-                    label="Amueblada"
-                    value={residential.isFurnished ? "Sí" : "No"}
+                    label={t("exploreDetail.features.furnished")}
+                    value={residential.isFurnished ? yesText : noText}
                   />
                 </>
               ) : null}
@@ -416,29 +473,29 @@ export function PropertyDetailPageContent({
                 <>
                   <FeatureCard
                     icon={Building03Icon}
-                    label="Oficinas"
+                    label={t("exploreDetail.features.offices")}
                     value={commercial.internalOffices}
                   />
                   <FeatureCard
                     icon={RulerIcon}
-                    label="Altura"
-                    value={`${formatNumber(commercial.ceilingHeight)} m`}
+                    label={t("exploreDetail.features.ceilingHeight")}
+                    value={`${formatNumber(commercial.ceilingHeight, intlLocale)} m`}
                   />
                   <FeatureCard
                     icon={Home01Icon}
-                    label="Uso de suelo"
-                    value={commercial.landUse || "No indicado"}
+                    label={t("exploreDetail.features.landUse")}
+                    value={commercial.landUse || notSpecifiedText}
                   />
                 </>
               ) : null}
 
               <FeatureCard
                 icon={RulerIcon}
-                label="Terreno"
+                label={t("exploreDetail.features.lotArea")}
                 value={
                   property.lotArea
-                    ? `${formatNumber(property.lotArea)} m2`
-                    : "No indicado"
+                    ? `${formatNumber(property.lotArea, intlLocale)} m2`
+                    : notSpecifiedText
                 }
               />
             </div>
@@ -447,17 +504,17 @@ export function PropertyDetailPageContent({
           <Card className="rounded-[2rem] p-6">
             <div className="mb-5">
               <h2 className="text-lg font-semibold text-foreground">
-                Cláusulas y restricciones
+                {t("exploreDetail.sections.clausesTitle")}
               </h2>
               <p className="text-sm text-muted-foreground">
-                Condiciones configuradas para esta propiedad.
+                {t("exploreDetail.sections.clausesDescription")}
               </p>
             </div>
 
             {clausesQuery.isLoading ? (
               <div className="rounded-[2rem] bg-muted/40 px-6 py-10">
                 <p className="text-sm text-muted-foreground">
-                  Cargando cláusulas...
+                  {t("exploreDetail.clauses.loading")}
                 </p>
               </div>
             ) : clauses.length > 0 ? (
@@ -468,10 +525,10 @@ export function PropertyDetailPageContent({
                     className="rounded-3xl border bg-background px-4 py-3"
                   >
                     <p className="text-xs text-muted-foreground">
-                      {getClauseLabel(clause.clauseId)}
+                      {getClauseLabel(clause.clauseId, t)}
                     </p>
                     <p className="mt-1 text-sm font-semibold text-foreground">
-                      {getClauseText(clause)}
+                      {getClauseText(clause, t)}
                     </p>
                   </div>
                 ))}
@@ -479,7 +536,7 @@ export function PropertyDetailPageContent({
             ) : (
               <div className="rounded-[2rem] bg-muted/40 px-6 py-10">
                 <p className="text-sm text-muted-foreground">
-                  Esta propiedad no tiene cláusulas configuradas.
+                  {t("exploreDetail.clauses.empty")}
                 </p>
               </div>
             )}
@@ -488,10 +545,10 @@ export function PropertyDetailPageContent({
           <Card className="rounded-[2rem] p-6">
             <div className="mb-5">
               <h2 className="text-lg font-semibold text-foreground">
-                Ubicación
+                {t("exploreDetail.sections.locationTitle")}
               </h2>
               <p className="text-sm text-muted-foreground">
-                {getFullAddress(location)}
+                {getFullAddress(location, t)}
               </p>
             </div>
 
@@ -503,20 +560,29 @@ export function PropertyDetailPageContent({
             ) : (
               <div className="rounded-[2rem] bg-muted/40 px-6 py-10">
                 <p className="text-sm text-muted-foreground">
-                  No hay coordenadas públicas disponibles para mostrar el mapa.
+                  {t("exploreDetail.location.noPublicCoordinates")}
                 </p>
               </div>
             )}
 
             {location ? (
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <InfoRow label="Colonia" value={location.neighborhood} />
-                <InfoRow label="Calle" value={location.street} />
                 <InfoRow
-                  label="Número exterior"
+                  label={t("exploreDetail.location.neighborhood")}
+                  value={location.neighborhood}
+                />
+                <InfoRow
+                  label={t("exploreDetail.location.street")}
+                  value={location.street}
+                />
+                <InfoRow
+                  label={t("exploreDetail.location.exteriorNumber")}
                   value={location.exteriorNumber}
                 />
-                <InfoRow label="Código postal" value={location.postalCode} />
+                <InfoRow
+                  label={t("exploreDetail.location.postalCode")}
+                  value={location.postalCode}
+                />
               </div>
             ) : null}
           </Card>
@@ -524,40 +590,64 @@ export function PropertyDetailPageContent({
 
         <aside className="space-y-4 lg:sticky lg:top-24 lg:h-fit">
           <Card className="rounded-[2rem] p-6">
-            <p className="text-sm text-muted-foreground">Precio</p>
+            <p className="text-sm text-muted-foreground">
+              {t("exploreDetail.pricing.price")}
+            </p>
             <p className="mt-1 text-3xl font-semibold text-foreground">
               {displayPrice > 0
-                ? formatPrice(displayPrice, preferredMode)
-                : "Consultar"}
+                ? formatPrice(
+                    displayPrice,
+                    preferredMode,
+                    intlLocale,
+                    t("exploreDetail.pricing.perMonth"),
+                  )
+                : t("exploreDetail.pricing.consult")}
             </p>
 
             {preferredMode === "rent" && rentPrice?.deposit ? (
               <div className="mt-4 rounded-3xl bg-muted/40 px-4 py-3">
-                <p className="text-xs text-muted-foreground">Depósito</p>
+                <p className="text-xs text-muted-foreground">
+                  {t("exploreDetail.pricing.deposit")}
+                </p>
                 <p className="mt-1 text-sm font-semibold text-foreground">
-                  {formatPrice(rentPrice.deposit, "sale")}
+                  {formatPrice(
+                    rentPrice.deposit,
+                    "sale",
+                    intlLocale,
+                    t("exploreDetail.pricing.perMonth"),
+                  )}
                 </p>
               </div>
             ) : null}
 
             <div className="mt-5 space-y-3">
               <SummaryRow
-                label="Operación"
-                value={preferredMode === "rent" ? "Renta" : "Venta"}
+                label={t("exploreDetail.pricing.operation")}
+                value={
+                  preferredMode === "rent"
+                    ? t("exploreDetail.pricing.rent")
+                    : t("exploreDetail.pricing.sale")
+                }
               />
-              <SummaryRow label="Tipo" value={typeLabel} />
-              <SummaryRow label="Modalidad" value={modalityLabel} />
-              <SummaryRow label="Estado" value={statusLabel} />
+              <SummaryRow label={t("exploreDetail.pricing.type")} value={typeLabel} />
               <SummaryRow
-                label="Negociable"
+                label={t("exploreDetail.pricing.modality")}
+                value={modalityLabel}
+              />
+              <SummaryRow
+                label={t("exploreDetail.pricing.status")}
+                value={statusLabel}
+              />
+              <SummaryRow
+                label={t("exploreDetail.pricing.negotiable")}
                 value={
                   preferredMode === "rent"
                     ? rentPrice?.isNegotiable
-                      ? "Sí"
-                      : "No"
+                      ? yesText
+                      : noText
                     : salePrice?.isNegotiable
-                      ? "Sí"
-                      : "No"
+                      ? yesText
+                      : noText
                 }
               />
             </div>
@@ -566,64 +656,65 @@ export function PropertyDetailPageContent({
               {getActionLabel({
                 isClient,
                 mode: preferredMode,
+                t,
               })}
             </Button>
 
             <Button variant="outline" className="mt-3 w-full rounded-full">
-              Contactar agente
+              {t("exploreDetail.actions.contactAgent")}
             </Button>
           </Card>
 
           <Card className="rounded-[2rem] p-6">
             <h2 className="text-lg font-semibold text-foreground">
-              Resumen de la propiedad
+              {t("exploreDetail.sections.summaryTitle")}
             </h2>
 
             <div className="mt-5 divide-y">
               <SummaryBlock
                 icon={Building03Icon}
-                label="Título"
+                label={t("exploreDetail.summary.title")}
                 value={property.title}
               />
               <SummaryBlock
                 icon={Home01Icon}
-                label="Tipo de propiedad"
+                label={t("exploreDetail.summary.propertyType")}
                 value={typeLabel}
               />
               <SummaryBlock
                 icon={DollarCircleIcon}
-                label="Modalidad"
+                label={t("exploreDetail.summary.modality")}
                 value={modalityLabel}
               />
               <SummaryBlock
                 icon={StarIcon}
-                label="Estado"
+                label={t("exploreDetail.summary.status")}
                 value={statusLabel}
               />
               <SummaryBlock
                 icon={RulerIcon}
-                label="Superficie de terreno"
+                label={t("exploreDetail.summary.lotArea")}
                 value={
                   property.lotArea
-                    ? `${formatNumber(property.lotArea)} m2`
-                    : "No indicado"
+                    ? `${formatNumber(property.lotArea, intlLocale)} m2`
+                    : notSpecifiedText
                 }
               />
               {residential ? (
                 <>
                   <SummaryBlock
                     icon={Home01Icon}
-                    label="Amueblada"
-                    value={residential.isFurnished ? "Sí" : "No"}
+                    label={t("exploreDetail.features.furnished")}
+                    value={residential.isFurnished ? yesText : noText}
                   />
                   <SummaryBlock
                     icon={BedSingle01Icon}
-                    label="Recámaras"
+                    label={t("exploreDetail.features.bedrooms")}
                     value={residential.bedrooms}
                   />
                   <SummaryBlock
                     icon={Bathtub01Icon}
-                    label="Baños"
+                    label={t("exploreDetail.features.bathrooms")}
                     value={residential.bathrooms}
                   />
                 </>
@@ -633,11 +724,10 @@ export function PropertyDetailPageContent({
 
           <Card className="rounded-[2rem] p-6">
             <h3 className="text-sm font-semibold text-foreground">
-              Información importante
+              {t("exploreDetail.sections.importantTitle")}
             </h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              La información de la propiedad puede cambiar. Confirma precio,
-              disponibilidad y condiciones antes de iniciar el proceso.
+              {t("exploreDetail.important.description")}
             </p>
           </Card>
         </aside>
@@ -653,7 +743,7 @@ function FeatureCard({
 }: {
   icon: typeof BedSingle01Icon;
   label: string;
-  value: React.ReactNode;
+  value: ReactNode;
 }) {
   return (
     <div className="rounded-3xl border bg-background p-4">
@@ -664,7 +754,7 @@ function FeatureCard({
   );
 }
 
-function InfoRow({ label, value }: { label: string; value?: React.ReactNode }) {
+function InfoRow({ label, value }: { label: string; value?: ReactNode }) {
   if (!value) return null;
 
   return (
@@ -680,7 +770,7 @@ function SummaryRow({
   value,
 }: {
   label: string;
-  value: React.ReactNode;
+  value: ReactNode;
 }) {
   return (
     <div className="flex items-center justify-between gap-4 border-b pb-2 last:border-b-0 last:pb-0">
@@ -697,7 +787,7 @@ function SummaryBlock({
 }: {
   icon: typeof BedSingle01Icon;
   label: string;
-  value: React.ReactNode;
+  value: ReactNode;
 }) {
   return (
     <div className="flex gap-4 py-5 first:pt-0 last:pb-0">

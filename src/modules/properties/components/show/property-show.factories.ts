@@ -118,10 +118,13 @@ export function buildPropertyFactItems(
   return facts;
 }
 
-export function getFriendlyPropertyErrorMessage(error: unknown) {
+export function getFriendlyPropertyErrorMessage(
+  error: unknown,
+  t: PropertyTranslator,
+) {
   if (error instanceof TypeError) {
-    return "No pudimos conectarnos en este momento. Revisa tu conexion e intenta nuevamente.";
+    return t("show.errors.connectionDescription");
   }
 
-  return "No fue posible cargar la propiedad por ahora. Intenta de nuevo en un momento.";
+  return t("show.errors.loadDescription");
 }
