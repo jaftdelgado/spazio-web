@@ -31,10 +31,7 @@ const createLoginSchema = (t: (key: string) => string) =>
 
 type LoginFormValues = z.infer<ReturnType<typeof createLoginSchema>>;
 
-const getErrorMessage = (
-  error: unknown,
-  fallbackMessage: string,
-): string => {
+const getErrorMessage = (error: unknown, fallbackMessage: string): string => {
   if (error instanceof HttpError) {
     const body = error.body as { error?: string } | null;
 
@@ -98,7 +95,7 @@ function LoginForm() {
             autoComplete="email"
             placeholder={t("auth.common.emailPlaceholder")}
             aria-invalid={Boolean(loginForm.formState.errors.email)}
-            className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+          className="h-11 border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
             {...loginForm.register("email")}
           />
           {loginForm.formState.errors.email?.message ? (
@@ -124,7 +121,7 @@ function LoginForm() {
               autoComplete="current-password"
               placeholder={t("auth.login.passwordPlaceholder")}
               aria-invalid={Boolean(loginForm.formState.errors.password)}
-              className="h-11 rounded-2xl border-input bg-background pl-10 pr-10 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+            className="h-11 border-input bg-background pl-10 pr-10 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
               {...loginForm.register("password")}
             />
             <button
@@ -168,7 +165,7 @@ function LoginForm() {
         <Button
           type="submit"
           disabled={loginMutation.isPending}
-          className="h-11 w-full rounded-2xl text-[15px]"
+          className="h-11 w-full text-[15px]"
         >
           {loginMutation.isPending ? (
             <HugeiconsIcon
@@ -183,7 +180,9 @@ function LoginForm() {
 
         <div className="my-2 flex items-center gap-3">
           <div className="h-px flex-1 bg-border" />
-          <span className="text-xs text-muted-foreground">{t("auth.login.divider")}</span>
+          <span className="text-xs text-muted-foreground">
+            {t("auth.login.divider")}
+          </span>
           <div className="h-px flex-1 bg-border" />
         </div>
 

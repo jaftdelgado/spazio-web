@@ -27,13 +27,13 @@ export function PropertyShowHeader({
   return (
     <header className="space-y-5 pt-(--admin-page-padding-y)">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Button className="rounded-full" size="sm" variant="outline" onClick={onBack}>
+        <Button className="" size="sm" variant="outline" onClick={onBack}>
           <HugeiconsIcon icon={ArrowLeft01Icon} size={16} strokeWidth={1.8} />
           <span>{backLabel}</span>
         </Button>
 
         {canEdit ? (
-          <Button className="rounded-full" size="sm" onClick={onEdit}>
+          <Button className="" size="sm" onClick={onEdit}>
             {editLabel}
           </Button>
         ) : null}

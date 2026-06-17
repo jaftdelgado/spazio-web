@@ -265,7 +265,7 @@ function PaymentDetailFields({
       {fields.map((field) => (
         <div
           key={field.label}
-          className="rounded-2xl border border-border/70 bg-muted/15 px-4 py-3"
+                className="border border-border/70 bg-muted/15 px-4 py-3"
         >
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             {field.label}
@@ -486,7 +486,7 @@ export function PaymentsPageContent() {
           return (
             <div className="flex w-full justify-end">
               <Button
-                className="rounded-2xl"
+                className=""
                 size="sm"
                 type="button"
                 variant="outline"
@@ -603,7 +603,7 @@ export function PaymentsPageContent() {
 
           <div className="flex items-end">
             <Button
-              className="w-full rounded-2xl xl:w-auto"
+              className="w-full xl:w-auto"
               type="button"
               onClick={handleApplyFilters}
             >
@@ -613,7 +613,7 @@ export function PaymentsPageContent() {
 
           <div className="flex items-end">
             <Button
-              className="w-full rounded-2xl xl:w-auto"
+              className="w-full xl:w-auto"
               type="button"
               variant="outline"
               onClick={handleClearFilters}
@@ -636,7 +636,7 @@ export function PaymentsPageContent() {
             </EmptyHeader>
             <EmptyContent>
               <Button
-                className="rounded-2xl"
+                className=""
                 disabled={isRetrying}
                 size="sm"
                 type="button"
@@ -735,7 +735,7 @@ export function PaymentsPageContent() {
 
           <AlertDialogFooter>
             <Button
-              className="rounded-2xl"
+              className=""
               type="button"
               variant="outline"
               onClick={() => setIsDetailOpen(false)}

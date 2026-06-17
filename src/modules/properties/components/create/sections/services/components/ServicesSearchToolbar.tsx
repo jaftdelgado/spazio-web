@@ -39,7 +39,7 @@ export function ServicesSearchToolbar({
         />
         <Input
           aria-label={t("create.services.searchPlaceholder")}
-          className="h-10 rounded-2xl border-input bg-background px-10 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+          className="h-10 border-input bg-background px-10 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
           name="property-services-search"
           placeholder={t("create.services.searchPlaceholder")}
           value={searchValue}
@@ -48,7 +48,7 @@ export function ServicesSearchToolbar({
         {searchValue ? (
           <Button
             aria-label={t("create.services.clearSearch")}
-            className="absolute right-1.5 top-1/2 h-8 w-8 -translate-y-1/2 rounded-2xl"
+          className="absolute right-1.5 top-1/2 h-8 w-8 -translate-y-1/2"
             size="icon-sm"
             type="button"
             variant="ghost"
@@ -61,7 +61,7 @@ export function ServicesSearchToolbar({
 
       <div className="sm:w-35 sm:shrink-0">
         <Button
-          className="h-10 w-full rounded-2xl sm:self-auto"
+          className="h-10 w-full sm:self-auto"
           disabled={!shouldShowLoadMore || isFetchingNextPage}
           type="button"
           variant="outline"

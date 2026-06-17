@@ -34,9 +34,9 @@
     "common": {
       "emailLabel": "Correo electronico",
       "emailPlaceholder": "nombre@correo.com",
-      "passwordLabel": "Contrasena",
-      "showPassword": "Mostrar contrasena",
-      "hidePassword": "Ocultar contrasena",
+      "passwordLabel": "Contraseña",
+      "showPassword": "Mostrar contraseña",
+      "hidePassword": "Ocultar contraseña",
       "unexpectedError": "Ocurrio un error inesperado",
       "actions": {
         "back": "Volver",
@@ -46,20 +46,20 @@
     "login": {
       "title": "Iniciar sesion",
       "description": "Ingresa tus credenciales para continuar",
-      "passwordPlaceholder": "Tu contrasena",
+      "passwordPlaceholder": "Tu contraseña",
       "submit": "Iniciar sesion",
       "divider": "o",
       "signupPrompt": "¿No tienes cuenta?",
       "signupLink": "Registrate",
-      "forgotPassword": "Olvide mi contrasena",
+      "forgotPassword": "Olvide mi contraseña",
       "validation": {
         "emailInvalid": "Correo invalido",
-        "passwordRequired": "Contrasena requerida"
+        "passwordRequired": "Contraseña requerida"
       }
     },
     "forgotPassword": {
       "email": {
-        "title": "Recuperar contrasena",
+        "title": "Recuperar contraseña",
         "description": "Ingresa el correo asociado a tu cuenta y te enviaremos un codigo.",
         "genericNotice": "Si el correo existe, enviaremos un codigo de verificacion.",
         "submit": "Enviar codigo"
@@ -71,13 +71,13 @@
         "verifying": "Verificando"
       },
       "password": {
-        "title": "Define una nueva contrasena",
-        "description": "Elige una contrasena segura para terminar la recuperacion.",
-        "submit": "Actualizar contrasena"
+        "title": "Define una nueva contraseña",
+        "description": "Elige una contraseña segura para terminar la recuperacion.",
+        "submit": "Actualizar contraseña"
       },
       "success": {
-        "title": "Contrasena actualizada",
-        "description": "Tu contrasena se actualizo correctamente. Ya puedes iniciar sesion."
+        "title": "Contraseña actualizada",
+        "description": "Tu contraseña se actualizo correctamente. Ya puedes iniciar sesion."
       }
     },
     "signUp": {
@@ -130,30 +130,30 @@
         }
       },
       "password": {
-        "title": "Elige una contrasena",
-        "description": "Crea una contrasena segura de 8 a 32 caracteres con mayusculas, numeros y simbolos.",
+        "title": "Elige una contraseña",
+        "description": "Crea una contraseña segura de 8 a 32 caracteres con mayusculas, numeros y simbolos.",
         "fields": {
           "password": {
-            "label": "Contrasena",
-            "placeholder": "Crea una contrasena"
+            "label": "Contraseña",
+            "placeholder": "Crea una contraseña"
           },
           "confirmPassword": {
-            "label": "Confirmar contrasena",
-            "placeholder": "Repite tu contrasena"
+            "label": "Confirmar contraseña",
+            "placeholder": "Repite tu contraseña"
           }
         },
         "submit": "Crear cuenta",
         "validation": {
-          "required": "La contrasena es requerida",
+          "required": "La contraseña es requerida",
           "minLength": "Minimo 8 caracteres",
           "maxLength": "Maximo 32 caracteres",
           "uppercase": "Incluye al menos una letra mayuscula",
           "number": "Incluye al menos un numero",
           "specialCharacter": "Incluye al menos un caracter especial (!@#$...)",
-          "confirmMismatch": "Las contrasenas no coinciden"
+          "confirmMismatch": "Las contraseñas no coinciden"
         },
         "criteria": {
-          "length": "La contrasena debe tener entre 8 y 32 caracteres.",
+          "length": "La contraseña debe tener entre 8 y 32 caracteres.",
           "uppercase": "Incluye al menos una mayuscula.",
           "number": "Agrega al menos un numero.",
           "specialCharacter": "Usa un simbolo especial (!, @, #, etc.)."
@@ -162,7 +162,7 @@
       "result": {
         "success": {
           "title": "Tu cuenta ya esta lista",
-          "description": "El registro se completo correctamente. Ya puedes iniciar sesion con tu correo y contrasena."
+          "description": "El registro se completo correctamente. Ya puedes iniciar sesion con tu correo y contraseña."
         },
         "error": {
           "title": "No pudimos crear tu cuenta",
@@ -239,19 +239,19 @@
       }
     },
     "password": {
-      "title": "Contrasena",
-      "hint": "Actualiza tu contrasena sin afectar el resto de tu perfil.",
-      "current": "Contrasena actual",
-      "new": "Nueva contrasena",
-      "confirm": "Confirmar nueva contrasena",
-      "submit": "Actualizar contrasena",
-      "successTitle": "Contrasena actualizada",
+      "title": "Contraseña",
+      "hint": "Actualiza tu contraseña sin afectar el resto de tu perfil.",
+      "current": "Contraseña actual",
+      "new": "Nueva contraseña",
+      "confirm": "Confirmar nueva contraseña",
+      "submit": "Actualizar contraseña",
+      "successTitle": "Contraseña actualizada",
       "sessionDialog": {
-        "successTitle": "Contrasena actualizada",
-        "errorTitle": "No pudimos actualizar tu contrasena"
+        "successTitle": "Contraseña actualizada",
+        "errorTitle": "No pudimos actualizar tu contraseña"
       },
       "validation": {
-        "currentRequired": "La contrasena actual es obligatoria"
+        "currentRequired": "La contraseña actual es obligatoria"
       }
     },
     "securityDialog": {
@@ -273,7 +273,7 @@
   },
   "staff": {
     "title": "Crear usuario staff",
-    "description": "Registra una cuenta de admin o agente y entrega la contrasena temporal al usuario.",
+    "description": "Registra una cuenta de admin o agente y entrega la contraseña temporal al usuario.",
     "submit": "Crear usuario",
     "submitting": "Creando...",
     "successTitle": "Usuario creado",
@@ -292,14 +292,14 @@
       "firstName": "El nombre es obligatorio",
       "lastName": "Los apellidos son obligatorios"
     },
-    "temporaryPasswordTitle": "Contrasena temporal",
+    "temporaryPasswordTitle": "Contraseña temporal",
     "temporaryPasswordDescription": "Se mantendra visible hasta que cierres esta vista.",
-    "passwordLabel": "Contrasena temporal",
-    "copy": "Copiar contrasena",
-    "copySuccessTitle": "Contrasena copiada",
+    "passwordLabel": "Contraseña temporal",
+    "copy": "Copiar contraseña",
+    "copySuccessTitle": "Contraseña copiada",
     "copySuccessDescription": "Ya puedes compartirla con el usuario.",
-    "shareHint": "Comparte esta contrasena con el usuario y pidela que la cambie desde su cuenta cuando inicie sesion.",
-    "emptyState": "Cuando crees un usuario staff, la contrasena temporal aparecera aqui.",
+    "shareHint": "Comparte esta contraseña con el usuario y pidela que la cambie desde su cuenta cuando inicie sesion.",
+    "emptyState": "Cuando crees un usuario staff, la contraseña temporal aparecera aqui.",
     "forbiddenTitle": "Acceso restringido",
     "forbiddenDescription": "Solo un administrador puede crear usuarios staff."
   }

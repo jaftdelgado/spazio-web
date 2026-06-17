@@ -34,12 +34,12 @@ function SelectTrigger({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger>) {
   return (
-      <SelectPrimitive.Trigger
-        data-slot="select-trigger"
-        className={cn(
-          "inline-flex h-9 w-full items-center justify-between gap-2 rounded-4xl border border-border bg-background px-3 text-sm whitespace-nowrap text-foreground shadow-xs outline-none transition-[color,box-shadow,background-color] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50 data-placeholder:text-muted-foreground",
-          className,
-        )}
+    <SelectPrimitive.Trigger
+      data-slot="select-trigger"
+      className={cn(
+        "inline-flex h-9 w-full items-center justify-between gap-2 rounded-full border border-border bg-background px-3 text-sm whitespace-nowrap text-foreground shadow-xs outline-none transition-[color,box-shadow,background-color] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50 data-placeholder:text-muted-foreground",
+        className,
+      )}
       {...props}
     >
       {children}

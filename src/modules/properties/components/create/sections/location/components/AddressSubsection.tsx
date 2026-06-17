@@ -106,7 +106,7 @@ export function AddressSubsection({
             }}
           >
             <SelectTrigger
-              className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] text-foreground shadow-none"
+              className="h-11 border-input bg-background px-4 text-[15px] text-foreground shadow-none"
               id="property-country"
             >
               <SelectValue
@@ -157,7 +157,7 @@ export function AddressSubsection({
             }}
           >
             <SelectTrigger
-              className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] text-foreground shadow-none"
+              className="h-11 border-input bg-background px-4 text-[15px] text-foreground shadow-none"
               id="property-state"
             >
               <SelectValue placeholder={t("create.fields.state.placeholder")} />
@@ -212,7 +212,7 @@ export function AddressSubsection({
             }}
           >
             <SelectTrigger
-              className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] text-foreground shadow-none"
+              className="h-11 border-input bg-background px-4 text-[15px] text-foreground shadow-none"
               id="property-municipality"
             >
               <SelectValue
@@ -266,7 +266,7 @@ export function AddressSubsection({
           label={t("create.fields.postalCode.label")}
         >
           <Input
-            className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+            className="h-11 border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
             id="property-postal-code"
             inputMode="numeric"
             maxLength={5}
@@ -286,7 +286,7 @@ export function AddressSubsection({
           label={t("create.fields.neighborhood.label")}
         >
           <Input
-            className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+            className="h-11 border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
             id="property-neighborhood"
             maxLength={60}
             placeholder={t("create.fields.neighborhood.placeholder")}
@@ -303,7 +303,7 @@ export function AddressSubsection({
           label={t("create.fields.street.label")}
         >
           <Input
-            className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+            className="h-11 border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
             id="property-street"
             maxLength={120}
             placeholder={t("create.fields.street.placeholder")}
@@ -318,7 +318,7 @@ export function AddressSubsection({
           label={t("create.fields.exteriorNumber.label")}
         >
           <Input
-            className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+            className="h-11 border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
             id="property-exterior"
             maxLength={8}
             placeholder={t("create.fields.exteriorNumber.placeholder")}
@@ -336,7 +336,7 @@ export function AddressSubsection({
           label={t("create.fields.interiorNumber.label")}
         >
           <Input
-            className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+            className="h-11 border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
             id="property-interior"
             maxLength={8}
             placeholder={t("create.fields.interiorNumber.placeholder")}

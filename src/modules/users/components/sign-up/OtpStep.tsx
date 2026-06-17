@@ -25,6 +25,9 @@ type OtpStepProps = {
   onBack: () => void;
 };
 
+const OTP_SLOT_CLASSNAME =
+  "size-11 text-base data-[active=true]:ring-ring/30";
+
 const getErrorMessage = (
   error: unknown,
   fallbackMessage: string,
@@ -102,7 +105,7 @@ export function OtpStep({ email, onSuccess, onBack }: OtpStepProps) {
         description={
           <>
             {t("auth.signUp.otp.descriptionPrefix")}{" "}
-            <span className="font-medium text-black/75">{email}</span>.{" "}
+            <span className="font-medium text-foreground">{email}</span>.{" "}
             {t("auth.signUp.otp.descriptionSuffix")}
           </>
         }
@@ -125,30 +128,30 @@ export function OtpStep({ email, onSuccess, onBack }: OtpStepProps) {
           <InputOTPGroup>
             <InputOTPSlot
               index={0}
-              className="size-11 border-black/10 bg-[#f5f5f7] text-base data-[active=true]:border-black/25 data-[active=true]:ring-black/10"
+              className={OTP_SLOT_CLASSNAME}
             />
             <InputOTPSlot
               index={1}
-              className="size-11 border-black/10 bg-[#f5f5f7] text-base data-[active=true]:border-black/25 data-[active=true]:ring-black/10"
+              className={OTP_SLOT_CLASSNAME}
             />
             <InputOTPSlot
               index={2}
-              className="size-11 border-black/10 bg-[#f5f5f7] text-base data-[active=true]:border-black/25 data-[active=true]:ring-black/10"
+              className={OTP_SLOT_CLASSNAME}
             />
           </InputOTPGroup>
           <InputOTPSeparator />
           <InputOTPGroup>
             <InputOTPSlot
               index={3}
-              className="size-11 border-black/10 bg-[#f5f5f7] text-base data-[active=true]:border-black/25 data-[active=true]:ring-black/10"
+              className={OTP_SLOT_CLASSNAME}
             />
             <InputOTPSlot
               index={4}
-              className="size-11 border-black/10 bg-[#f5f5f7] text-base data-[active=true]:border-black/25 data-[active=true]:ring-black/10"
+              className={OTP_SLOT_CLASSNAME}
             />
             <InputOTPSlot
               index={5}
-              className="size-11 border-black/10 bg-[#f5f5f7] text-base data-[active=true]:border-black/25 data-[active=true]:ring-black/10"
+              className={OTP_SLOT_CLASSNAME}
             />
           </InputOTPGroup>
         </InputOTP>
@@ -173,7 +176,7 @@ export function OtpStep({ email, onSuccess, onBack }: OtpStepProps) {
         <Button
           type="button"
           variant="ghost"
-          className="h-9 rounded-full px-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="h-9 px-2 text-muted-foreground hover:bg-muted hover:text-foreground"
           onClick={onBack}
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={17} />
@@ -183,7 +186,7 @@ export function OtpStep({ email, onSuccess, onBack }: OtpStepProps) {
           type="button"
           variant="ghost"
           disabled={resendSeconds > 0 || resendMutation.isPending}
-          className="h-9 rounded-full px-3 text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="h-9 px-3 text-muted-foreground hover:bg-muted hover:text-foreground"
           onClick={() => {
             void resendCode();
           }}
