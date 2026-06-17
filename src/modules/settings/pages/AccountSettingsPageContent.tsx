@@ -252,12 +252,14 @@ export function AccountSettingsPageContent() {
   };
 
   const submitPhoto = async () => {
-    if (!selectedPhoto) {
+    const photoToUpload = selectedPhoto;
+
+    if (!photoToUpload) {
       setPhotoError(t("profile.photo.validation.required"));
       return;
     }
 
-    const validationError = validateProfilePhoto(selectedPhoto, t);
+    const validationError = validateProfilePhoto(photoToUpload, t);
     if (validationError) {
       setPhotoError(validationError);
       return;
@@ -265,7 +267,7 @@ export function AccountSettingsPageContent() {
 
     try {
       setPhotoError(null);
-      await uploadPhotoMutation.mutateAsync({ file: selectedPhoto });
+      await uploadPhotoMutation.mutateAsync({ file: photoToUpload });
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }
