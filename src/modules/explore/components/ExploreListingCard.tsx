@@ -1,22 +1,22 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+
 import {
-  BedDoubleIcon,
-  Building06Icon,
+  Building03Icon,
+  DollarCircleIcon,
   Location01Icon,
   RulerIcon,
-  ShowerHeadIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { useAuth } from "@lib/auth/useAuth";
 import type { ExploreListing } from "@/modules/explore/data/explore-listings";
 import { exploreTypeMeta } from "@/modules/explore/data/explore-listings";
-
-import { useAuth } from "@lib/auth/useAuth";
-import { useRouter } from "next/navigation";
+import { usePropertyPrices } from "@/modules/properties/application/prices/hooks/usePropertyPrices";
 
 function formatPrice(price: number, mode: ExploreListing["mode"]) {
   const formatter = new Intl.NumberFormat("es-MX", {
@@ -30,119 +30,188 @@ function formatPrice(price: number, mode: ExploreListing["mode"]) {
     : formatter.format(price);
 }
 
+function getModeLabel(mode: ExploreListing["mode"]) {
+  return mode === "rent" ? "Renta" : "Venta";
+}
+
+function getActionLabel({
+  isAuthenticated,
+  isClient,
+  mode,
+}: {
+  isAuthenticated: boolean;
+  isClient: boolean;
+  mode: ExploreListing["mode"];
+}) {
+  if (!isAuthenticated) {
+    return "Ver más";
+  }
+
+  if (!isClient) {
+    return "Gestionar";
+  }
+
+  return mode === "rent" ? "Rentar" : "Comprar";
+}
+
 export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
   const router = useRouter();
   const { isAuthenticated, role } = useAuth();
+
+  const pricesQuery = usePropertyPrices(listing.id);
+
+  const numericRole =
+    typeof role === "number"
+      ? role
+      : typeof role === "string"
+        ? Number(role)
+        : 0;
+
+  const isClient = numericRole === 3 || numericRole === 0;
+
   const typeMeta = exploreTypeMeta[listing.type];
-  const modeLabel = listing.mode === "sale" ? "Venta" : "Renta";
-  const isClient = role === 3;
+
+  const rentPrice =
+    pricesQuery.data?.rentPrices.find((price) => price.rentPrice > 0) ?? null;
+
+  const displayMode: ExploreListing["mode"] =
+    isClient && rentPrice ? "rent" : listing.mode;
+
+  const displayPrice =
+    displayMode === "rent"
+      ? rentPrice?.rentPrice ?? listing.price
+      : listing.price;
+
+  const modeLabel = getModeLabel(displayMode);
+  const imageSrc = listing.coverPhotoUrl ?? listing.imageSrc;
+
+  const handleAction = () => {
+    if (!isAuthenticated) {
+      router.push("/auth/login");
+      return;
+    }
+
+    if (isClient) {
+      router.push(`/explore/${listing.id}`);
+      return;
+    }
+
+    router.push(`/admin/properties/${listing.id}`);
+  };
 
   return (
-    <Card className="gap-0 overflow-hidden py-0">
-      <div className="relative h-52 overflow-hidden border-b bg-muted">
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.14),transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(90,103,255,0.18),transparent_34%)]" />
-        <div className="relative flex h-full items-center justify-center">
+    <Card className="group gap-0 overflow-hidden border-none bg-transparent p-0 shadow-none">
+      <div className="relative h-52 overflow-hidden rounded-[1.35rem] bg-muted">
+        {listing.coverPhotoUrl ? (
           <Image
-            src={typeMeta.imageSrc}
-            alt={typeMeta.label}
-            className="size-28 object-contain opacity-95"
+            fill
+            unoptimized
+            alt={listing.title}
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
+            src={imageSrc}
           />
-        </div>
+        ) : (
+          <div className="flex h-full items-center justify-center bg-muted">
+            <Image
+              alt={typeMeta.label}
+              className="size-28 object-contain opacity-90"
+              src={typeMeta.imageSrc}
+            />
+          </div>
+        )}
 
-        <div className="absolute top-3 left-3 flex gap-2">
-          <span className="rounded-full border bg-background/90 px-2.5 py-1 text-[11px] font-medium text-foreground backdrop-blur">
+        <div className="absolute top-3 left-3 flex flex-wrap gap-2">
+          <span className="rounded-full bg-background px-3 py-1 text-xs font-medium text-foreground shadow-sm">
             {typeMeta.label}
           </span>
-          <span className="rounded-full border bg-background/90 px-2.5 py-1 text-[11px] font-medium text-foreground backdrop-blur">
+          <span className="rounded-full bg-background px-3 py-1 text-xs font-medium text-foreground shadow-sm">
             {modeLabel}
           </span>
         </div>
 
-        {listing.featured ? (
-          <span className="absolute top-3 right-3 rounded-full border bg-background/90 px-2.5 py-1 text-[11px] font-medium text-foreground backdrop-blur">
-            Destacada
-          </span>
-        ) : null}
+        <button
+          type="button"
+          aria-label="Ver opciones"
+          className="absolute top-3 right-3 flex size-8 items-center justify-center rounded-full bg-background text-lg leading-none text-foreground shadow-sm"
+          onClick={handleAction}
+        >
+          ⋮
+        </button>
       </div>
 
-      <div className="space-y-4 p-4">
-        <div className="space-y-1">
-          <h3 className="text-base font-medium text-foreground">
+      <div className="space-y-3 px-1 pt-3">
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="line-clamp-2 text-sm font-semibold text-foreground">
             {listing.title}
           </h3>
-          <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <HugeiconsIcon icon={Location01Icon} size={15} />
-            <span>
-              {listing.neighborhood}, {listing.city}
+
+          {listing.featured ? (
+            <span className="shrink-0 rounded-full border px-2 py-0.5 text-[11px] text-muted-foreground">
+              Destacada
             </span>
-          </p>
+          ) : (
+            <span className="shrink-0 text-xs text-muted-foreground">
+              ☆ Disponible
+            </span>
+          )}
         </div>
 
-        <div className="grid grid-cols-3 gap-3 text-sm">
-          <Stat
-            icon={BedDoubleIcon}
-            label="Recamaras"
-            value={listing.bedrooms ?? "-"}
+        <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+          <HugeiconsIcon
+            icon={Location01Icon}
+            size={14}
+            className="mt-0.5 shrink-0"
           />
-          <Stat
-            icon={ShowerHeadIcon}
-            label="Banos"
-            value={listing.bathrooms ?? "-"}
-          />
-          <Stat icon={RulerIcon} label="m2" value={listing.area} />
-        </div>
+          <span className="line-clamp-1">
+            {listing.neighborhood}, {listing.city}
+          </span>
+        </p>
 
-        <div className="flex items-center justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <p className="text-xs text-muted-foreground">Precio</p>
-            <p className="text-base font-medium text-foreground">
-              {formatPrice(listing.price, listing.mode)}
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <HugeiconsIcon icon={RulerIcon} size={14} />
+              <span>Área</span>
+            </p>
+            <p className="mt-1 font-semibold text-foreground">
+              {listing.area > 0 ? `${listing.area} m2` : "-"}
             </p>
           </div>
 
-          <Button 
-            size="sm" 
-            className="h-9 rounded-2xl px-4 text-xs"
-            onClick={() => {
-              if (!isAuthenticated) {
-                router.push("/auth/login");
-              } else if (isClient) {
-                // Here we would open the visit modal or detail
-                router.push(`/explore/${listing.id}`);
-              } else {
-                router.push("/admin/properties");
-              }
-            }}
+          <div>
+            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <HugeiconsIcon icon={DollarCircleIcon} size={14} />
+              <span>Precio</span>
+            </p>
+            <p className="mt-1 font-semibold text-foreground">
+              {displayPrice > 0 ? formatPrice(displayPrice, displayMode) : "-"}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-3 pt-1">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <HugeiconsIcon icon={Building03Icon} size={14} />
+            <span>
+              {listing.bedrooms ?? "-"} rec. · {listing.bathrooms ?? "-"} baños
+            </span>
+          </div>
+
+          <Button
+            type="button"
+            size="sm"
+            className="h-8 rounded-full px-4 text-xs"
+            onClick={handleAction}
           >
-            {!isAuthenticated 
-              ? "Ver mas" 
-              : isClient 
-                ? (listing.mode === "rent" ? "Rentar" : "Comprar") 
-                : "Gestionar"}
+            {getActionLabel({
+              isAuthenticated,
+              isClient,
+              mode: displayMode,
+            })}
           </Button>
         </div>
       </div>
     </Card>
-  );
-}
-
-function Stat({
-  icon,
-  label,
-  value,
-}: {
-  icon: typeof Building06Icon;
-  label: string;
-  value: number | string;
-}) {
-  return (
-    <div className="rounded-3xl bg-muted/70 px-3 py-2">
-      <div className="mb-1 flex items-center gap-1.5 text-muted-foreground">
-        <HugeiconsIcon icon={icon} size={14} />
-        <span className="text-[11px]">{label}</span>
-      </div>
-      <p className="text-sm font-medium text-foreground">{value}</p>
-    </div>
   );
 }

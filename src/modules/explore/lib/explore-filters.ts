@@ -9,7 +9,7 @@ export type ExploreFilters = {
   mode: "all" | ExploreListingMode;
   parkingOnly: boolean;
   petFriendlyOnly: boolean;
-  priceCap: "all" | 50000 | 3000000 | 8000000;
+priceCap: "all" | 10000 | 20000 | 50000 | 3000000 | 8000000;
   search: string;
   types: ExploreListingType[];
 };
