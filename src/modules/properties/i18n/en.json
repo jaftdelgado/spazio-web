@@ -318,12 +318,17 @@
     },
     "services": {
       "loading": "Loading available amenities...",
+      "searchPlaceholder": "Search service or amenity...",
+      "clearSearch": "Clear services search",
       "selectedTitle": "Selected",
       "selectedHint": "Click an amenity to remove it from the property.",
       "selectedEmpty": "You have not selected amenities yet.",
       "availableTitle": "Available",
       "availableHint": "Click an amenity to add it to the property.",
-      "availableEmpty": "There are no more available amenities."
+      "availableEmpty": "There are no more available amenities.",
+      "availableSearchEmpty": "We could not find services for that search.",
+      "loadMore": "Load more...",
+      "loadingMore": "Loading..."
     },
     "clauses": {
       "add": "Add",

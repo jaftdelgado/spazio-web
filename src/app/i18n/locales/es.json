@@ -12,8 +12,11 @@
     "actions": {
       "profile": "Perfil",
       "settings": "Configuración",
+      "panel": "Ir al panel",
+      "explore": "Vista pública",
       "logout": "Cerrar sesión"
     },
+    "fallbackRole": "Usuario",
     "toast": {
       "title": "Próximamente",
       "profileDescription": "La vista de perfil todavía no está disponible.",
@@ -23,10 +26,12 @@
   "adminTopbarNav": {
     "ariaLabel": "Navegación del panel de administración",
     "items": {
+      "explore": "Vista pública",
       "summary": "Resumen",
       "properties": "Propiedades",
       "visits": "Visitas",
-      "payments": "Pagos"
+      "payments": "Pagos",
+      "users": "Usuarios"
     }
   }
 }

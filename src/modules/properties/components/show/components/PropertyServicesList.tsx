@@ -38,7 +38,7 @@ export function PropertyServicesList({
 
   if (services.length === 0) {
     return (
-      <p className="py-[10px] text-[15px] font-normal leading-[1.4] text-[#222222]">
+      <p className="py-[10px] text-[15px] font-normal leading-[1.4] text-foreground">
         {t("show.servicesEmpty")}
       </p>
     );
@@ -51,14 +51,14 @@ export function PropertyServicesList({
           key={service.serviceId}
           className="flex items-center gap-3 border-0 bg-transparent py-[10px] shadow-none"
         >
-          <div className="flex size-7 shrink-0 items-center justify-center text-[#222222] [&_svg]:size-7 [&_svg]:fill-none [&_svg]:stroke-current">
+          <div className="flex size-7 shrink-0 items-center justify-center text-foreground [&_svg]:size-7 [&_svg]:fill-none [&_svg]:stroke-current">
             <HugeiconsIcon
               icon={resolveServiceIcon(service.icon)}
               size={28}
               strokeWidth={1.8}
             />
           </div>
-          <p className="m-0 text-[15px] font-normal leading-[1.4] text-[#222222]">
+          <p className="m-0 text-[15px] font-normal leading-[1.4] text-foreground">
             {tService(service.code)}
           </p>
         </div>

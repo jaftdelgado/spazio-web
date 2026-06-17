@@ -12,8 +12,11 @@
     "actions": {
       "profile": "Profile",
       "settings": "Settings",
+      "panel": "Go to panel",
+      "explore": "Public view",
       "logout": "Log out"
     },
+    "fallbackRole": "User",
     "toast": {
       "title": "Coming soon",
       "profileDescription": "The profile view is not available yet.",
@@ -23,10 +26,12 @@
   "adminTopbarNav": {
     "ariaLabel": "Admin panel navigation",
     "items": {
+      "explore": "Public view",
       "summary": "Overview",
       "properties": "Properties",
       "visits": "Visits",
-      "payments": "Payments"
+      "payments": "Payments",
+      "users": "Users"
     }
   }
 }

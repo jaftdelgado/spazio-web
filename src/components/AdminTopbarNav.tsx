@@ -1,9 +1,11 @@
 "use client";
 
 import {
+  ArrowRight01Icon,
   Building03Icon,
   Calendar03Icon,
   CreditCardIcon,
+  UserGroupIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import { usePathname, useRouter } from "next/navigation";
@@ -18,13 +20,21 @@ type TopbarNavItem = {
   href: string;
   icon: IconSvgElement;
   labelKey:
+    | "adminTopbarNav.items.explore"
     | "adminTopbarNav.items.properties"
     | "adminTopbarNav.items.visits"
-    | "adminTopbarNav.items.payments";
+    | "adminTopbarNav.items.payments"
+    | "adminTopbarNav.items.users";
   allowedRoles: number[];
 };
 
 const adminNavItems: readonly TopbarNavItem[] = [
+  {
+    href: ROUTES.explore,
+    icon: ArrowRight01Icon,
+    labelKey: "adminTopbarNav.items.explore",
+    allowedRoles: [1, 2],
+  },
   {
     href: ROUTES.admin.properties,
     icon: Building03Icon,
@@ -35,13 +45,19 @@ const adminNavItems: readonly TopbarNavItem[] = [
     href: ROUTES.admin.visits,
     icon: Calendar03Icon,
     labelKey: "adminTopbarNav.items.visits",
-    allowedRoles: [1, 2, 3],
+    allowedRoles: [1, 2],
   },
   {
     href: ROUTES.admin.payments,
     icon: CreditCardIcon,
     labelKey: "adminTopbarNav.items.payments",
-    allowedRoles: [1, 2, 3],
+    allowedRoles: [1, 2],
+  },
+  {
+    href: ROUTES.admin.users,
+    icon: UserGroupIcon,
+    labelKey: "adminTopbarNav.items.users",
+    allowedRoles: [1],
   },
 ] as const;
 

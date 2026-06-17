@@ -21,6 +21,14 @@
       "footer": {
         "rights": "© 2026 Spazio. All rights reserved.",
         "accessibilityLabel": "Accessibility options"
+      },
+      "menu": {
+        "profile": "My profile",
+        "visits": "My visits",
+        "payments": "My payments",
+        "settings": "Settings",
+        "logout": "Log out",
+        "goToPanel": "Go to panel"
       }
     },
     "common": {
@@ -43,9 +51,33 @@
       "divider": "or",
       "signupPrompt": "Don't have an account?",
       "signupLink": "Sign up",
+      "forgotPassword": "Forgot password?",
       "validation": {
         "emailInvalid": "Invalid email",
         "passwordRequired": "Password is required"
+      }
+    },
+    "forgotPassword": {
+      "email": {
+        "title": "Recover password",
+        "description": "Enter the email linked to your account and we will send a code.",
+        "genericNotice": "If the email exists, we will send a verification code.",
+        "submit": "Send code"
+      },
+      "otp": {
+        "title": "Verify code",
+        "descriptionPrefix": "Enter the 6-digit code sent to",
+        "descriptionSuffix": "Check your spam folder too.",
+        "verifying": "Verifying"
+      },
+      "password": {
+        "title": "Set a new password",
+        "description": "Choose a secure password to finish recovery.",
+        "submit": "Update password"
+      },
+      "success": {
+        "title": "Password updated",
+        "description": "Your password was updated successfully. You can now sign in."
       }
     },
     "signUp": {
@@ -142,5 +174,133 @@
         }
       }
     }
+  },
+  "profile": {
+    "header": {
+      "title": "Account and profile",
+      "description": "Manage your personal info, photo, email, and credentials."
+    },
+    "common": {
+      "save": "Save changes",
+      "saving": "Saving..."
+    },
+    "identity": {
+      "title": "Identity",
+      "hint": "Quick summary of your current account.",
+      "emailLabel": "Email",
+      "roleLabel": "Role"
+    },
+    "personal": {
+      "title": "Personal details",
+      "hint": "Update your name and phone independently.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "phone": "Phone",
+      "successTitle": "Profile updated",
+      "validation": {
+        "firstName": "First name is required",
+        "lastName": "Last name is required"
+      }
+    },
+    "photo": {
+      "title": "Profile photo",
+      "hint": "Upload a new image for your avatar.",
+      "description": "You can pick an image from your device and save it when you're ready.",
+      "requirements": "Upload one JPG, PNG, or WEBP image up to 5 MB.",
+      "previewAlt": "Profile photo preview",
+      "pickFile": "Choose file",
+      "upload": "Upload photo",
+      "uploading": "Uploading...",
+      "clear": "Clear selection",
+      "successTitle": "Photo updated",
+      "errorTitle": "We couldn't upload the photo",
+      "validation": {
+        "required": "Choose an image to continue.",
+        "single": "You can only upload one image at a time.",
+        "format": "Use a JPG, PNG, or WEBP image.",
+        "size": "That image is too large. Use a file up to 5 MB."
+      }
+    },
+    "email": {
+      "title": "Email address",
+      "hint": "Change your email in a short verification flow.",
+      "current": "Current email",
+      "new": "New email",
+      "code": "Verification code",
+      "requestSubmit": "Send code",
+      "verifySubmit": "Confirm change",
+      "requestSuccessTitle": "Code sent",
+      "requestSuccessDescription": "We sent a code to the new email to confirm the change.",
+      "successTitle": "Email updated",
+      "verifyNotice": "Enter the code sent to {{email}} to complete the change.",
+      "sessionDialog": {
+        "successTitle": "Email updated",
+        "errorTitle": "We could not update your email"
+      }
+    },
+    "password": {
+      "title": "Password",
+      "hint": "Update your password without affecting the rest of your profile.",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm new password",
+      "submit": "Update password",
+      "successTitle": "Password updated",
+      "sessionDialog": {
+        "successTitle": "Password updated",
+        "errorTitle": "We could not update your password"
+      },
+      "validation": {
+        "currentRequired": "Current password is required"
+      }
+    },
+    "securityDialog": {
+      "action": "Continue"
+    },
+    "delete": {
+      "title": "Delete account",
+      "hint": "Sensitive action that will sign you out and remove your access.",
+      "cardTitle": "Delete my account",
+      "cardDescription": "Review this decision carefully. Once completed, you will no longer be able to sign in with this account.",
+      "submit": "Delete account",
+      "cancel": "Cancel",
+      "deleting": "Deleting...",
+      "dialogTitle": "Delete account",
+      "dialogDescription": "This action will sign you out and remove your access. To confirm, type",
+      "dialogWarning": "This action can affect your information and revoke your access immediately.",
+      "dialogInput": "Type DELETE to continue"
+    }
+  },
+  "staff": {
+    "title": "Create staff user",
+    "description": "Create an admin or agent account and deliver the temporary password to the user.",
+    "submit": "Create user",
+    "submitting": "Creating...",
+    "successTitle": "User created",
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phone": "Phone",
+      "role": "Role"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "agent": "Agent"
+    },
+    "validation": {
+      "firstName": "First name is required",
+      "lastName": "Last name is required"
+    },
+    "temporaryPasswordTitle": "Temporary password",
+    "temporaryPasswordDescription": "It will remain visible until you leave this view.",
+    "passwordLabel": "Temporary password",
+    "copy": "Copy password",
+    "copySuccessTitle": "Password copied",
+    "copySuccessDescription": "You can now share it with the user.",
+    "shareHint": "Share this password with the user and ask them to change it from their account after signing in.",
+    "emptyState": "When you create a staff user, the temporary password will appear here.",
+    "forbiddenTitle": "Restricted access",
+    "forbiddenDescription": "Only an administrator can create staff users."
   }
 }

@@ -27,7 +27,6 @@ export function PreferencesSettingsPageContent() {
   return (
     <div>
       <SettingsPageHeader
-        eyebrow="Settings · Preferencias"
         title="Preferencias"
         description="Personaliza el idioma del sitio y el modo de apariencia para que Spazio se adapte mejor a ti."
       />

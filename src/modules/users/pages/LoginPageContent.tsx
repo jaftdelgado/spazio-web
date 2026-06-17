@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SectionHeader } from "@/components/ui/section-header";
+import { ROUTES } from "@/config/routes";
 import { HttpError } from "@lib/http/http-errors";
 import { useLogin } from "@users/application/hooks/useUsers";
 import { useUsersTranslation } from "@users/i18n/useUsersTranslation";
@@ -110,7 +111,7 @@ function LoginForm() {
         <div className="space-y-2">
           <Label htmlFor="password">{t("auth.common.passwordLabel")}</Label>
           <div className="relative">
-            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-black/40">
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground">
               <HugeiconsIcon
                 icon={LockPasswordIcon}
                 size={17}
@@ -134,7 +135,7 @@ function LoginForm() {
                   : t("auth.common.showPassword")
               }
               onClick={() => setShowPassword((value) => !value)}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-black/40 transition-colors hover:text-black/70"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
             >
               <HugeiconsIcon
                 icon={showPassword ? ViewOffSlashIcon : ViewIcon}
@@ -148,6 +149,14 @@ function LoginForm() {
               {loginForm.formState.errors.password.message}
             </p>
           ) : null}
+          <div className="flex justify-end">
+            <a
+              href={ROUTES.auth.forgotPassword}
+              className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            >
+              {t("auth.login.forgotPassword")}
+            </a>
+          </div>
         </div>
 
         {loginForm.formState.errors.root?.message ? (
@@ -173,15 +182,15 @@ function LoginForm() {
         </Button>
 
         <div className="my-2 flex items-center gap-3">
-          <div className="h-px flex-1 bg-black/8" />
-          <span className="text-xs text-black/40">{t("auth.login.divider")}</span>
-          <div className="h-px flex-1 bg-black/8" />
+          <div className="h-px flex-1 bg-border" />
+          <span className="text-xs text-muted-foreground">{t("auth.login.divider")}</span>
+          <div className="h-px flex-1 bg-border" />
         </div>
 
         <p className="text-center text-sm text-muted-foreground">
           {t("auth.login.signupPrompt")}{" "}
           <a
-            href="/auth/sign-up"
+            href={ROUTES.auth.signUp}
             className="text-foreground underline-offset-4 hover:underline"
           >
             {t("auth.login.signupLink")}
@@ -198,7 +207,7 @@ export function LoginPageContent() {
   return (
     <AuthShell
       header={{
-        navHref: "/auth/sign-up",
+        navHref: ROUTES.auth.signUp,
         navLabel: t("auth.shell.navigation.toSignUp"),
       }}
     >

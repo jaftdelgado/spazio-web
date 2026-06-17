@@ -125,7 +125,7 @@ export function ProfileStep({ onSuccess, onBack }: ProfileStepProps) {
       <div className="space-y-2">
         <Label htmlFor="phone">{t("auth.signUp.profile.fields.phone.label")}</Label>
         <div className="relative">
-          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-black/40">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground">
             <HugeiconsIcon
               icon={SmartPhone01Icon}
               size={17}
