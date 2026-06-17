@@ -645,7 +645,7 @@ export function PropertyCreatePageContent() {
                   <li key={id}>
                     <Button
                       className={cn(
-                        "h-10 w-full justify-start rounded-2xl px-3 text-sm",
+                        "h-10 w-full justify-start px-3 text-sm",
                         isActive
                           ? "bg-primary/10 text-primary hover:bg-primary/15 dark:bg-primary/20"
                           : !isEnabled

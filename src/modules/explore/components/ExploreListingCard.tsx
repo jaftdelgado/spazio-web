@@ -208,7 +208,7 @@ export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
           <Button
             type="button"
             size="sm"
-            className="h-8 rounded-full px-4 text-xs"
+            className="h-8 px-4 text-xs"
             onClick={handleAction}
           >
             {actionLabel}

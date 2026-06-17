@@ -80,7 +80,7 @@ export function PropertiesDataGridFooter({
             <Button
               key={page}
               className={cn(
-                "min-w-9 rounded-2xl px-0",
+                  "min-w-9 px-0",
                 page === currentPage &&
                   "bg-primary text-primary-foreground hover:bg-primary/90",
               )}

@@ -89,7 +89,7 @@ export function AdminTopbarNav() {
               key={item.href}
               aria-current={isActive ? "page" : undefined}
               className={cn(
-                "h-9 rounded-2xl px-3.5 text-sm font-medium shadow-none",
+                "h-9 px-3.5 text-sm font-medium shadow-none",
                 isActive
                   ? "bg-foreground text-background hover:bg-foreground"
                   : "border-border/70 bg-background/80 text-muted-foreground hover:bg-muted hover:text-foreground",

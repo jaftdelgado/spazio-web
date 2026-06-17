@@ -44,10 +44,10 @@ export function PropertyShowErrorState({
           <EmptyDescription>{message}</EmptyDescription>
         </EmptyHeader>
         <EmptyContent className="flex-row justify-center">
-          <Button className="rounded-2xl" variant="outline" onClick={onBack}>
+          <Button className="" variant="outline" onClick={onBack}>
             {backLabel}
           </Button>
-          <Button className="rounded-2xl" onClick={onRetry}>
+          <Button className="" onClick={onRetry}>
             {retryLabel}
           </Button>
         </EmptyContent>

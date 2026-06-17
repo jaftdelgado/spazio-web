@@ -117,6 +117,7 @@ body {
 }
 
 body [data-slot="input"],
+body [data-slot="input-otp-slot"],
 body textarea,
 body [data-slot="button"][data-variant="outline"],
 body [data-slot="button"][data-variant="secondary"],
@@ -166,7 +167,7 @@ body [data-slot="switch"] {
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.398 0.195 277.366);
+  --primary: rgb(66, 54, 166);
   --primary-foreground: oklch(0.962 0.018 272.314);
   --secondary: #282828;
   --secondary-foreground: oklch(0.985 0 0);
