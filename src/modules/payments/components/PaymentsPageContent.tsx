@@ -36,6 +36,13 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HttpError } from "@/lib/http/http-errors";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -43,7 +50,6 @@ import { usePropertyList } from "@/modules/properties/application/get/hooks/useP
 import {
   type CheckoutContext,
   type PaymentDetail,
-  type PaymentListFilters,
   type PaymentListItem,
 } from "../domain/payments.entity";
 import {
@@ -56,6 +62,17 @@ import { CheckoutPaymentModal } from "./CheckoutPaymentModal";
 import { useContractsList } from "@/modules/contracts/application/hooks/useContracts";
 import { contractsHttpAdapter } from "@/modules/contracts/infra/contracts.http-adapter";
 import { toast } from "sonner";
+import {
+  buildPropertyOptions,
+  buildStatusOptions,
+  filterPaymentsRows,
+  getStableCalendarDate,
+  isVisiblePaymentStatus,
+  normalizePaymentStatus,
+  paginateFilteredPayments,
+  type PaymentPageFilterState,
+  type PaymentStatusKey,
+} from "./payments-page.filters";
 
 
 type PaymentColumnId =
@@ -75,13 +92,6 @@ type LoadingPaymentGridRow = DataGridRowBase & {
   isLoading: true;
 };
 type PaymentsTableRow = PaymentGridRow | LoadingPaymentGridRow;
-type PaymentFilterFormState = {
-  propertyId: string;
-  statusId: string;
-  dateFrom: string;
-  dateTo: string;
-};
-
 const parseAsUTC = (dateStr: string): Date | null => {
   if (!dateStr) return null;
   const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
@@ -139,23 +149,15 @@ const isPaymentForContract = (
 };
 
 const DEFAULT_PAGE_SIZE = 20;
+const MAX_API_FETCH_LIMIT = 100;
 const LOADING_ROW_COUNT = 8;
+const ALL_PROPERTIES_VALUE = "__all_properties__";
+const ALL_STATUSES_VALUE = "__all_statuses__";
 const chipClassName =
   "inline-flex rounded-full border border-border/70 bg-muted/30 px-2.5 py-1 text-xs font-medium text-muted-foreground";
 
 function isLoadingRow(row: PaymentsTableRow): row is LoadingPaymentGridRow {
   return "isLoading" in row;
-}
-
-function parseOptionalNumber(value: string) {
-  const trimmed = value.trim();
-
-  if (trimmed.length === 0) {
-    return undefined;
-  }
-
-  const parsed = Number(trimmed);
-  return Number.isFinite(parsed) ? parsed : undefined;
 }
 
 function getPaymentErrorKey(error: unknown) {
@@ -202,6 +204,27 @@ function formatDate(
   }
 
   return new Intl.DateTimeFormat(locale, options).format(date);
+}
+
+function formatStableCalendarDate(
+  value: string | null,
+  locale: string,
+  fallback: string,
+  options?: Intl.DateTimeFormatOptions,
+) {
+  const stableDate = getStableCalendarDate(value);
+
+  if (!stableDate) {
+    return fallback;
+  }
+
+  const [year, month, day] = stableDate.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+
+  return new Intl.DateTimeFormat(locale, {
+    ...options,
+    timeZone: "UTC",
+  }).format(date);
 }
 
 function formatCurrency(value: number, currency: string, locale: string) {
@@ -274,7 +297,7 @@ function PaymentDetailFields({
     },
     {
       label: t("detail.fields.billingPeriod"),
-      value: formatDate(
+      value: formatStableCalendarDate(
         detail.billingPeriod,
         locale,
         fallback,
@@ -283,7 +306,7 @@ function PaymentDetailFields({
     },
     {
       label: t("detail.fields.dueDate"),
-      value: formatDate(
+      value: formatStableCalendarDate(
         detail.dueDate,
         locale,
         fallback,
@@ -378,33 +401,29 @@ export function PaymentsPageContent() {
   const [isDetailOpen, setIsDetailOpen] = React.useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = React.useState(false);
   const [checkoutContext, setCheckoutContext] = React.useState<CheckoutContext | null>(null);
-  const [filterForm, setFilterForm] = React.useState<PaymentFilterFormState>({
-    propertyId: "",
-    statusId: "",
+  const [filterForm, setFilterForm] = React.useState<PaymentPageFilterState>({
+    propertyKey: "",
+    statusKey: "",
     dateFrom: "",
     dateTo: "",
   });
   const [appliedFilters, setAppliedFilters] =
-    React.useState<PaymentFilterFormState>({
-    propertyId: "",
-    statusId: "",
+    React.useState<PaymentPageFilterState>({
+    propertyKey: "",
+    statusKey: "",
     dateFrom: "",
     dateTo: "",
   });
 
-  const queryFilters = React.useMemo<PaymentListFilters>(
+  const fetchFilters = React.useMemo(
     () => ({
-      propertyId: parseOptionalNumber(appliedFilters.propertyId),
-      statusId: parseOptionalNumber(appliedFilters.statusId),
-      dateFrom: appliedFilters.dateFrom || undefined,
-      dateTo: appliedFilters.dateTo || undefined,
-      limit: DEFAULT_PAGE_SIZE,
-      offset: (page - 1) * DEFAULT_PAGE_SIZE,
+      limit: MAX_API_FETCH_LIMIT,
+      offset: 0,
     }),
-    [appliedFilters, page],
+    [],
   );
 
-  const paymentsQuery = usePaymentsList(queryFilters);
+  const paymentsQuery = usePaymentsList(fetchFilters);
   const propertiesQuery = usePropertyList(
     {
       page: 1,
@@ -434,9 +453,9 @@ export function PaymentsPageContent() {
     [propertiesQuery.data?.data],
   );
 
-  const getPropertyTitle = React.useCallback(
-    (row: PaymentGridRow) => {
-      if (row.isSimulated) {
+  const resolvePropertyTitle = React.useCallback(
+    (row: PaymentListItem | PaymentGridRow) => {
+      if ("isSimulated" in row && row.isSimulated) {
         return row.propertyTitle || t("labels.property");
       }
 
@@ -466,8 +485,8 @@ export function PaymentsPageContent() {
     const actualPayments = paymentsQuery.data?.data ?? [];
     
     // Filter actual payments that are NOT failed/cancelled
-    const activeActualPayments = actualPayments.filter(p => 
-      !p.status || !["failed", "fallido", "cancelled", "cancelado", "rejected", "rechazado"].includes(p.status.toLowerCase())
+    const activeActualPayments = actualPayments.filter((payment) =>
+      isVisiblePaymentStatus(payment.status),
     );
     
     for (const contract of contractsQuery.data) {
@@ -508,8 +527,11 @@ export function PaymentsPageContent() {
             ? p.contractId === contract.contractId
             : (Math.round(Number(p.amount)) === Math.round(expectedAmt) &&
                p.currency?.toUpperCase() === contract.currency?.toUpperCase());
-          return isMatch && p.status && 
-            ["completed", "completado", "approved", "aprobado", "success", "exitoso"].includes(p.status.toLowerCase());
+          const normalizedStatus = normalizePaymentStatus(p.status);
+          return (
+            isMatch &&
+            (normalizedStatus === "completed" || normalizedStatus === "approved")
+          );
         });
         
         let lastBillingPeriod = contract.startDate;
@@ -557,27 +579,57 @@ export function PaymentsPageContent() {
     return list;
   }, [canAccess, contractsQuery.data, paymentsQuery.data?.data]);
 
-  const rows = React.useMemo<PaymentGridRow[]>(
-    () => {
-      const HIDDEN_STATUSES = ["failed", "fallido", "cancelled", "cancelado", "rejected", "rechazado", "cancelled_by_new_attempt"];
-      const actual = (paymentsQuery.data?.data ?? [])
-        .filter((item) => !HIDDEN_STATUSES.includes((item.status ?? "").toLowerCase()))
+  const actualRows = React.useMemo<PaymentGridRow[]>(
+    () =>
+      (paymentsQuery.data?.data ?? [])
+        .filter((item) => isVisiblePaymentStatus(item.status))
         .map((item) => ({
           id: item.paymentUuid,
           ...item,
-        }));
-      if (page === 1) {
-        return [...simulatedRows, ...actual];
-      }
-      return actual;
-    },
-    [paymentsQuery.data?.data, simulatedRows, page],
+          propertyTitle: resolvePropertyTitle(item),
+        })),
+    [paymentsQuery.data?.data, resolvePropertyTitle],
   );
 
-  const totalCount = (paymentsQuery.data?.meta.total ?? 0) + simulatedRows.length;
-  const totalPages = Math.max(1, Math.ceil(totalCount / DEFAULT_PAGE_SIZE));
+  const allRows = React.useMemo<PaymentGridRow[]>(
+    () => [
+      ...simulatedRows,
+      ...actualRows,
+    ],
+    [actualRows, simulatedRows],
+  );
+
+  const propertyOptions = React.useMemo(
+    () => buildPropertyOptions(allRows),
+    [allRows],
+  );
+
+  const statusOptions = React.useMemo(
+    () => buildStatusOptions(allRows),
+    [allRows],
+  );
+
+  const filteredRows = React.useMemo(
+    () => filterPaymentsRows(allRows, appliedFilters),
+    [allRows, appliedFilters],
+  );
+
+  const paginatedRows = React.useMemo(
+    () => paginateFilteredPayments(filteredRows, page, DEFAULT_PAGE_SIZE),
+    [filteredRows, page],
+  );
+
+  const rows = paginatedRows.pageRows;
+  const totalCount = paginatedRows.totalCount;
+  const totalPages = paginatedRows.totalPages;
 
   const isLoadingAll = paymentsQuery.isLoading || (role === 3 && contractsQuery.isLoading);
+
+  React.useEffect(() => {
+    if (page !== paginatedRows.currentPage) {
+      setPage(paginatedRows.currentPage);
+    }
+  }, [page, paginatedRows.currentPage]);
 
   const rowsToRender = React.useMemo<PaymentsTableRow[]>(
     () =>
@@ -657,9 +709,9 @@ export function PaymentsPageContent() {
   }, [filterForm]);
 
   const handleClearFilters = React.useCallback(() => {
-    const cleared = {
-      propertyId: "",
-      statusId: "",
+    const cleared: PaymentPageFilterState = {
+      propertyKey: "",
+      statusKey: "",
       dateFrom: "",
       dateTo: "",
     };
@@ -679,18 +731,18 @@ export function PaymentsPageContent() {
         case "property":
           return (
             <span className="font-medium text-foreground">
-              {getPropertyTitle(row)}
+              {row.propertyTitle || t("labels.property")}
             </span>
           );
         case "billingPeriod":
-          return formatDate(
+          return formatStableCalendarDate(
             row.billingPeriod,
             intlLocale,
             t("labels.notAvailable"),
             { year: "numeric", month: "long" },
           );
         case "dueDate":
-          return formatDate(
+          return formatStableCalendarDate(
             row.dueDate,
             intlLocale,
             t("labels.notAvailable"),
@@ -711,8 +763,9 @@ export function PaymentsPageContent() {
             </span>
           );
         case "actions": {
-          const isPending = !row.paymentDate || 
-            ["pending", "pendiente", "unpaid"].includes(row.status?.toLowerCase());
+          const isPending =
+            !row.paymentDate ||
+            normalizePaymentStatus(row.status) === "pending";
 
           return (
             <div className="flex w-full justify-end gap-2">
@@ -747,8 +800,8 @@ export function PaymentsPageContent() {
                       // Determine if this is the first payment: no completed payments for this contract
                       const completedPayments = (paymentsQuery.data?.data ?? []).filter(p =>
                         p.contractId === row.contractId &&
-                        ["completed", "completado", "approved", "aprobado", "success", "exitoso"].includes(
-                          (p.status ?? "").toLowerCase()
+                        ["completed", "approved"].includes(
+                          normalizePaymentStatus(p.status)
                         )
                       );
                       const isFirstPayment = completedPayments.length === 0;
@@ -767,7 +820,7 @@ export function PaymentsPageContent() {
                         contractUuid,
                         currency: row.currency,
                         amount: correctAmount,
-                        periodName: formatDate(
+                        periodName: formatStableCalendarDate(
                           row.billingPeriod,
                           intlLocale,
                           t("labels.notAvailable"),
@@ -818,7 +871,7 @@ export function PaymentsPageContent() {
           return null;
       }
     },
-    [intlLocale, t, role, contractsQuery.data, paymentsQuery.data, getPropertyTitle],
+    [intlLocale, t, role, contractsQuery.data, paymentsQuery.data],
   );
 
   if (!canAccess) {
@@ -832,43 +885,81 @@ export function PaymentsPageContent() {
           <div className="space-y-2">
             <label
               className="text-xs font-medium uppercase tracking-wide text-muted-foreground"
-              htmlFor="payments-property-id"
+              htmlFor="payments-property"
             >
               {t("filters.propertyId")}
             </label>
-            <Input
-              id="payments-property-id"
-              inputMode="numeric"
-              placeholder={t("filters.propertyIdPlaceholder")}
-              value={filterForm.propertyId}
-              onChange={(event) =>
+            <Select
+              value={filterForm.propertyKey || ALL_PROPERTIES_VALUE}
+              onValueChange={(value) =>
                 setFilterForm((current) => ({
                   ...current,
-                  propertyId: event.target.value,
+                  propertyKey:
+                    value === ALL_PROPERTIES_VALUE ? "" : value,
                 }))
               }
-            />
+            >
+              <SelectTrigger id="payments-property" className="h-10 w-full">
+                <SelectValue placeholder={t("filters.propertyIdPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL_PROPERTIES_VALUE}>
+                  {t("filters.allProperties")}
+                </SelectItem>
+                {propertyOptions.length > 0 ? (
+                  propertyOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem disabled value="properties-empty">
+                    {t("labels.notAvailable")}
+                  </SelectItem>
+                )}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
             <label
               className="text-xs font-medium uppercase tracking-wide text-muted-foreground"
-              htmlFor="payments-status-id"
+              htmlFor="payments-status"
             >
               {t("filters.statusId")}
             </label>
-            <Input
-              id="payments-status-id"
-              inputMode="numeric"
-              placeholder={t("filters.statusIdPlaceholder")}
-              value={filterForm.statusId}
-              onChange={(event) =>
+            <Select
+              value={filterForm.statusKey || ALL_STATUSES_VALUE}
+              onValueChange={(value) =>
                 setFilterForm((current) => ({
                   ...current,
-                  statusId: event.target.value,
+                  statusKey:
+                    value === ALL_STATUSES_VALUE
+                      ? ""
+                      : (value as PaymentStatusKey),
                 }))
               }
-            />
+            >
+              <SelectTrigger id="payments-status" className="h-10 w-full">
+                <SelectValue placeholder={t("filters.statusIdPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL_STATUSES_VALUE}>
+                  {t("filters.allStatuses")}
+                </SelectItem>
+                {statusOptions.length > 0 ? (
+                  statusOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {t(`filters.statusOptions.${option.value}` as never)}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem disabled value="statuses-empty">
+                    {t("labels.notAvailable")}
+                  </SelectItem>
+                )}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
@@ -974,7 +1065,7 @@ export function PaymentsPageContent() {
                 getRowLabel={(row) =>
                   isLoadingRow(row)
                     ? t("states.loadingRowLabel")
-                    : getPropertyTitle(row)
+                    : row.propertyTitle || t("labels.property")
                 }
                 renderCell={renderCell}
                 rows={rowsToRender}

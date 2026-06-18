@@ -23,9 +23,16 @@ function SelectGroup({
 }
 
 function SelectValue({
+  className,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Value>) {
-  return <SelectPrimitive.Value data-slot="select-value" {...props} />;
+  return (
+    <SelectPrimitive.Value
+      data-slot="select-value"
+      className={cn("min-w-0 flex-1 truncate text-left", className)}
+      {...props}
+    />
+  );
 }
 
 function SelectTrigger({
@@ -37,7 +44,7 @@ function SelectTrigger({
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       className={cn(
-        "inline-flex h-9 w-full items-center justify-between gap-2 rounded-full border border-border bg-background px-3 text-sm whitespace-nowrap text-foreground shadow-xs outline-none transition-[color,box-shadow,background-color] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50 data-placeholder:text-muted-foreground",
+        "inline-flex h-9 w-full min-w-0 items-center justify-between gap-2 overflow-hidden rounded-full border border-border bg-background px-3 text-sm whitespace-nowrap text-foreground shadow-xs outline-none transition-[color,box-shadow,background-color] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50 data-placeholder:text-muted-foreground",
         className,
       )}
       {...props}

@@ -18,6 +18,7 @@ import {
 
 type PaymentListResponseDto = Parameters<typeof mapPaymentListResponse>[0];
 type PaymentDetailDto = Parameters<typeof mapPaymentDetail>[0];
+const MAX_PAYMENT_LIST_LIMIT = 100;
 
 export const paymentsHttpAdapter = {
   async list(filters?: PaymentListFilters): Promise<PaymentListResponse> {
@@ -40,7 +41,10 @@ export const paymentsHttpAdapter = {
     }
 
     if (filters?.limit !== undefined) {
-      params.set("limit", String(filters.limit));
+      params.set(
+        "limit",
+        String(Math.min(filters.limit, MAX_PAYMENT_LIST_LIMIT)),
+      );
     }
 
     if (filters?.offset !== undefined) {

@@ -6,12 +6,23 @@
   "filters": {
     "propertyId": "Propiedad",
     "propertyIdPlaceholder": "Filtrar propiedad",
+    "allProperties": "Todas las propiedades",
     "statusId": "Estado",
     "statusIdPlaceholder": "Filtrar estado",
+    "allStatuses": "Todos los estados",
     "dateFrom": "Fecha desde",
     "dateTo": "Fecha hasta",
     "apply": "Aplicar filtros",
-    "clear": "Limpiar"
+    "clear": "Limpiar",
+    "statusOptions": {
+      "approved": "Aprobado",
+      "cancelled": "Cancelado",
+      "completed": "Completado",
+      "failed": "Fallido",
+      "pending": "Pendiente",
+      "rejected": "Rechazado",
+      "unknown": "No disponible"
+    }
   },
   "columns": {
     "property": "Propiedad",
