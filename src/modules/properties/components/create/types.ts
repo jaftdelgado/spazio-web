@@ -22,6 +22,7 @@ export type PropertyCreateSectionId =
 
 export type PropertyCreateFormState = {
   title: string;
+  agentId: number | null;
   propertyTypeId: number | null;
   modalityId: number | null;
   description: string;
@@ -68,6 +69,7 @@ export type PropertyCreateFormState = {
 
 export const initialPropertyCreateFormState: PropertyCreateFormState = {
   title: "",
+  agentId: null,
   propertyTypeId: null,
   modalityId: null,
   description: "",

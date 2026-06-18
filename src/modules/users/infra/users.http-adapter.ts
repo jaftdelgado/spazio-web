@@ -7,6 +7,7 @@ import { HttpError } from "@lib/http/http-errors";
 
 import type { UserRepository } from "@users/domain/users.repository";
 import {
+  mapListAgentsResponse,
   mapAdminCreateUserResult,
   mapEmailChangeVerificationResult,
   mapLoginResult,
@@ -33,6 +34,7 @@ type RefreshDTO = Parameters<typeof mapRefreshResult>[0];
 type UpdateProfileDTO = Parameters<typeof mapUpdateProfileResult>[0];
 type UserProfileDTO = Parameters<typeof mapUserProfile>[0];
 type AdminCreateUserDTO = Parameters<typeof mapAdminCreateUserResult>[0];
+type ListAgentsDTO = Parameters<typeof mapListAgentsResponse>[0];
 
 function buildPhotoUploadFormData(file: File) {
   const formData = new FormData();
@@ -41,6 +43,11 @@ function buildPhotoUploadFormData(file: File) {
 }
 
 export const usersHttpAdapter = {
+  async listAgents() {
+    const response = await httpClient.get<ListAgentsDTO>("/api/v1/users/agents");
+    return mapListAgentsResponse(response);
+  },
+
   async preRegister(input) {
     return httpClient.post<MessageResponse>("/api/v1/users/pre-register", {
       email: input.email,

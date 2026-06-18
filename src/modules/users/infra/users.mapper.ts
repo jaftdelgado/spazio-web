@@ -1,6 +1,7 @@
 "use client";
 
 import type {
+  AgentListItem,
   AdminCreateUserResult,
   AuthUser,
   EmailChangeVerificationResult,
@@ -34,6 +35,18 @@ type UserProfileDTO = {
   profile_picture_url?: string | null;
   status_id: number;
   created_at: string;
+};
+
+type AgentListItemDTO = {
+  user_id: number;
+  user_uuid: string;
+  first_name: string;
+  last_name: string;
+  profile_picture_url: string | null;
+};
+
+type ListAgentsResponseDTO = {
+  data: AgentListItemDTO[];
 };
 
 type VerifyEmailResultDTO = {
@@ -96,6 +109,22 @@ export const mapUserProfile = (dto: UserProfileDTO): UserProfile => {
     statusId: dto.status_id,
     createdAt: new Date(dto.created_at),
   };
+};
+
+export const mapAgentListItem = (dto: AgentListItemDTO): AgentListItem => {
+  return {
+    userId: dto.user_id,
+    userUuid: dto.user_uuid,
+    firstName: dto.first_name,
+    lastName: dto.last_name,
+    profilePictureUrl: dto.profile_picture_url,
+  };
+};
+
+export const mapListAgentsResponse = (
+  dto: ListAgentsResponseDTO,
+): AgentListItem[] => {
+  return dto.data.map(mapAgentListItem);
 };
 
 export const mapVerifyEmailResult = (

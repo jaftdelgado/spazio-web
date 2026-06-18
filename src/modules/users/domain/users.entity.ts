@@ -23,6 +23,18 @@ export interface UserProfile {
   createdAt: Date;
 }
 
+export interface AgentListItem {
+  userId: number;
+  userUuid: string;
+  firstName: string;
+  lastName: string;
+  profilePictureUrl: string | null;
+}
+
+export interface ListAgentsResponse {
+  data: AgentListItem[];
+}
+
 export interface PreRegisterInput {
   email: string;
 }

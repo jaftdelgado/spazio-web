@@ -54,6 +54,7 @@ describe("property http adapters", () => {
       description: "Description",
       propertyTypeId: 2,
       modalityId: 3,
+      agentId: 21,
       lotArea: 120,
       isFeatured: true,
       location: {
@@ -75,6 +76,7 @@ describe("property http adapters", () => {
       "/api/v1/properties",
       expect.objectContaining({
         title: "Demo",
+        agent_id: 21,
         services: [1, 2],
         clauses: [{ clause_id: 8, boolean_value: true }],
       }),
@@ -87,6 +89,7 @@ describe("property http adapters", () => {
 
     await propertyPatchHttpAdapter.updateProperty("uuid-1", {
       title: "Updated",
+      agentId: 21,
       location: {
         cityId: 9,
         neighborhood: "Roma",
@@ -104,6 +107,7 @@ describe("property http adapters", () => {
       "/api/v1/properties/uuid-1",
       expect.objectContaining({
         title: "Updated",
+        agent_id: 21,
         location: expect.objectContaining({ city_id: 9 }),
       }),
     );

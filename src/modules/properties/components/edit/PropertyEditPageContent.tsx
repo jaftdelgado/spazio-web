@@ -215,6 +215,7 @@ function resolveInitialFormState(
   return {
     ...initialPropertyEditFormState,
     title: detail.title,
+    agentId: detail.assignedAgent?.userId ?? null,
     propertyTypeId: detail.propertyTypeId,
     modalityId: detail.modalityId,
     description: detail.description,
@@ -285,12 +286,17 @@ function resolveInitialFormState(
 function buildUpdatePropertyInput(
   form: PropertyEditFormState,
   propertyTypeKind: PropertyTypeKind,
+  initialAgentId: number | null,
 ): UpdatePropertyInput {
   return {
     title: form.title.trim(),
     description: form.description.trim(),
     lotArea: Number(form.lotArea),
     isFeatured: form.isFeatured,
+    agentId:
+      form.agentId !== null && form.agentId !== initialAgentId
+        ? form.agentId
+        : undefined,
     location: {
       cityId: form.cityId ?? 0,
       neighborhood: form.neighborhood.trim(),
@@ -696,6 +702,7 @@ function PropertyEditLoadedContent(props: {
   const [form, setForm] = React.useState<PropertyEditFormState>(() =>
     resolveInitialFormState(props.initialData),
   );
+  const initialAgentId = props.initialData.detail.assignedAgent?.userId ?? null;
   const photosRef = React.useRef(form.photos);
 
   React.useEffect(() => {
@@ -828,7 +835,7 @@ function PropertyEditLoadedContent(props: {
     try {
       await propertyPatchHttpAdapter.updateProperty(
         props.propertyUuid,
-        buildUpdatePropertyInput(form, propertyTypeKind),
+        buildUpdatePropertyInput(form, propertyTypeKind, initialAgentId),
       );
       await propertyServicesHttpAdapter.updatePropertyServices(
         props.propertyUuid,
@@ -873,7 +880,15 @@ function PropertyEditLoadedContent(props: {
     } finally {
       setIsSubmitting(false);
     }
-  }, [form, pricingMode, propertyTypeKind, props.propertyUuid, queryClient, t]);
+  }, [
+    form,
+    initialAgentId,
+    pricingMode,
+    propertyTypeKind,
+    props.propertyUuid,
+    queryClient,
+    t,
+  ]);
 
   const handleAttemptSubmit = React.useCallback(() => {
     if (firstInvalidSection) {
@@ -894,6 +909,7 @@ function PropertyEditLoadedContent(props: {
       case "general":
         return (
           <GeneralSection
+            canClearAgentSelection={initialAgentId === null}
             disableImmutableFields
             form={form}
             patchForm={patchForm}
@@ -920,7 +936,7 @@ function PropertyEditLoadedContent(props: {
       default:
         return null;
     }
-  }, [activeSection, form, patchForm, propertyTypeKind]);
+  }, [activeSection, form, initialAgentId, patchForm, propertyTypeKind]);
 
   return (
     <div className="admin-page-view flex min-h-full flex-col bg-background text-foreground">

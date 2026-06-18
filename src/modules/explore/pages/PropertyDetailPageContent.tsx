@@ -239,7 +239,8 @@ export function PropertyDetailPageContent({
   const { intlLocale, t } = usePropertiesTranslation();
   const [isRentModalOpen, setIsRentModalOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [checkoutContext, setCheckoutContext] = useState<CheckoutContext | null>(null);
+  const [checkoutContext, setCheckoutContext] =
+    useState<CheckoutContext | null>(null);
 
   const propertyQuery = useProperty(uuid);
   const pricesQuery = usePropertyPrices(uuid);
@@ -367,7 +368,7 @@ export function PropertyDetailPageContent({
       <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
           <Card className="overflow-hidden rounded-[2rem] border bg-card p-0">
-            <div className="relative h-[380px] overflow-hidden bg-muted">
+            <div className="relative h-95 overflow-hidden bg-muted">
               {coverPhotoUrl ? (
                 <Image
                   fill
@@ -775,7 +776,9 @@ export function PropertyDetailPageContent({
         onSuccess={async (confirmation) => {
           setIsRentModalOpen(false);
           try {
-            const contractDetail = await contractsHttpAdapter.getById(confirmation.contractUuid);
+            const contractDetail = await contractsHttpAdapter.getById(
+              confirmation.contractUuid,
+            );
             setCheckoutContext({
               contractId: contractDetail.contractId,
               contractUuid: contractDetail.contractUuid,
@@ -786,7 +789,9 @@ export function PropertyDetailPageContent({
             setIsCheckoutOpen(true);
           } catch (err) {
             console.error("Error fetching contract detail", err);
-            toast.error("La renta se confirmó, pero no se pudo abrir la pasarela de pago. Busca tu contrato en 'Mis pagos'.");
+            toast.error(
+              "La renta se confirmó, pero no se pudo abrir la pasarela de pago. Busca tu contrato en 'Mis pagos'.",
+            );
           }
         }}
       />

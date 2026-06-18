@@ -16,6 +16,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -69,6 +70,21 @@ const formatArea = (value: number | null, locale: string) => {
 
 const formatAddress = (address: string | null | undefined) => {
   return address && address.trim().length > 0 ? address : "-";
+};
+
+const getAgentFullName = (agent: PropertyCard["assignedAgent"]) => {
+  if (!agent) return "";
+  return `${agent.firstName} ${agent.lastName}`.trim();
+};
+
+const getAgentInitials = (agent: PropertyCard["assignedAgent"]) => {
+  const source = getAgentFullName(agent) || "AG";
+  return source
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
 };
 
 export function PropertiesGridView({
@@ -227,6 +243,29 @@ export function PropertiesGridView({
                     {formatAddress(propertyAddressMap[row.propertyUuid])}
                   </span>
                 </p>
+                {row.assignedAgent ? (
+                  <div
+                    className="flex items-center gap-2 text-[12px] text-muted-foreground"
+                    title={getAgentFullName(row.assignedAgent)}
+                  >
+                    <Avatar className="size-5 border-border/70">
+                      {row.assignedAgent.profilePictureUrl ? (
+                        <AvatarImage
+                          alt={getAgentFullName(row.assignedAgent)}
+                          src={row.assignedAgent.profilePictureUrl}
+                        />
+                      ) : null}
+                      <AvatarFallback className="text-[10px]">
+                        {getAgentInitials(row.assignedAgent)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="truncate">
+                      {t("grid.agentAssigned", {
+                        agent: getAgentFullName(row.assignedAgent),
+                      })}
+                    </span>
+                  </div>
+                ) : null}
               </div>
 
               <div className="mt-auto pt-2.5">

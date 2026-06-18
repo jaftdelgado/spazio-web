@@ -1,4 +1,5 @@
 import {
+  mapListAgentsResponse,
   mapAdminCreateUserResult,
   mapLoginResult,
   mapPasswordResetVerificationResult,
@@ -58,6 +59,30 @@ describe("users.mapper", () => {
         refreshToken: "r",
       }),
     );
+  });
+
+  it("maps assignable agents preserving nullable photo urls", () => {
+    expect(
+      mapListAgentsResponse({
+        data: [
+          {
+            user_id: 21,
+            user_uuid: "agent-21",
+            first_name: "Ada",
+            last_name: "Lovelace",
+            profile_picture_url: null,
+          },
+        ],
+      }),
+    ).toEqual([
+      {
+        userId: 21,
+        userUuid: "agent-21",
+        firstName: "Ada",
+        lastName: "Lovelace",
+        profilePictureUrl: null,
+      },
+    ]);
   });
 
   it("maps update profile and admin create payloads", () => {
