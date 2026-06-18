@@ -353,6 +353,7 @@ export function PropertyDetailPageContent({
   const canShowMap =
     typeof location?.latitude === "number" &&
     typeof location?.longitude === "number";
+  const hasRentFlow = property?.modalityId === 2 || property?.modalityId === 3;
 
   const canOpenRentModal =
     preferredMode === "rent" &&
@@ -709,17 +710,19 @@ export function PropertyDetailPageContent({
                 )}
               </div>
 
-              <Button
-                className="mt-6 w-full rounded-full"
-                disabled={shouldDisablePrimaryAction}
-                onClick={handlePrimaryAction}
-              >
-                {getActionLabel({
-                  isClient,
-                  mode: preferredMode,
-                  t,
-                })}
-              </Button>
+              {hasRentFlow ? (
+                <Button
+                  className="mt-6 w-full rounded-full"
+                  disabled={shouldDisablePrimaryAction}
+                  onClick={handlePrimaryAction}
+                >
+                  {getActionLabel({
+                    isClient,
+                    mode: preferredMode,
+                    t,
+                  })}
+                </Button>
+              ) : null}
 
               <Button variant="outline" className="mt-3 w-full rounded-full">
                 {t("exploreDetail.actions.contactAgent")}
