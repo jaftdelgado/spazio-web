@@ -199,8 +199,8 @@ export function PropertyShowPageContent({
                 {t("show.sale.openButton")}
               </Button>
               <PropertySaleAlertDialog
-                agreedAmount={prices.salePrice.salePrice}
-                currency={prices.salePrice.currency}
+                agreedAmount={prices.salePrice?.salePrice ?? 0}
+                currency={prices.salePrice?.currency ?? "MXN"}
                 isOpen={isSaleDialogOpen}
                 onOpenChange={setIsSaleDialogOpen}
                 propertyTitle={detail.title}

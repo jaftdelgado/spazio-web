@@ -74,7 +74,7 @@ describe("httpClient", () => {
     );
 
     await expect(httpClient.get("/api/protected")).rejects.toEqual(
-      expect.objectContaining<HttpError>({
+      expect.objectContaining({
         status: 401,
         body: { error: "Unauthorized" },
       }),

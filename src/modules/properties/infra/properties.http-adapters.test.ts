@@ -122,8 +122,7 @@ describe("property http adapters", () => {
     await propertyPricesHttpAdapter.updatePropertyPrices("uuid-1", {
       salePrice: {
         salePrice: 1000000,
-        currency: "MXN",
-        isNegotiable: false,
+        isNegotiable: true,
       },
       rentPrices: [],
     });
@@ -141,7 +140,8 @@ describe("property http adapters", () => {
       1,
       "/api/v1/properties/uuid-1/prices",
       expect.objectContaining({
-        sale_price: { sale_price: 1000000, is_negotiable: false },
+        sale_price: { sale_price: 1000000, is_negotiable: true },
+        rent_prices: [],
       }),
     );
     expect(httpClient.put).toHaveBeenNthCalledWith(
