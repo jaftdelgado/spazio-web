@@ -79,7 +79,10 @@ function getPropertyTypeKey(propertyTypeId?: number): ExploreListingType {
   return "house";
 }
 
-function getPropertyTypeLabel(propertyTypeId: number | undefined, t: TranslationFn) {
+function getPropertyTypeLabel(
+  propertyTypeId: number | undefined,
+  t: TranslationFn,
+) {
   const typeKey = getPropertyTypeKey(propertyTypeId);
 
   return t(`exploreDetail.propertyTypes.${typeKey}`);
@@ -286,8 +289,8 @@ export function PropertyDetailPageContent({
 
   const displayPrice =
     preferredMode === "rent"
-      ? rentPrice?.rentPrice ?? cardProperty?.price?.amount ?? 0
-      : salePrice?.salePrice ?? cardProperty?.price?.amount ?? 0;
+      ? (rentPrice?.rentPrice ?? cardProperty?.price?.amount ?? 0)
+      : (salePrice?.salePrice ?? cardProperty?.price?.amount ?? 0);
 
   const typeKey = getPropertyTypeKey(property?.propertyTypeId);
   const typeLabel = getPropertyTypeLabel(property?.propertyTypeId, t);
@@ -340,8 +343,10 @@ export function PropertyDetailPageContent({
           <p className="mt-2 text-sm text-muted-foreground">
             {t("exploreDetail.states.errorDescription")}
           </p>
-          <Button asChild className="mt-6 rounded-full">
-            <Link href="/explore">{t("exploreDetail.actions.backToExplore")}</Link>
+          <Button asChild className="mt-6">
+            <Link href="/explore">
+              {t("exploreDetail.actions.backToExplore")}
+            </Link>
           </Button>
         </Card>
       </main>
@@ -351,7 +356,7 @@ export function PropertyDetailPageContent({
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8">
       <div className="mb-5">
-        <Button asChild variant="ghost" className="rounded-full px-0">
+        <Button asChild variant="ghost" className="px-0">
           <Link href="/explore" className="inline-flex items-center gap-2">
             <HugeiconsIcon icon={ArrowLeft02Icon} size={18} />
             {t("exploreDetail.actions.backToExplore")}
@@ -645,7 +650,10 @@ export function PropertyDetailPageContent({
                     : t("exploreDetail.pricing.sale")
                 }
               />
-              <SummaryRow label={t("exploreDetail.pricing.type")} value={typeLabel} />
+              <SummaryRow
+                label={t("exploreDetail.pricing.type")}
+                value={typeLabel}
+              />
               <SummaryRow
                 label={t("exploreDetail.pricing.modality")}
                 value={modalityLabel}
@@ -684,7 +692,7 @@ export function PropertyDetailPageContent({
               })}
             </Button>
 
-            <Button variant="outline" className="mt-3 w-full rounded-full">
+            <Button variant="outline" className="mt-3 w-full">
               {t("exploreDetail.actions.contactAgent")}
             </Button>
           </Card>
@@ -824,13 +832,7 @@ function InfoRow({ label, value }: { label: string; value?: ReactNode }) {
   );
 }
 
-function SummaryRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: ReactNode;
-}) {
+function SummaryRow({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-4 border-b pb-2 last:border-b-0 last:pb-0">
       <span className="text-sm text-muted-foreground">{label}</span>
@@ -855,9 +857,7 @@ function SummaryBlock({
       </div>
       <div>
         <p className="text-sm font-medium text-foreground">{label}</p>
-        <p className="mt-1 text-sm leading-6 text-muted-foreground">
-          {value}
-        </p>
+        <p className="mt-1 text-sm leading-6 text-muted-foreground">{value}</p>
       </div>
     </div>
   );

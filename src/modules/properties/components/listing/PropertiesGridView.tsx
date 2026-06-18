@@ -134,7 +134,7 @@ export function PropertiesGridView({
                   <DropdownMenuTrigger asChild>
                     <Button
                       aria-label={t("actions.ariaLabel")}
-                      className="rounded-full bg-background/85 text-foreground backdrop-blur"
+                      className="bg-background/85 text-foreground backdrop-blur"
                       size="icon-sm"
                       variant="ghost"
                     >

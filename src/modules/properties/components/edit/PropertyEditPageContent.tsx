@@ -649,7 +649,7 @@ function PropertyEditSidebar(props: {
               <li key={id}>
                 <Button
                   className={cn(
-                    "h-10 w-full justify-start rounded-2xl px-3 text-sm",
+                  "h-10 w-full justify-start px-3 text-sm",
                     isActive
                       ? "bg-primary/10 text-primary hover:bg-primary/15 dark:bg-primary/20"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -1129,7 +1129,7 @@ export function PropertyEditPageContent() {
           </EmptyHeader>
           <EmptyContent>
             <Button
-              className="rounded-2xl"
+              className=""
               onClick={() => router.push(ROUTES.admin.properties)}
             >
               {t("edit.states.backToList")}
@@ -1162,7 +1162,7 @@ export function PropertyEditPageContent() {
           </EmptyHeader>
           <EmptyContent>
             <Button
-              className="rounded-2xl"
+              className=""
               onClick={() => {
                 void queries.detailQuery.refetch();
                 void queries.servicesQuery.refetch();

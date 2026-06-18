@@ -129,7 +129,7 @@ export function ClausesSection({
           </EmptyHeader>
           <EmptyContent>
             <Button
-              className="rounded-2xl"
+              className=""
               disabled={clausesQuery.isRefetching}
               size="sm"
               type="button"

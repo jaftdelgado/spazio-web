@@ -67,7 +67,7 @@ export function RegistrationResultStep({
           <Button
             type="button"
             variant="ghost"
-            className="h-9 rounded-full px-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="h-9 px-2 text-muted-foreground hover:bg-muted hover:text-foreground"
             onClick={onRetry}
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={17} />

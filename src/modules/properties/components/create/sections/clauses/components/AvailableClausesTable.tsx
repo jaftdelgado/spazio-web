@@ -86,7 +86,7 @@ export function AvailableClausesTable({
                   aria-label={t("create.clauses.addAriaLabel", {
                     clause: tClause(row.clause.code),
                   })}
-                  className="rounded-2xl"
+                  className=""
                   size="icon-sm"
                   type="button"
                   variant="secondary"

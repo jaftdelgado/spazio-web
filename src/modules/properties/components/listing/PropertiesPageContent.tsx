@@ -260,7 +260,7 @@ export function PropertiesPageContent() {
           </EmptyHeader>
           <EmptyContent>
             <Button
-              className="rounded-2xl"
+              className=""
               disabled={isRetrying}
               size="sm"
               onClick={() => {

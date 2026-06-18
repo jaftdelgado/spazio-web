@@ -60,7 +60,7 @@ export function TopbarUserMenu({
       <DropdownMenuTrigger asChild>
         <Button
           aria-label={t("topbarUserMenu.triggerLabel")}
-          className="h-10 rounded-2xl border-border/70 px-2.5"
+          className="h-10 border-border/70 px-2.5"
           size="sm"
           variant="outline"
         >

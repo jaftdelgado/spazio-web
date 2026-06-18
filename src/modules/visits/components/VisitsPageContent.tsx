@@ -314,7 +314,7 @@ export function VisitsPageContent() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 min-w-8 rounded-md p-0"
+                className="h-8 min-w-8 p-0"
                 onClick={handlePrevMonth}
               >
                 <HugeiconsIcon icon={ArrowLeft01Icon} size={18} />
@@ -322,7 +322,7 @@ export function VisitsPageContent() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 rounded-md px-3 text-xs font-semibold"
+                className="h-8 px-3 text-xs font-semibold"
                 onClick={handleToday}
               >
                 {t("calendar.today")}
@@ -330,7 +330,7 @@ export function VisitsPageContent() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 min-w-8 rounded-md p-0"
+                className="h-8 min-w-8 p-0"
                 onClick={handleNextMonth}
               >
                 <HugeiconsIcon icon={ArrowRight01Icon} size={18} />

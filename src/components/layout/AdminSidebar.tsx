@@ -770,7 +770,7 @@ function AdminSidebarNav({
             aria-current={isActive ? "page" : undefined}
             className={cn(
               "h-10 justify-start px-4 text-sm font-medium outline-none",
-              "group-data-[collapsible=icon]:size-11 group-data-[collapsible=icon]:min-w-11 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:rounded-2xl group-data-[collapsible=icon]:px-0",
+              "group-data-[collapsible=icon]:size-11 group-data-[collapsible=icon]:min-w-11 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
               isActive
                 ? "bg-black/6 text-slate-950 hover:bg-black/8"
                 : "text-slate-700 hover:bg-black/4 hover:text-slate-950",

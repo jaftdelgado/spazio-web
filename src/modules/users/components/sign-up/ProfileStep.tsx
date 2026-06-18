@@ -92,7 +92,7 @@ export function ProfileStep({ onSuccess, onBack }: ProfileStepProps) {
           autoComplete="given-name"
           placeholder={t("auth.signUp.profile.fields.firstName.placeholder")}
           aria-invalid={Boolean(profileForm.formState.errors.firstName)}
-          className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+          className="h-11 border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
           {...profileForm.register("firstName")}
         />
         {profileForm.formState.errors.firstName?.message ? (
@@ -112,7 +112,7 @@ export function ProfileStep({ onSuccess, onBack }: ProfileStepProps) {
           autoComplete="family-name"
           placeholder={t("auth.signUp.profile.fields.lastName.placeholder")}
           aria-invalid={Boolean(profileForm.formState.errors.lastName)}
-          className="h-11 rounded-2xl border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+          className="h-11 border-input bg-background px-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
           {...profileForm.register("lastName")}
         />
         {profileForm.formState.errors.lastName?.message ? (
@@ -138,7 +138,7 @@ export function ProfileStep({ onSuccess, onBack }: ProfileStepProps) {
             autoComplete="tel"
             placeholder={t("auth.signUp.profile.fields.phone.placeholder")}
             aria-invalid={Boolean(profileForm.formState.errors.phone)}
-            className="h-11 rounded-2xl border-input bg-background pl-10 pr-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+            className="h-11 border-input bg-background pl-10 pr-4 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
             {...profileForm.register("phone")}
           />
         </div>
@@ -154,7 +154,7 @@ export function ProfileStep({ onSuccess, onBack }: ProfileStepProps) {
           <Button
             type="button"
             variant="ghost"
-            className="h-9 rounded-full px-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="h-9 px-2 text-muted-foreground hover:bg-muted hover:text-foreground"
             onClick={onBack}
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={17} />

@@ -52,7 +52,7 @@ export function PropertiesDataGridHeader({
         />
         <Input
           aria-label={t("searchPlaceholder")}
-          className="h-11 rounded-2xl border-input bg-background px-10 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+            className="h-11 border-input bg-background px-10 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
           name="properties-search"
           placeholder={t("searchPlaceholder")}
           value={searchValue}
@@ -61,7 +61,7 @@ export function PropertiesDataGridHeader({
         {searchValue ? (
           <Button
             aria-label={t("searchPlaceholder")}
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-2xl"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2"
             size="icon-sm"
             type="button"
             variant="ghost"

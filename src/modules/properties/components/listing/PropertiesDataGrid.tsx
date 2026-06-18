@@ -200,7 +200,7 @@ function renderPropertyCell(
           <DropdownMenuTrigger asChild>
             <Button
               aria-label={labels.actionsAriaLabel}
-              className="rounded-2xl"
+                className=""
               size="icon-sm"
               variant="ghost"
             >

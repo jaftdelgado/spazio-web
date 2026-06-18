@@ -147,7 +147,7 @@ export function PasswordStep({
               : "auth.signUp.password.fields.confirmPassword.placeholder",
           )}
           aria-invalid={Boolean(error)}
-          className="h-11 rounded-2xl border-input bg-background pl-10 pr-10 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
+          className="h-11 border-input bg-background pl-10 pr-10 text-[15px] shadow-none focus-visible:border-ring focus-visible:ring-ring/30"
           {...passwordForm.register(fieldName)}
         />
         <button
@@ -205,7 +205,7 @@ export function PasswordStep({
         <Button
           type="button"
           variant="ghost"
-          className="h-9 rounded-full px-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="h-9 px-2 text-muted-foreground hover:bg-muted hover:text-foreground"
           onClick={onBack}
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={17} />
