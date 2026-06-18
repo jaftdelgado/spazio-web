@@ -122,7 +122,6 @@ describe("property http adapters", () => {
     await propertyPricesHttpAdapter.updatePropertyPrices("uuid-1", {
       salePrice: {
         salePrice: 1000000,
-        currency: "MXN",
         isNegotiable: false,
       },
       rentPrices: [],

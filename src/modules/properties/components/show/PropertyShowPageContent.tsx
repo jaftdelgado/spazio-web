@@ -126,6 +126,7 @@ export function PropertyShowPageContent({
     (detail.modalityId === 1 || detail.modalityId === 3) &&
     detail.statusId === 2 &&
     prices.salePrice !== null;
+  const salePrice = prices.salePrice;
 
   return (
     <div className="admin-page-view flex min-h-full flex-col gap-8 pb-8 text-foreground">
@@ -188,7 +189,7 @@ export function PropertyShowPageContent({
 
         <aside className="space-y-5 lg:sticky lg:top-[calc(var(--admin-topbar-height)+1.5rem)] lg:self-start">
           <PropertyPricingCard items={priceItems} />
-          {canSellProperty ? (
+          {canSellProperty && salePrice ? (
             <>
               <Button
                 className="w-full"
@@ -199,8 +200,8 @@ export function PropertyShowPageContent({
                 {t("show.sale.openButton")}
               </Button>
               <PropertySaleAlertDialog
-                agreedAmount={prices.salePrice.salePrice}
-                currency={prices.salePrice.currency}
+                agreedAmount={salePrice.salePrice}
+                currency={salePrice.currency}
                 isOpen={isSaleDialogOpen}
                 onOpenChange={setIsSaleDialogOpen}
                 propertyTitle={detail.title}
