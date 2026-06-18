@@ -67,11 +67,34 @@ function mapExploreTypesToPropertyTypeIds(
   return ids.length > 0 ? ids : undefined;
 }
 
-function mapExploreModeToModalityId(mode: "all" | "sale" | "rent") {
-  if (mode === "sale") return 1;
-  if (mode === "rent") return 2;
+function shouldShowPropertyByMode(
+  propertyModalityId: number,
+  selectedMode: "all" | "sale" | "rent",
+) {
+  if (selectedMode === "rent") {
+    return propertyModalityId === 2 || propertyModalityId === 3;
+  }
 
-  return undefined;
+  if (selectedMode === "sale") {
+    return propertyModalityId === 1 || propertyModalityId === 3;
+  }
+
+  return true;
+}
+
+function resolveListingMode(
+  propertyPriceType: string | undefined,
+  selectedMode: "all" | "sale" | "rent",
+): ExploreListing["mode"] {
+  if (selectedMode === "rent") {
+    return "rent";
+  }
+
+  if (selectedMode === "sale") {
+    return "sale";
+  }
+
+  return propertyPriceType === "rent" ? "rent" : "sale";
 }
 
 export function ExplorePageContent() {
@@ -93,7 +116,17 @@ export function ExplorePageContent() {
       ? propertyTypeIds[0]
       : undefined;
 
-  const modalityId = mapExploreModeToModalityId(filters.mode);
+  /*
+   * No mandamos modalityId al backend porque las propiedades mixtas
+   * tienen modalityId = 3. Si enviamos modality_id=2 al filtrar renta,
+   * el backend excluye las mixtas aunque tengan precios de renta activos.
+   *
+   * Por eso traemos las propiedades públicas y filtramos venta/renta aquí,
+   * considerando:
+   * venta => modalityId 1 o 3
+   * renta => modalityId 2 o 3
+   */
+  const modalityId = undefined;
 
   const maxPrice =
     filters.priceCap === "all" ? undefined : filters.priceCap;
@@ -114,38 +147,45 @@ export function ExplorePageContent() {
 
   const backendListings = useMemo<ExploreListing[]>(
     () =>
-      propertiesQuery.data?.data.map((property) => {
-        const type = mapPropertyTypeToExploreType(property.propertyType.name);
+      propertiesQuery.data?.data
+        .filter((property) =>
+          shouldShowPropertyByMode(
+            property.modality.modalityId,
+            filters.mode,
+          ),
+        )
+        .map((property) => {
+          const type = mapPropertyTypeToExploreType(property.propertyType.name);
 
-        const city =
-          property.city ??
-          property.location?.cityName ??
-          t("explore.values.noCity");
+          const city =
+            property.city ??
+            property.location?.cityName ??
+            t("explore.values.noCity");
 
-        const neighborhood =
-          property.neighborhood ?? t("explore.values.noNeighborhood");
+          const neighborhood =
+            property.neighborhood ?? t("explore.values.noNeighborhood");
 
-        const hasParking = (property.parkingSpots ?? 0) > 0;
+          const hasParking = (property.parkingSpots ?? 0) > 0;
 
-        return {
-          id: property.propertyUuid,
-          title: property.title,
-          type,
-          mode: property.price?.priceType === "rent" ? "rent" : "sale",
-          city,
-          neighborhood,
-          price: property.price?.amount ?? 0,
-          bedrooms: property.bedrooms,
-          bathrooms: property.bathrooms,
-          area: property.builtArea ?? 0,
-          featured: property.isFeatured,
-          parking: hasParking,
-          petFriendly: property.petFriendly,
-          imageSrc: exploreTypeMeta[type].imageSrc,
-          coverPhotoUrl: property.coverPhotoUrl,
-        };
-      }) ?? [],
-    [propertiesQuery.data, t],
+          return {
+            id: property.propertyUuid,
+            title: property.title,
+            type,
+            mode: resolveListingMode(property.price?.priceType, filters.mode),
+            city,
+            neighborhood,
+            price: property.price?.amount ?? 0,
+            bedrooms: property.bedrooms,
+            bathrooms: property.bathrooms,
+            area: property.builtArea ?? 0,
+            featured: property.isFeatured,
+            parking: hasParking,
+            petFriendly: property.petFriendly,
+            imageSrc: exploreTypeMeta[type].imageSrc,
+            coverPhotoUrl: property.coverPhotoUrl,
+          };
+        }) ?? [],
+    [filters.mode, propertiesQuery.data, t],
   );
 
   const listings = useMemo(
