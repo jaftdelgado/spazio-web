@@ -4,6 +4,7 @@ import path from "path";
 const nextConfig: NextConfig = {
   reactCompiler: true,
   turbopack: {
+    root: __dirname,
     resolveAlias: {
       "@": path.resolve(__dirname, "src"),
       "@lib": path.resolve(__dirname, "src/lib"),
