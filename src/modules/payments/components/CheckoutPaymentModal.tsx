@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import QRCode from "qrcode";
 import { 
   CreditCardIcon, 
   UserIcon, 
@@ -24,6 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/auth/useAuth";
+import { HttpError } from "@/lib/http/http-errors";
 import { useProcessPayment } from "../application/hooks/usePayments";
 import type { CheckoutContext } from "../domain/payments.entity";
 
@@ -72,12 +74,56 @@ export function CheckoutPaymentModal({
   const [payerEmail, setPayerEmail] = React.useState(user?.email || "");
 
   const [isProcessing, setIsProcessing] = React.useState(false);
+  const [isQrLoading, setIsQrLoading] = React.useState(true);
   const [paymentResult, setPaymentResult] = React.useState<{
     success: boolean;
     message: string;
     referenceNumber?: string | null;
     isOxxo?: boolean;
   } | null>(null);
+
+  const [newQrCodeUrl, setNewQrCodeUrl] = React.useState<string>("");
+  const [existingQrCodeUrl, setExistingQrCodeUrl] = React.useState<string>("");
+
+  // Generate QR code locally for new payment reference
+  React.useEffect(() => {
+    if (paymentResult?.referenceNumber) {
+      setIsQrLoading(true);
+      QRCode.toDataURL(paymentResult.referenceNumber, { width: 150, margin: 1 })
+        .then((url) => {
+          setNewQrCodeUrl(url);
+          setIsQrLoading(false);
+        })
+        .catch((err) => {
+          console.error("Error generating QR code:", err);
+          setIsQrLoading(false);
+        });
+    } else {
+      setNewQrCodeUrl("");
+    }
+  }, [paymentResult?.referenceNumber]);
+
+  // Generate QR code locally for existing payment reference
+  React.useEffect(() => {
+    const ref = checkout?.existingPaymentUuid
+      ? "REF-" + checkout.existingPaymentUuid.slice(0, 8).toUpperCase()
+      : "";
+
+    if (ref) {
+      setIsQrLoading(true);
+      QRCode.toDataURL(ref, { width: 150, margin: 1 })
+        .then((url) => {
+          setExistingQrCodeUrl(url);
+          setIsQrLoading(false);
+        })
+        .catch((err) => {
+          console.error("Error generating QR code:", err);
+          setIsQrLoading(false);
+        });
+    } else {
+      setExistingQrCodeUrl("");
+    }
+  }, [checkout?.existingPaymentUuid]);
 
   // Pre-populate email
   React.useEffect(() => {
@@ -88,6 +134,21 @@ export function CheckoutPaymentModal({
       return () => clearTimeout(timer);
     }
   }, [user]);
+
+  React.useEffect(() => {
+    if (isOpen && checkout?.existingPaymentMethod?.trim().toLowerCase() === "oxxo") {
+      setPaymentType("oxxo");
+    } else {
+      setPaymentType("card");
+    }
+  }, [isOpen, checkout]);
+
+  // If checkout amount exceeds OXXO limit, force card payment type
+  React.useEffect(() => {
+    if (checkout && checkout.amount > 10000) {
+      setPaymentType("card");
+    }
+  }, [checkout]);
 
   // Load MercadoPago SDK script
   React.useEffect(() => {
@@ -112,6 +173,9 @@ export function CheckoutPaymentModal({
         setPaymentType("card");
         setIsProcessing(false);
         setPaymentResult(null);
+        setIsQrLoading(true);
+        setNewQrCodeUrl("");
+        setExistingQrCodeUrl("");
       }, 0);
       return () => clearTimeout(timer);
     }
@@ -254,7 +318,28 @@ export function CheckoutPaymentModal({
       }
     } catch (err: unknown) {
       console.error("Payment error:", err);
-      const errMsg = err instanceof Error ? err.message : "Ocurrió un error inesperado al procesar el pago.";
+      let errMsg = "Ocurrió un error inesperado al procesar el pago.";
+      if (err instanceof HttpError) {
+        const body = err.body as { error?: string } | null;
+        if (body?.error && body.error.trim() !== "") {
+          errMsg = body.error;
+        } else {
+          errMsg = `Error del servidor (${err.status}): No se pudo procesar el pago.`;
+        }
+      } else if (err instanceof Error) {
+        errMsg = err.message;
+      } else if (err && typeof err === "object") {
+        // El SDK de MercadoPago lanza objetos planos (no instancias de Error)
+        // Estructura típica: { message: "...", cause: [{ code, description }] }
+        const mpErr = err as { message?: string; cause?: Array<{ description?: string; code?: number }> };
+        if (mpErr.cause?.[0]?.description) {
+          errMsg = `Error de tarjeta: ${mpErr.cause[0].description}`;
+        } else if (mpErr.message) {
+          errMsg = mpErr.message;
+        } else {
+          errMsg = "Error al validar la tarjeta. Verifique los datos e intente de nuevo.";
+        }
+      }
       setPaymentResult({
         success: false,
         message: errMsg,
@@ -295,15 +380,21 @@ export function CheckoutPaymentModal({
 
             {paymentResult.referenceNumber && (
               <div className="mt-6 flex flex-col items-center space-y-4 w-full">
-                <div className="rounded-2xl bg-white p-3 shadow-md border border-border">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${paymentResult.referenceNumber}`}
-                    alt="Código QR OXXO"
-                    width={150}
-                    height={150}
-                    className="mx-auto"
-                  />
+                <div className="relative rounded-2xl bg-white p-3 shadow-md border border-border flex items-center justify-center min-h-[174px] min-w-[174px]">
+                  {isQrLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white rounded-2xl">
+                      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+                    </div>
+                  )}
+                  {newQrCodeUrl && (
+                    <img
+                      src={newQrCodeUrl}
+                      alt="Código QR OXXO"
+                      width={150}
+                      height={150}
+                      className="mx-auto"
+                    />
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground max-w-[280px]">
                   Presenta este código QR o proporciona la siguiente referencia en caja para realizar tu pago en cualquier OXXO.
@@ -377,11 +468,14 @@ export function CheckoutPaymentModal({
                   </button>
                   <button
                     type="button"
+                    disabled={checkout !== null && checkout.amount > 10000}
                     onClick={() => setPaymentType("oxxo")}
-                    className={`flex flex-col items-center justify-center p-4 rounded-3xl border transition-all cursor-pointer ${
-                      paymentType === "oxxo"
-                        ? "border-primary bg-primary/5 text-primary shadow-sm"
-                        : "border-border/80 bg-background text-muted-foreground hover:bg-muted/10"
+                    className={`flex flex-col items-center justify-center p-4 rounded-3xl border transition-all ${
+                      checkout !== null && checkout.amount > 10000
+                        ? "border-border/40 bg-muted/20 text-muted-foreground/40 cursor-not-allowed opacity-50"
+                        : paymentType === "oxxo"
+                          ? "border-primary bg-primary/5 text-primary shadow-sm cursor-pointer"
+                          : "border-border/80 bg-background text-muted-foreground hover:bg-muted/10 cursor-pointer"
                     }`}
                   >
                     <HugeiconsIcon icon={Mail01Icon} size={22} className="mb-2" />
@@ -390,93 +484,131 @@ export function CheckoutPaymentModal({
                 </div>
               </div>
 
-              {/* Payer Email */}
-              <div className="space-y-1.5">
-                <label htmlFor="checkout-payer-email" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
-                  <HugeiconsIcon icon={Mail01Icon} size={12} />
-                  <span>Correo Electrónico de Contacto</span>
-                </label>
-                <Input
-                  id="checkout-payer-email"
-                  type="email"
-                  required
-                  placeholder="ejemplo@correo.com"
-                  value={payerEmail}
-                  onChange={(e) => setPayerEmail(e.target.value)}
-                  className="rounded-2xl"
-                />
-              </div>
+              {checkout !== null && checkout.amount > 10000 && (
+                <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-3.5 flex gap-2.5 text-xs text-amber-600 dark:text-amber-500 animate-fade-in">
+                  <HugeiconsIcon icon={Alert02Icon} size={16} className="shrink-0 mt-0.5" />
+                  <p className="leading-normal">
+                    El pago por **OXXO (Efectivo)** tiene un límite máximo de **$10,000.00 MXN**. Para montos superiores, por favor utiliza una tarjeta de crédito o débito.
+                  </p>
+                </div>
+              )}
 
-              {paymentType === "card" && (
+              {paymentType === "oxxo" && checkout?.existingPaymentMethod?.trim().toLowerCase() === "oxxo" ? (
+                <div className="flex flex-col items-center text-center animate-fade-in space-y-4 py-2">
+                  <div className="relative rounded-2xl bg-white p-3 shadow-md border border-border flex items-center justify-center min-h-[174px] min-w-[174px]">
+                    {isQrLoading && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-white rounded-2xl">
+                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+                      </div>
+                    )}
+                    {existingQrCodeUrl && (
+                      <img
+                        src={existingQrCodeUrl}
+                        alt="Código QR OXXO"
+                        width={150}
+                        height={150}
+                        className="mx-auto"
+                      />
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground max-w-[280px]">
+                    Esta referencia ya fue generada. Presenta este código QR o proporciona la siguiente referencia en caja para realizar tu pago en cualquier OXXO.
+                  </p>
+                  <div className="rounded-2xl bg-muted/40 px-5 py-2.5 text-sm font-bold font-mono text-foreground border border-border/70 select-all">
+                    Referencia: {"REF-" + checkout.existingPaymentUuid?.slice(0, 8).toUpperCase()}
+                  </div>
+                </div>
+              ) : (
                 <>
-                  {/* Card Number */}
+                  {/* Payer Email */}
                   <div className="space-y-1.5">
-                    <label htmlFor="checkout-card-number" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
-                      <HugeiconsIcon icon={CreditCardIcon} size={12} />
-                      <span>Número de Tarjeta</span>
+                    <label htmlFor="checkout-payer-email" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
+                      <HugeiconsIcon icon={Mail01Icon} size={12} />
+                      <span>Correo Electrónico de Contacto</span>
                     </label>
                     <Input
-                      id="checkout-card-number"
-                      type="text"
+                      id="checkout-payer-email"
+                      type="email"
                       required
-                      placeholder="0000 0000 0000 0000"
-                      value={cardNumber}
-                      onChange={handleCardNumberChange}
+                      placeholder="ejemplo@correo.com"
+                      value={payerEmail}
+                      onChange={(e) => setPayerEmail(e.target.value)}
                       className="rounded-2xl"
                     />
                   </div>
 
-                  {/* Cardholder Name */}
-                  <div className="space-y-1.5">
-                    <label htmlFor="checkout-cardholder-name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
-                      <HugeiconsIcon icon={UserIcon} size={12} />
-                      <span>Nombre del Titular</span>
-                    </label>
-                    <Input
-                      id="checkout-cardholder-name"
-                      type="text"
-                      required
-                      placeholder="Escribe como aparece en la tarjeta"
-                      value={cardholderName}
-                      onChange={(e) => setCardholderName(e.target.value)}
-                      className="rounded-2xl"
-                    />
-                  </div>
+                  {paymentType === "card" && (
+                    <>
+                      {/* Card Number */}
+                      <div className="space-y-1.5">
+                        <label htmlFor="checkout-card-number" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
+                          <HugeiconsIcon icon={CreditCardIcon} size={12} />
+                          <span>Número de Tarjeta</span>
+                        </label>
+                        <Input
+                          id="checkout-card-number"
+                          type="text"
+                          required
+                          placeholder="0000 0000 0000 0000"
+                          value={cardNumber}
+                          onChange={handleCardNumberChange}
+                          className="rounded-2xl"
+                        />
+                      </div>
 
-                  {/* Expiry and CVV */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label htmlFor="checkout-card-expiry" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
-                        <HugeiconsIcon icon={Calendar01Icon} size={12} />
-                        <span>Vencimiento</span>
-                      </label>
-                      <Input
-                        id="checkout-card-expiry"
-                        type="text"
-                        required
-                        placeholder="MM/AA"
-                        value={expiry}
-                        onChange={handleExpiryChange}
-                        className="rounded-2xl"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label htmlFor="checkout-card-cvv" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
-                        <HugeiconsIcon icon={AccessIcon} size={12} />
-                        <span>CVV</span>
-                      </label>
-                      <Input
-                        id="checkout-card-cvv"
-                        type="password"
-                        required
-                        placeholder="123"
-                        maxLength={4}
-                        value={cvv}
-                        onChange={(e) => setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                        className="rounded-2xl"
-                      />
-                    </div>
-                  </div>
+                      {/* Cardholder Name */}
+                      <div className="space-y-1.5">
+                        <label htmlFor="checkout-cardholder-name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
+                          <HugeiconsIcon icon={UserIcon} size={12} />
+                          <span>Nombre del Titular</span>
+                        </label>
+                        <Input
+                          id="checkout-cardholder-name"
+                          type="text"
+                          required
+                          placeholder="Escribe como aparece en la tarjeta"
+                          value={cardholderName}
+                          onChange={(e) => setCardholderName(e.target.value)}
+                          className="rounded-2xl"
+                        />
+                      </div>
+
+                      {/* Expiry and CVV */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label htmlFor="checkout-card-expiry" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
+                            <HugeiconsIcon icon={Calendar01Icon} size={12} />
+                            <span>Vencimiento</span>
+                          </label>
+                          <Input
+                            id="checkout-card-expiry"
+                            type="text"
+                            required
+                            placeholder="MM/AA"
+                            value={expiry}
+                            onChange={handleExpiryChange}
+                            className="rounded-2xl"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label htmlFor="checkout-card-cvv" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
+                            <HugeiconsIcon icon={AccessIcon} size={12} />
+                            <span>CVV</span>
+                          </label>
+                          <Input
+                            id="checkout-card-cvv"
+                            type="password"
+                            required
+                            placeholder="123"
+                            maxLength={4}
+                            value={cvv}
+                            onChange={(e) => setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                            className="rounded-2xl"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </>
               )}
             </div>
@@ -489,19 +621,23 @@ export function CheckoutPaymentModal({
                 onClick={() => onOpenChange(false)}
                 className="rounded-2xl px-5"
               >
-                Pagar luego
+                {paymentType === "oxxo" && checkout?.existingPaymentMethod?.trim().toLowerCase() === "oxxo" ? "Cerrar" : "Pagar luego"}
               </Button>
-              <Button
-                type="submit"
-                disabled={!isFormValid || isProcessing}
-                className="rounded-2xl flex-1 py-5 text-sm font-semibold cursor-pointer"
-              >
-                {isProcessing
-                  ? "Procesando pago..."
-                  : paymentType === "card"
-                    ? "Confirmar y Pagar"
-                    : "Generar Referencia OXXO"}
-              </Button>
+              {!(paymentType === "oxxo" && checkout?.existingPaymentMethod?.trim().toLowerCase() === "oxxo") && (
+                <Button
+                  type="submit"
+                  disabled={!isFormValid || isProcessing}
+                  className="rounded-2xl flex-1 py-5 text-sm font-semibold cursor-pointer"
+                >
+                  {isProcessing
+                    ? "Procesando pago..."
+                    : paymentType === "card"
+                      ? checkout?.existingPaymentMethod
+                        ? "Pagar de una vez"
+                        : "Confirmar y Pagar"
+                      : "Generar Referencia OXXO"}
+                </Button>
+              )}
             </AlertDialogFooter>
           </form>
         )}

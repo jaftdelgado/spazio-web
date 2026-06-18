@@ -14,12 +14,14 @@ export interface ContractsEntity {
 }
 
 export interface ContractListItemEntity {
+  contractId: number;
   contractUuid: string;
   transactionType: string;
   propertyTitle: string;
   agreedAmount: number;
   currency: string;
   startDate: string;
+  endDate?: string | null;
   status: string;
   clientName: string;
   createdAt: string;
