@@ -71,23 +71,27 @@ describe("contracts.mapper", () => {
   it("maps contract list items", () => {
     expect(
       mapContractListItem({
+        contract_id: 5,
         contract_uuid: "ae2e3a48-d96c-4729-931f-8051c382a56c",
         transaction_type: "rent",
         property_title: "Casa en Xalapa",
         agreed_amount: 8000,
         currency: "MXN",
         start_date: "2026-06-18T00:00:00Z",
+        end_date: "2026-07-18T00:00:00Z",
         status: "Status.Draft",
         client_name: "Cliente Renta",
         created_at: "2026-06-17T00:00:00Z",
       }),
     ).toEqual({
+      contractId: 5,
       contractUuid: "ae2e3a48-d96c-4729-931f-8051c382a56c",
       transactionType: "rent",
       propertyTitle: "Casa en Xalapa",
       agreedAmount: 8000,
       currency: "MXN",
       startDate: "2026-06-18T00:00:00Z",
+      endDate: "2026-07-18T00:00:00Z",
       status: "Status.Draft",
       clientName: "Cliente Renta",
       createdAt: "2026-06-17T00:00:00Z",
@@ -98,12 +102,14 @@ describe("contracts.mapper", () => {
     expect(
       mapContractList([
         {
+          contract_id: 7,
           contract_uuid: "42b16c12-ad9d-4c59-ba54-01acfc4103ee",
           transaction_type: "sale",
           property_title: "Depa Nuevo Moderno",
           agreed_amount: 975000,
           currency: "MXN",
           start_date: "2026-06-18T00:00:00Z",
+          end_date: null,
           status: "Status.Draft",
           client_name: "Cliente Compra",
           created_at: "2026-06-17T00:00:00Z",
