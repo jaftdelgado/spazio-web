@@ -1,6 +1,7 @@
 "use client";
 
 import type {
+  AgentListItem,
   AdminCreateUserInput,
   AdminCreateUserResult,
   ChangePasswordInput,
@@ -29,6 +30,7 @@ import type {
 } from "./users.entity";
 
 export interface UserRepository {
+  listAgents(): Promise<AgentListItem[]>;
   preRegister(input: PreRegisterInput): Promise<MessageResult>;
   verifyEmail(input: VerifyEmailInput): Promise<VerifyEmailResult>;
   completeRegister(input: CompleteRegisterInput): Promise<RegisterResult>;

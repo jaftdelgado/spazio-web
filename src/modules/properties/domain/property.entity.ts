@@ -23,6 +23,14 @@ export interface PropertyCardStatus {
   name: string;
 }
 
+export interface AssignedAgent {
+  userId: number;
+  userUuid: string;
+  firstName: string;
+  lastName: string;
+  profilePictureUrl: string | null;
+}
+
 export interface PropertyCard {
   propertyId: number;
   propertyUuid: string;
@@ -33,6 +41,7 @@ export interface PropertyCard {
   propertyType: PropertyCardType;
   modality: PropertyCardModality;
   status: PropertyCardStatus;
+  assignedAgent?: AssignedAgent;
   price: PropertyCardPrice | null;
   location: PropertyCardLocation | null;
   city: string | null;
@@ -115,6 +124,7 @@ export interface PropertyDetail {
   lotArea: number;
   isFeatured: boolean;
   registeredBy: string;
+  assignedAgent?: AssignedAgent;
   residential: ResidentialDetail | null;
   commercial: CommercialDetail | null;
   location: PropertyLocation | null;
@@ -275,6 +285,7 @@ export type UpdatePropertyInput = {
   description?: string;
   lotArea?: number;
   isFeatured?: boolean;
+  agentId?: number;
   residential?: UpdateResidentialInput;
   commercial?: UpdateCommercialInput;
   location?: UpdateLocationInput;
@@ -343,6 +354,7 @@ export type CreatePropertyInput = {
   description: string;
   propertyTypeId: number;
   modalityId: number;
+  agentId?: number;
   lotArea: number;
   isFeatured: boolean;
   residential?: CreateResidentialInput;

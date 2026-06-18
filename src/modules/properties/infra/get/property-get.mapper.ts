@@ -1,6 +1,7 @@
 "use client";
 
 import type {
+  AssignedAgent,
   CommercialDetail,
   PropertyCard,
   PropertyCardLocation,
@@ -51,6 +52,7 @@ type PropertyCardDTO = {
   property_type: PropertyCardTypeDTO;
   modality: PropertyCardModalityDTO;
   status: PropertyCardStatusDTO;
+  assigned_agent?: AssignedAgentDTO | null;
   price: PropertyCardPriceDTO;
   location: {
     country_id: number;
@@ -67,6 +69,14 @@ type PropertyCardDTO = {
   bathrooms?: number | null;
   parking_spots?: number | null;
   built_area?: number | null;
+};
+
+type AssignedAgentDTO = {
+  user_id: number;
+  user_uuid: string;
+  first_name: string;
+  last_name: string;
+  profile_picture_url: string | null;
 };
 
 type ListMetaDTO = {
@@ -131,6 +141,7 @@ type PropertyDetailDataDTO = {
   lot_area: number;
   is_featured: boolean;
   registered_by?: string;
+  assigned_agent?: AssignedAgentDTO | null;
   residential: ResidentialDTO | null;
   commercial: CommercialDTO | null;
   location: LocationDTO | null;
@@ -217,6 +228,22 @@ const mapPropertyCardLocation = (
   };
 };
 
+const mapAssignedAgent = (
+  dto?: AssignedAgentDTO | null,
+): AssignedAgent | undefined => {
+  if (!dto) {
+    return undefined;
+  }
+
+  return {
+    userId: dto.user_id,
+    userUuid: dto.user_uuid,
+    firstName: dto.first_name,
+    lastName: dto.last_name,
+    profilePictureUrl: dto.profile_picture_url,
+  };
+};
+
 const resolvePropertyCardCity = (dto: PropertyCardDTO): string | null => {
   if (dto.city && dto.city.trim() !== "") {
     return dto.city;
@@ -242,6 +269,7 @@ const mapPropertyCard = (dto: PropertyCardDTO): PropertyCard => ({
   propertyType: mapPropertyCardType(dto.property_type),
   modality: mapPropertyCardModality(dto.modality),
   status: mapPropertyCardStatus(dto.status),
+  assignedAgent: mapAssignedAgent(dto.assigned_agent),
   price: mapPropertyCardPrice(dto.price),
   location: mapPropertyCardLocation(dto.location),
   city: resolvePropertyCardCity(dto),
@@ -315,6 +343,7 @@ export const mapPropertyDetail = (dto: GetPropertyDTO): PropertyDetail => ({
   lotArea: dto.data.lot_area,
   isFeatured: dto.data.is_featured,
   registeredBy: dto.data.registered_by ?? "",
+  assignedAgent: mapAssignedAgent(dto.data.assigned_agent),
   residential: dto.data.residential ? mapResidential(dto.data.residential) : null,
   commercial: dto.data.commercial ? mapCommercial(dto.data.commercial) : null,
   location: dto.data.location ? mapLocation(dto.data.location) : null,

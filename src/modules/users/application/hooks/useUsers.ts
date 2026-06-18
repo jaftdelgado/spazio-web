@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { auth } from "@lib/auth/auth";
 import { authSessionQueryKey } from "@lib/auth/useAuth";
@@ -26,6 +26,12 @@ import { usersHttpAdapter } from "@users/infra/users.http-adapter";
 function invalidateAuthSession(queryClient: ReturnType<typeof useQueryClient>) {
   queryClient.invalidateQueries({ queryKey: authSessionQueryKey });
 }
+
+export const useAssignableAgents = () =>
+  useQuery({
+    queryKey: ["users", "agents"],
+    queryFn: () => usersHttpAdapter.listAgents(),
+  });
 
 export const usePreRegister = () =>
   useMutation({

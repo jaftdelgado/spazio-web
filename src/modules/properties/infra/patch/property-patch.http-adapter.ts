@@ -22,6 +22,7 @@ export const propertyPatchHttpAdapter: Pick<
     if (input.description !== undefined) body.description = input.description;
     if (input.lotArea !== undefined) body.lot_area = input.lotArea;
     if (input.isFeatured !== undefined) body.is_featured = input.isFeatured;
+    if (input.agentId !== undefined) body.agent_id = input.agentId;
 
     if (input.residential !== undefined) {
       body.residential = {

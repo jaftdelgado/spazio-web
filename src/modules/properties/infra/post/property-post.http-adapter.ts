@@ -18,6 +18,7 @@ export const propertyPostHttpAdapter: Pick<
       description: input.description,
       property_type_id: input.propertyTypeId,
       modality_id: input.modalityId,
+      ...(input.agentId !== undefined && { agent_id: input.agentId }),
       lot_area: input.lotArea,
       is_featured: input.isFeatured,
       location: {

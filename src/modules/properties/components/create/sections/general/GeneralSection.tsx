@@ -10,17 +10,23 @@ import { ModalitySubsection } from "./components/ModalitySubsection";
 import { PropertyTypeSubsection } from "./components/PropertyTypeSubsection";
 
 export function GeneralSection({
+  canClearAgentSelection = true,
   form,
   disableImmutableFields = false,
   patchForm,
 }: {
+  canClearAgentSelection?: boolean;
   form: PropertyCreateFormState;
   disableImmutableFields?: boolean;
   patchForm: PatchPropertyCreateForm;
 }) {
   return (
     <>
-      <IdentitySubsection form={form} patchForm={patchForm} />
+      <IdentitySubsection
+        canClearAgentSelection={canClearAgentSelection}
+        form={form}
+        patchForm={patchForm}
+      />
       <PropertyTypeSubsection
         disabled={disableImmutableFields}
         form={form}

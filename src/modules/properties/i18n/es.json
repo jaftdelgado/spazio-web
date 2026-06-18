@@ -119,6 +119,14 @@
         "hint": "Nombre comercial del inmueble.",
         "placeholder": "Ej: Departamento amueblado cerca de Polanco"
       },
+      "agent": {
+        "label": "Agente asignado",
+        "placeholder": "Selecciona un agente",
+        "unassigned": "Sin agente asignado",
+        "hint": "Opcional. Si no seleccionas un agente, la propiedad quedará sin asignación.",
+        "loading": "Cargando agentes asignables...",
+        "error": "No se pudieron cargar los agentes asignables."
+      },
       "locationMap": {
         "label": "Mapa",
         "hint": "Haz clic o arrastra el marcador para fijar la ubicación exacta del inmueble.",
@@ -521,6 +529,9 @@
         "location": "Completa la ubicación antes de guardar los cambios.",
         "pricing": "Completa la información de precios antes de guardar los cambios."
       }
+    },
+    "fields": {
+      "agentLockedHint": "Puedes reasignar la propiedad a otro agente, pero este flujo no permite dejarla sin agente una vez asignada."
     }
   },
   "searchPlaceholder": "Buscar propiedades...",
@@ -539,6 +550,7 @@
     "address": "Dirección",
     "modality": "Modalidad",
     "status": "Estado",
+    "agent": "Agente",
     "price": "Precio",
     "builtArea": "Área"
   },
@@ -563,7 +575,8 @@
   },
   "grid": {
     "price": "Precio",
-    "area": "Área"
+    "area": "Área",
+    "agentAssigned": "Agente: {{agent}}"
   },
   "listing": {
     "propertyTypes": {
@@ -621,7 +634,8 @@
     "locationEmpty": "No hay ubicación disponible para esta propiedad.",
     "pricingEmpty": "No hay precios activos para esta propiedad.",
     "summary": {
-      "registeredByLabel": "Registrado por"
+      "registeredByLabel": "Registrado por",
+      "assignedAgentLabel": "Agente asignado"
     },
     "pricing": {
       "sale": "Venta",

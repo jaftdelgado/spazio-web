@@ -12,14 +12,17 @@ import type {
 } from "@properties/components/create/types";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 
+import { AgentAssignmentSubsection } from "./AgentAssignmentSubsection";
 import { DescriptionField } from "./DescriptionField";
 
 type IdentitySubsectionProps = {
+  canClearAgentSelection?: boolean;
   form: PropertyCreateFormState;
   patchForm: PatchPropertyCreateForm;
 };
 
 export function IdentitySubsection({
+  canClearAgentSelection = true,
   form,
   patchForm,
 }: IdentitySubsectionProps) {
@@ -43,6 +46,19 @@ export function IdentitySubsection({
           value={form.title}
           onChange={(event) => patchForm({ title: event.target.value })}
         />
+      </CreateFormField>
+
+      <CreateFormField
+        htmlFor="property-agent"
+        label={t("create.fields.agent.label")}
+      >
+        <div id="property-agent">
+          <AgentAssignmentSubsection
+            agentId={form.agentId}
+            canClearSelection={canClearAgentSelection}
+            onChange={(agentId) => patchForm({ agentId })}
+          />
+        </div>
       </CreateFormField>
 
       <DescriptionField
