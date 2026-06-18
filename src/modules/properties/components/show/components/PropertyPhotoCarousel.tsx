@@ -26,7 +26,7 @@ export function PropertyPhotoCarousel({
 
   if (images.length === 0) {
     return (
-      <div className="flex aspect-[4/3] w-full items-center justify-center rounded-[28px] bg-muted/35 text-muted-foreground">
+      <div className="flex aspect-4/3 w-full items-center justify-center rounded-[28px] bg-card text-muted-foreground">
         <div className="flex flex-col items-center gap-3">
           <HugeiconsIcon icon={Building03Icon} size={40} strokeWidth={1.8} />
           <p className="text-sm font-medium">{emptyLabel}</p>
@@ -36,7 +36,7 @@ export function PropertyPhotoCarousel({
   }
 
   return (
-    <div className="property-show-carousel overflow-hidden rounded-[28px] bg-muted/20">
+    <div className="property-show-carousel overflow-hidden rounded-[28px]">
       <style>{`
         .property-show-carousel .Carousal_005 {
           height: clamp(320px, 52vw, 560px);

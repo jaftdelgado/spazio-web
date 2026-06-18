@@ -288,15 +288,14 @@ function buildUpdatePropertyInput(
   propertyTypeKind: PropertyTypeKind,
   initialAgentId: number | null,
 ): UpdatePropertyInput {
+  const hasAgentAssignmentChanged = form.agentId !== initialAgentId;
+
   return {
     title: form.title.trim(),
     description: form.description.trim(),
     lotArea: Number(form.lotArea),
     isFeatured: form.isFeatured,
-    agentId:
-      form.agentId !== null && form.agentId !== initialAgentId
-        ? form.agentId
-        : undefined,
+    agentId: hasAgentAssignmentChanged ? form.agentId : undefined,
     location: {
       cityId: form.cityId ?? 0,
       neighborhood: form.neighborhood.trim(),
@@ -909,7 +908,6 @@ function PropertyEditLoadedContent(props: {
       case "general":
         return (
           <GeneralSection
-            canClearAgentSelection={initialAgentId === null}
             disableImmutableFields
             form={form}
             patchForm={patchForm}

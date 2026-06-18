@@ -531,7 +531,7 @@
       }
     },
     "fields": {
-      "agentLockedHint": "Puedes reasignar la propiedad a otro agente, pero este flujo no permite dejarla sin agente una vez asignada."
+      "agentLockedHint": "Puedes cambiar o quitar la asignación del agente en cualquier momento."
     }
   },
   "searchPlaceholder": "Buscar propiedades...",
@@ -571,7 +571,9 @@
     "loadErrorTitle": "No pudimos cargar las propiedades",
     "retry": "Reintentar",
     "connectionErrorDescription": "No pudimos conectarnos en este momento. Revisa tu conexión e intenta nuevamente.",
-    "loadErrorDescription": "No fue posible cargar las propiedades por ahora. Intenta de nuevo en un momento."
+    "loadErrorDescription": "No fue posible cargar las propiedades por ahora. Intenta de nuevo en un momento.",
+    "agentEmptyTitle": "Aún no tienes propiedades asignadas",
+    "agentEmptyDescription": "Cuando se te asigne una propiedad, aparecerá aquí para que puedas gestionarla."
   },
   "grid": {
     "price": "Precio",
@@ -603,7 +605,7 @@
   "show": {
     "actions": {
       "backToList": "Volver a propiedades",
-      "edit": "Modificar",
+      "edit": "Modificar Propiedad",
       "show": "Mostrar",
       "hide": "Ocultar"
     },
