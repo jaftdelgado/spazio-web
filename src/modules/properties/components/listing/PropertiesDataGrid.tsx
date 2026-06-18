@@ -4,6 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 
 import {
+  UserCircleIcon,
   Building03Icon,
   Delete02Icon,
   DollarCircleIcon,
@@ -12,11 +13,11 @@ import {
   MapsLocation01Icon,
   MoreVerticalIcon,
   NoteIcon,
-  RulerIcon,
   TaskDone02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/config/routes";
 import {
@@ -48,6 +49,7 @@ type PropertyGridColumnId =
   | "address"
   | "modality"
   | "status"
+  | "agent"
   | "price"
   | "builtArea"
   | "actions";
@@ -117,6 +119,8 @@ function renderLoadingCell(columnId: PropertyGridColumnId) {
       return <Skeleton className="ml-auto h-4 w-28 rounded-full" />;
     case "builtArea":
       return <Skeleton className="ml-auto h-4 w-16 rounded-full" />;
+    case "agent":
+      return <Skeleton className="h-6 w-32 rounded-full" />;
     case "actions":
       return <Skeleton className="ml-auto h-8 w-8 rounded-2xl" />;
     default:
@@ -182,6 +186,35 @@ function renderPropertyCell(
           {getStatusLabel(row.status.statusId, row.status.name, t)}
         </span>
       );
+    case "agent": {
+      if (!row.assignedAgent) {
+        return <span className="text-muted-foreground">-</span>;
+      }
+
+      const fullName =
+        `${row.assignedAgent.firstName} ${row.assignedAgent.lastName}`.trim();
+      const initials = fullName
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase() ?? "")
+        .join("");
+
+      return (
+        <div className="flex min-w-0 items-center gap-2">
+          <Avatar className="size-6 border-border/70">
+            {row.assignedAgent.profilePictureUrl ? (
+              <AvatarImage
+                alt={fullName}
+                src={row.assignedAgent.profilePictureUrl}
+              />
+            ) : null}
+            <AvatarFallback className="text-[10px]">{initials}</AvatarFallback>
+          </Avatar>
+          <span className="truncate text-foreground">{fullName}</span>
+        </div>
+      );
+    }
     case "price":
       return (
         <span className="tabular-nums text-foreground">
@@ -200,7 +233,7 @@ function renderPropertyCell(
           <DropdownMenuTrigger asChild>
             <Button
               aria-label={labels.actionsAriaLabel}
-                className=""
+              className=""
               size="icon-sm"
               variant="ghost"
             >
@@ -278,10 +311,10 @@ export function PropertiesDataGrid({
         minWidth: 220,
       },
       {
-        id: "propertyType",
-        label: columnLabel(Building03Icon, t("columns.propertyType")),
-        width: 160,
-        minWidth: 140,
+        id: "agent",
+        label: columnLabel(UserCircleIcon, t("columns.agent")),
+        width: 220,
+        minWidth: 180,
       },
       {
         id: "address",
@@ -306,12 +339,6 @@ export function PropertiesDataGrid({
         label: columnLabel(DollarCircleIcon, t("columns.price")),
         width: 180,
         minWidth: 160,
-      },
-      {
-        id: "builtArea",
-        label: columnLabel(RulerIcon, t("columns.builtArea")),
-        width: 130,
-        minWidth: 110,
       },
       {
         id: "actions",

@@ -120,7 +120,16 @@
       },
       "title": {
         "label": "Title",
-        "hint": "Commercial name for the property."
+        "hint": "Commercial name for the property.",
+        "placeholder": "Ex: Furnished apartment near Polanco"
+      },
+      "agent": {
+        "label": "Assigned agent",
+        "placeholder": "Select an agent",
+        "unassigned": "No assigned agent",
+        "hint": "Optional. If you do not select an agent, the property will remain unassigned.",
+        "loading": "Loading assignable agents...",
+        "error": "Assignable agents could not be loaded."
       },
       "locationMap": {
         "label": "Map",
@@ -527,6 +536,9 @@
         "location": "Complete the location before saving changes.",
         "pricing": "Complete the pricing information before saving changes."
       }
+    },
+    "fields": {
+      "agentLockedHint": "You can reassign the property to another agent, but this flow does not allow leaving it unassigned once it already has one."
     }
   },
   "searchPlaceholder": "Search properties...",
@@ -545,6 +557,7 @@
     "address": "Address",
     "modality": "Modality",
     "status": "Status",
+    "agent": "Agent",
     "price": "Price",
     "builtArea": "Area"
   },
@@ -569,7 +582,8 @@
   },
   "grid": {
     "price": "Price",
-    "area": "Area"
+    "area": "Area",
+    "agentAssigned": "Agent: {{agent}}"
   },
   "listing": {
     "propertyTypes": {
@@ -627,7 +641,8 @@
     "locationEmpty": "No location is available for this property.",
     "pricingEmpty": "There are no active prices for this property.",
     "summary": {
-      "registeredByLabel": "Registered by"
+      "registeredByLabel": "Registered by",
+      "assignedAgentLabel": "Assigned agent"
     },
     "pricing": {
       "sale": "Sale",

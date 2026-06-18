@@ -29,6 +29,28 @@ vi.mock("@lib/auth/auth", () => ({
 }));
 
 describe("usersHttpAdapter", () => {
+  it("loads assignable agents", async () => {
+    vi.mocked(httpClient.get).mockResolvedValue({
+      data: [
+        {
+          user_id: 21,
+          user_uuid: "agent-21",
+          first_name: "Ada",
+          last_name: "Lovelace",
+          profile_picture_url: null,
+        },
+      ],
+    });
+
+    await expect(usersHttpAdapter.listAgents()).resolves.toEqual([
+      expect.objectContaining({
+        userId: 21,
+        profilePictureUrl: null,
+      }),
+    ]);
+    expect(httpClient.get).toHaveBeenCalledWith("/api/v1/users/agents");
+  });
+
   it("stores tokens after login", async () => {
     vi.mocked(httpClient.post).mockResolvedValue({
       access_token: "access",
