@@ -7,7 +7,6 @@ import {
   usePropertyTypes,
 } from "@/modules/catalogs/application/hooks/useCatalogs";
 import { ExploreFilterSidebar } from "@/modules/explore/components/ExploreFilterSidebar";
-import { ExploreHeroSection } from "@/modules/explore/components/ExploreHeroSection";
 import { ExploreListingsSection } from "@/modules/explore/components/ExploreListingsSection";
 import {
   exploreTypeMeta,
@@ -170,6 +169,9 @@ export function ExplorePageContent() {
           return {
             id: property.propertyUuid,
             title: property.title,
+            address:
+              property.addressSummary ??
+              [property.neighborhood, city].filter(Boolean).join(", "),
             type,
             mode: resolveListingMode(property.price?.priceType, filters.mode),
             city,
@@ -202,20 +204,6 @@ export function ExplorePageContent() {
 
   return (
     <ExploreShell>
-      <ExploreHeroSection
-        activeCount={activeCount}
-        heroSearch={heroSearch}
-        listingCount={listings.length}
-        onHeroSearchChange={setHeroSearch}
-        onSearchSubmit={() =>
-          setFilters((current) => ({
-            ...current,
-            search: heroSearch,
-          }))
-        }
-        totalCount={backendListings.length}
-      />
-
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]">
         <ExploreFilterSidebar
           activeCount={activeCount}

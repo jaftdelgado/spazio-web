@@ -10,6 +10,7 @@ export type ExploreListingMode = "sale" | "rent";
 export type ExploreListing = {
   id: string;
   title: string;
+  address: string;
   type: ExploreListingType;
   mode: ExploreListingMode;
   city: string;

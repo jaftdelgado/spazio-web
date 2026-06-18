@@ -4,14 +4,12 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import {
-  Building03Icon,
   DollarCircleIcon,
   Location01Icon,
   RulerIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@lib/auth/useAuth";
 import type { ExploreListing } from "@/modules/explore/data/explore-listings";
@@ -60,7 +58,7 @@ export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
 
   const displayPrice =
     displayMode === "rent"
-      ? rentPrice?.rentPrice ?? listing.price
+      ? (rentPrice?.rentPrice ?? listing.price)
       : listing.price;
 
   const modeLabel =
@@ -70,8 +68,6 @@ export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
 
   const typeLabel = t(`explore.cards.propertyTypes.${listing.type}`);
   const imageSrc = listing.coverPhotoUrl ?? listing.imageSrc;
-
-  const actionLabel = t("explore.cards.viewMore");
 
   const handleAction = () => {
     if (isClient) {
@@ -83,14 +79,25 @@ export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
   };
 
   return (
-    <Card className="group gap-0 overflow-hidden border-none bg-transparent p-0 shadow-none">
-      <div className="relative h-52 overflow-hidden rounded-[1.35rem] bg-muted">
+    <Card
+      className="group gap-0 overflow-hidden bg-transparent py-0 shadow-none ring-0 transition-colors duration-200 hover:cursor-pointer hover:bg-accent/60"
+      role="link"
+      tabIndex={0}
+      onClick={handleAction}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          handleAction();
+        }
+      }}
+    >
+      <div className="relative h-52 overflow-hidden rounded-2xl bg-muted">
         {listing.coverPhotoUrl ? (
           <Image
             fill
             unoptimized
             alt={listing.title}
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover"
             sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
             src={imageSrc}
           />
@@ -103,104 +110,63 @@ export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
             />
           </div>
         )}
-
-        <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-          <span className="rounded-full bg-background px-3 py-1 text-xs font-medium text-foreground shadow-sm">
-            {typeLabel}
-          </span>
-          <span className="rounded-full bg-background px-3 py-1 text-xs font-medium text-foreground shadow-sm">
-            {modeLabel}
-          </span>
-        </div>
-
-        <button
-          type="button"
-          aria-label={t("explore.cards.viewOptions")}
-          className="absolute top-3 right-3 flex size-8 items-center justify-center rounded-full bg-background text-lg leading-none text-foreground shadow-sm"
-          onClick={handleAction}
-        >
-          ⋮
-        </button>
       </div>
 
-      <div className="space-y-3 px-1 pt-3">
-        <div className="flex items-start justify-between gap-3">
-          <h3 className="line-clamp-2 text-sm font-semibold text-foreground">
-            {listing.title}
-          </h3>
+      <div className="px-3 py-3 sm:px-4 sm:py-4">
+        <div className="flex h-auto flex-col gap-2.5">
+          <div className="flex items-start justify-between gap-3">
+            <h3 className="line-clamp-2 text-sm font-medium text-foreground">
+              {listing.title}
+            </h3>
 
-          {listing.featured ? (
-            <span className="shrink-0 rounded-full border px-2 py-0.5 text-[11px] text-muted-foreground">
-              {t("explore.cards.featured")}
-            </span>
-          ) : (
-            <span className="shrink-0 text-xs text-muted-foreground">
-              ☆ {t("explore.cards.available")}
-            </span>
-          )}
-        </div>
-
-        <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
-          <HugeiconsIcon
-            icon={Location01Icon}
-            size={14}
-            className="mt-0.5 shrink-0"
-          />
-          <span className="line-clamp-1">
-            {listing.neighborhood}, {listing.city}
-          </span>
-        </p>
-
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <HugeiconsIcon icon={RulerIcon} size={14} />
-              <span>{t("explore.cards.area")}</span>
-            </p>
-            <p className="mt-1 font-semibold text-foreground">
-              {listing.area > 0
-                ? `${listing.area} m2`
-                : t("explore.cards.noValue")}
-            </p>
+            {listing.featured ? (
+              <span className="shrink-0 rounded-full border px-2 py-0.5 text-[11px] text-muted-foreground">
+                {t("explore.cards.featured")}
+              </span>
+            ) : null}
           </div>
 
-          <div>
-            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <HugeiconsIcon icon={DollarCircleIcon} size={14} />
-              <span>{t("explore.cards.price")}</span>
-            </p>
-            <p className="mt-1 font-semibold text-foreground">
-              {displayPrice > 0
-                ? formatPrice(
-                    displayPrice,
-                    displayMode,
-                    intlLocale,
-                    t("explore.cards.perMonth"),
-                  )
-                : t("explore.cards.noValue")}
-            </p>
+          <p className="flex items-start gap-1.5 pr-2 text-xs leading-5 text-muted-foreground">
+            <HugeiconsIcon
+              icon={Location01Icon}
+              size={14}
+              className="mt-0.5 shrink-0"
+            />
+            <span className="line-clamp-2 overflow-hidden text-ellipsis">
+              {listing.address}
+            </span>
+          </p>
+
+          <div className="grid grid-cols-2 gap-5 text-sm">
+            <div>
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <HugeiconsIcon icon={RulerIcon} size={14} />
+                <span>{t("explore.cards.area")}</span>
+              </p>
+              <p className="mt-1 font-semibold text-foreground">
+                {listing.area > 0
+                  ? `${listing.area} m2`
+                  : t("explore.cards.noValue")}
+              </p>
+            </div>
+
+            <div>
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <HugeiconsIcon icon={DollarCircleIcon} size={14} />
+                <span>{t("explore.cards.price")}</span>
+              </p>
+              <p className="mt-1 font-semibold text-foreground">
+                {displayPrice > 0
+                  ? formatPrice(
+                      displayPrice,
+                      displayMode,
+                      intlLocale,
+                      t("explore.cards.perMonth"),
+                    )
+                  : t("explore.cards.noValue")}
+              </p>
           </div>
         </div>
-
-        <div className="flex items-center justify-between gap-3 pt-1">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <HugeiconsIcon icon={Building03Icon} size={14} />
-            <span>
-              {listing.bedrooms ?? t("explore.cards.noValue")}{" "}
-              {t("explore.cards.bedroomsShort")} ·{" "}
-              {listing.bathrooms ?? t("explore.cards.noValue")}{" "}
-              {t("explore.cards.bathroomsShort")}
-            </span>
-          </div>
-
-          <Button
-            type="button"
-            size="sm"
-            className="h-8 px-4 text-xs"
-            onClick={handleAction}
-          >
-            {actionLabel}
-          </Button>
         </div>
       </div>
     </Card>
