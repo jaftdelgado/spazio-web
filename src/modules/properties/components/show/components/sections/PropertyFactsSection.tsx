@@ -27,7 +27,7 @@ export function PropertyFactsSection({
       action={
         <button
           type="button"
-          className="text-sm font-normal text-muted-foreground"
+          className="text-sm text-muted-foreground"
           onClick={() => setIsExpanded((current) => !current)}
         >
           {isExpanded ? collapseLabel : expandLabel}

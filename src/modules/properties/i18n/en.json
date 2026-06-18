@@ -538,7 +538,7 @@
       }
     },
     "fields": {
-      "agentLockedHint": "You can reassign the property to another agent, but this flow does not allow leaving it unassigned once it already has one."
+      "agentLockedHint": "You can change or remove the assigned agent at any time."
     }
   },
   "searchPlaceholder": "Search properties...",
@@ -578,7 +578,9 @@
     "loadErrorTitle": "We could not load the properties",
     "retry": "Retry",
     "connectionErrorDescription": "We could not connect right now. Check your connection and try again.",
-    "loadErrorDescription": "We could not load the properties right now. Try again in a moment."
+    "loadErrorDescription": "We could not load the properties right now. Try again in a moment.",
+    "agentEmptyTitle": "You do not have assigned properties yet",
+    "agentEmptyDescription": "Once a property is assigned to you, it will appear here so you can manage it."
   },
   "grid": {
     "price": "Price",
@@ -610,7 +612,7 @@
   "show": {
     "actions": {
       "backToList": "Back to properties",
-      "edit": "Edit",
+      "edit": "Edit Property",
       "show": "Show",
       "hide": "Hide"
     },
