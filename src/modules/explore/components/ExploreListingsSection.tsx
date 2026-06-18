@@ -30,28 +30,14 @@ export function ExploreListingsSection({
 
   return (
     <section className="space-y-6">
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <header className="max-w-3xl space-y-3">
         <div>
-          <h2 className="text-xl font-medium text-foreground">
-            {t("explore.listings.title")}
+          <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+            {t("explore.hero.title")}
           </h2>
-          <p className="text-sm text-muted-foreground">
-            {isLoading
-              ? t("explore.listings.loadingSummary")
-              : t("explore.listings.showing", {
-                  visibleCount: String(listings.length),
-                  totalCount: String(totalCount),
-                })}
+          <p className="text-sm leading-6 text-muted-foreground sm:text-base">
+            {t("explore.hero.description")}
           </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="rounded-full border bg-card px-3 py-1 text-xs text-muted-foreground">
-            {t("explore.listings.publicBadge")}
-          </span>
-          <span className="rounded-full border bg-card px-3 py-1 text-xs text-muted-foreground">
-            {t("explore.listings.exploreBadge")}
-          </span>
         </div>
       </header>
 
@@ -74,17 +60,7 @@ export function ExploreListingsSection({
         <>
           <section className="grid gap-4 lg:grid-cols-3">
             {highlightedListings.map((listing) => (
-              <div key={listing.id} className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-foreground">
-                    {t("explore.listings.selectionTitle")}
-                  </p>
-                  <span className="rounded-full border bg-card px-2.5 py-1 text-[11px] text-muted-foreground">
-                    {t("explore.listings.curatedBadge")}
-                  </span>
-                </div>
-                <ExploreListingCard listing={listing} />
-              </div>
+              <ExploreListingCard key={listing.id} listing={listing} />
             ))}
           </section>
 
