@@ -446,7 +446,9 @@ export function PaymentsPageContent() {
 
       if (contractsQuery.data) {
         const matchedContract = contractsQuery.data.find((c) =>
+        const matchedContract = contractsQuery.data.find((c) =>
           isPaymentForContract(row, c, row.billingPeriod, isSameDate(row.billingPeriod, c.startDate))
+        );
         );
 
         if (matchedContract) {
