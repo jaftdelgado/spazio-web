@@ -103,7 +103,10 @@ export function AccountSettingsPageContent() {
     useWatch({ control: passwordForm.control, name: "newPassword" }) ?? "";
 
   const displayPhotoUrl = previewUrl ?? user?.profilePictureUrl ?? null;
-  const roleLabel = useMemo(() => user?.roleName ?? "Cuenta", [user?.roleName]);
+  const roleLabel = useMemo(
+    () => user?.roleName ?? t("settingsSidebar.account"),
+    [t, user?.roleName],
+  );
   const canDeleteAccount = deleteConfirmation.trim() === "ELIMINAR";
 
   useEffect(() => {
@@ -279,7 +282,7 @@ export function AccountSettingsPageContent() {
 
         <AccountIdentitySection
           displayPhotoUrl={displayPhotoUrl}
-          email={user?.email ?? "Cuenta"}
+          email={user?.email ?? t("settingsSidebar.account")}
           firstName={user?.firstName}
           lastName={user?.lastName}
           roleLabel={roleLabel}

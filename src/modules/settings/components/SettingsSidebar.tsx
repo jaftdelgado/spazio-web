@@ -6,26 +6,27 @@ import { Globe02Icon, ProfileIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import { cn } from "@/lib/utils";
-
-const settingsNavItems = [
-  {
-    href: "/settings/account",
-    icon: ProfileIcon,
-    label: "Cuenta y perfil",
-  },
-  {
-    href: "/settings/preferences",
-    icon: Globe02Icon,
-    label: "Preferencias",
-  },
-] as const;
+import { useUsersTranslation } from "@users/i18n/useUsersTranslation";
 
 export function SettingsSidebar() {
+  const { t } = useUsersTranslation();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const source = searchParams.get("from");
   const suffix =
     source === "admin" || source === "explore" ? `?from=${source}` : "";
+  const settingsNavItems = [
+    {
+      href: "/settings/account",
+      icon: ProfileIcon,
+      label: t("settingsSidebar.account"),
+    },
+    {
+      href: "/settings/preferences",
+      icon: Globe02Icon,
+      label: t("settingsSidebar.preferences"),
+    },
+  ] as const;
 
   return (
     <aside className="lg:sticky lg:top-[calc(var(--settings-topbar-height)+1.5rem)] lg:self-start">

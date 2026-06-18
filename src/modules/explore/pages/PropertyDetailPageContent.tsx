@@ -297,9 +297,7 @@ export function PropertyDetailPageContent({
           intlLocale,
           salePrice.currency,
         ),
-        note: salePrice.isNegotiable
-          ? t("show.pricing.negotiable")
-          : undefined,
+        note: salePrice.isNegotiable ? t("show.pricing.negotiable") : undefined,
       });
     }
 
@@ -435,7 +433,7 @@ export function PropertyDetailPageContent({
         <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
           <div className="space-y-6">
             <Card className="overflow-hidden rounded-[2rem] border bg-card p-0">
-              <div className="relative h-[380px] overflow-hidden bg-muted">
+              <div className="relative h-95 overflow-hidden bg-muted">
                 {coverPhotoUrl ? (
                   <Image
                     fill
