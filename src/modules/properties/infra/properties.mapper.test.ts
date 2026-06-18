@@ -76,6 +76,13 @@ describe("property mappers", () => {
         lot_area: 100,
         is_featured: true,
         registered_by: "Agent",
+        assigned_agent: {
+          user_id: 21,
+          user_uuid: "agent-21",
+          first_name: "Ada",
+          last_name: "Lovelace",
+          profile_picture_url: null,
+        },
         residential: {
           bedrooms: 2,
           bathrooms: 1,
@@ -109,6 +116,7 @@ describe("property mappers", () => {
 
     expect(result.residential?.isFurnished).toBe(true);
     expect(result.location?.street).toBe("Street");
+    expect(result.assignedAgent?.userId).toBe(21);
   });
 
   it("maps property history and price history", () => {

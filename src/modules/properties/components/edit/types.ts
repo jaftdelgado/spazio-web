@@ -22,6 +22,7 @@ export type PropertyEditSectionId =
 
 export type PropertyEditFormState = {
   title: string;
+  agentId: number | null;
   propertyTypeId: number | null;
   modalityId: number | null;
   description: string;
@@ -68,6 +69,7 @@ export type PropertyEditFormState = {
 
 export const initialPropertyEditFormState: PropertyEditFormState = {
   title: "",
+  agentId: null,
   propertyTypeId: null,
   modalityId: null,
   description: "",

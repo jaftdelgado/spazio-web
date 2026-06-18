@@ -9,8 +9,9 @@ import {
   TaskDone02Icon,
   UserIcon,
 } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   getModalityLabel,
@@ -29,6 +30,13 @@ type PropertySummaryCardProps = {
   registeredByName: string | null;
 };
 
+type SummaryItem = {
+  key: string;
+  icon: IconSvgElement;
+  label: string;
+  value: string;
+};
+
 export function PropertySummaryCard({
   intlLocale,
   modalityName,
@@ -37,34 +45,51 @@ export function PropertySummaryCard({
   registeredByName,
 }: PropertySummaryCardProps) {
   const { t } = usePropertiesTranslation();
+  const assignedAgentName = detail.assignedAgent
+    ? `${detail.assignedAgent.firstName} ${detail.assignedAgent.lastName}`.trim()
+    : null;
+  const assignedAgentInitials = assignedAgentName
+    ? assignedAgentName
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase() ?? "")
+        .join("")
+    : "AG";
 
-  const items = [
+  const items: SummaryItem[] = [
     {
+      key: "title",
       icon: Building03Icon,
       label: t("create.fields.title.label"),
       value: detail.title,
     },
     {
+      key: "propertyType",
       icon: Home04Icon,
       label: t("create.sections.propertyType.label"),
       value: getPropertyTypeLabel(detail.propertyTypeId, propertyTypeName, t),
     },
     {
+      key: "modality",
       icon: SaleTag02Icon,
       label: t("create.sections.modality.label"),
       value: getModalityLabel(detail.modalityId, modalityName, t),
     },
     {
+      key: "status",
       icon: TaskDone02Icon,
       label: t("columns.status"),
       value: getStatusLabel(detail.statusId, "", t),
     },
     {
+      key: "lotArea",
       icon: RulerIcon,
       label: t("create.fields.lotArea.label"),
       value: formatPropertyArea(detail.lotArea, intlLocale),
     },
     {
+      key: "isFurnished",
       icon: Sofa01Icon,
       label: t("create.fields.isFurnished.label"),
       value: detail.residential
@@ -76,9 +101,20 @@ export function PropertySummaryCard({
     ...(registeredByName
       ? [
           {
+            key: "registeredBy",
             icon: UserIcon,
             label: t("show.summary.registeredByLabel"),
             value: registeredByName,
+          },
+        ]
+      : []),
+    ...(assignedAgentName
+      ? [
+          {
+            key: "assignedAgent",
+            icon: UserIcon,
+            label: t("show.summary.assignedAgentLabel"),
+            value: assignedAgentName,
           },
         ]
       : []),
@@ -95,7 +131,7 @@ export function PropertySummaryCard({
         <div className="overflow-hidden rounded-none border-y border-border/60 bg-transparent">
           {items.map((item) => (
             <div
-              key={item.label}
+              key={item.key}
               className="grid grid-cols-[28px_minmax(0,1fr)] items-start gap-3 border-b border-border/60 py-4 last:border-b-0"
             >
               <div className="flex size-7 items-center justify-center text-foreground">
@@ -105,9 +141,26 @@ export function PropertySummaryCard({
                 <p className="m-0 text-[15px] font-normal leading-[1.4] text-foreground">
                   {item.label}
                 </p>
-                <p className="mt-1 text-[15px] font-normal leading-[1.4] text-muted-foreground">
-                  {item.value}
-                </p>
+                {item.key === "assignedAgent" && detail.assignedAgent ? (
+                  <div className="mt-1 flex items-center gap-3">
+                    <Avatar className="size-8 border-border/70">
+                      {detail.assignedAgent.profilePictureUrl ? (
+                        <AvatarImage
+                          alt={assignedAgentName ?? ""}
+                          src={detail.assignedAgent.profilePictureUrl}
+                        />
+                      ) : null}
+                      <AvatarFallback>{assignedAgentInitials}</AvatarFallback>
+                    </Avatar>
+                    <p className="text-[15px] font-normal leading-[1.4] text-muted-foreground">
+                      {item.value}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="mt-1 text-[15px] font-normal leading-[1.4] text-muted-foreground">
+                    {item.value}
+                  </p>
+                )}
               </div>
             </div>
           ))}

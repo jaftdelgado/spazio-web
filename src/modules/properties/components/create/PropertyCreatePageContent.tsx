@@ -161,6 +161,7 @@ function buildCreatePropertyInput(
     description: form.description.trim(),
     propertyTypeId: form.propertyTypeId ?? 0,
     modalityId: form.modalityId ?? 0,
+    agentId: form.agentId ?? undefined,
     lotArea: Number(form.lotArea),
     isFeatured: form.isFeatured,
     location: {
