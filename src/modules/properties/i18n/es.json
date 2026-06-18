@@ -644,6 +644,26 @@
       "deposit": "Depósito",
       "negotiable": "Negociable"
     },
+    "sale": {
+      "openButton": "Vender",
+      "dialogTitle": "Confirmar venta",
+      "dialogDescription": "Esta acción formalizará la venta de la propiedad y no se puede deshacer.",
+      "summaryTitle": "Resumen de la venta",
+      "fields": {
+        "property": "Propiedad",
+        "salePrice": "Precio de venta actual",
+        "currency": "Moneda"
+      },
+      "lockedAmountNote": "El monto acordado se enviará exactamente con el precio de venta actual registrado para esta propiedad. Este valor no se puede modificar.",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar venta",
+      "submitting": "Confirmando venta...",
+      "errorFallback": "No pudimos formalizar la venta. Inténtalo de nuevo.",
+      "toast": {
+        "successTitle": "Venta formalizada",
+        "successDescription": "La venta se formalizó correctamente."
+      }
+    },
     "history": {
       "loading": "Cargando historial de la propiedad...",
       "empty": "Esta propiedad aún no tiene historial registrado.",
