@@ -38,7 +38,7 @@ function formatPrice(
 
 export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
   const router = useRouter();
-  const { isAuthenticated, role } = useAuth();
+  const { role } = useAuth();
   const { intlLocale, t } = usePropertiesTranslation();
 
   const pricesQuery = usePropertyPrices(listing.id);
@@ -71,13 +71,7 @@ export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
   const typeLabel = t(`explore.cards.propertyTypes.${listing.type}`);
   const imageSrc = listing.coverPhotoUrl ?? listing.imageSrc;
 
-  const actionLabel = !isAuthenticated
-    ? t("explore.cards.viewMore")
-    : !isClient
-      ? t("explore.cards.manage")
-      : displayMode === "rent"
-        ? t("explore.cards.rent")
-        : t("explore.cards.buy");
+  const actionLabel = t("explore.cards.viewMore");
 
   const handleAction = () => {
     if (isClient) {

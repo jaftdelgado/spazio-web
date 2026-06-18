@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import {
-  PlusSignIcon,
   ChevronsDownUpIcon,
   ArrowLeft01Icon,
   ArrowRight01Icon,
@@ -21,7 +20,6 @@ import { VisitsTable } from "./VisitsTable";
 import { VisitConfirmAlertDialog } from "./VisitConfirmAlertDialog";
 import { VisitCompleteAlertDialog } from "./VisitCompleteAlertDialog";
 import { VisitCancelAlertDialog } from "./VisitCancelAlertDialog";
-import { ScheduleVisitModal } from "./ScheduleVisitModal";
 import { RescheduleVisitModal } from "./RescheduleVisitModal";
 import type { VisitEntity } from "../domain/visits.entity";
 
@@ -54,7 +52,6 @@ export function VisitsPageContent() {
   const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
   const [isCompleteOpen, setIsCompleteOpen] = React.useState(false);
   const [isCancelOpen, setIsCancelOpen] = React.useState(false);
-  const [isScheduleOpen, setIsScheduleOpen] = React.useState(false);
   const [isRescheduleOpen, setIsRescheduleOpen] = React.useState(false);
 
   const [selectedVisitUuid, setSelectedVisitUuid] = React.useState<string | null>(
@@ -73,7 +70,6 @@ export function VisitsPageContent() {
 
   const isAdmin = role === 1;
   const isAgent = role === 2;
-  const isClient = role === 3;
   const dateLocale = locale === "es" ? es : enUS;
   const statusLabelByKey = React.useMemo(
     () =>
@@ -173,16 +169,6 @@ export function VisitsPageContent() {
         <h1 className="text-2xl font-bold tracking-tight text-foreground uppercase">
           {t("title")}
         </h1>
-        {isClient && (
-          <Button
-            variant="primary"
-            className="font-bold shadow-sm"
-            onClick={() => setIsScheduleOpen(true)}
-          >
-            <HugeiconsIcon icon={PlusSignIcon} size={20} strokeWidth={2.5} />
-            <span>{t("actions.schedule")}</span>
-          </Button>
-        )}
       </div>
 
       <div className="grid grid-cols-1 gap-4 rounded-xl border border-divider bg-content1 p-4 shadow-sm md:grid-cols-4">
@@ -437,16 +423,6 @@ export function VisitsPageContent() {
         onOpenChange={setIsCancelOpen}
         onConfirm={handleCancelAction}
         isLoading={cancelVisit.isPending}
-      />
-
-      <ScheduleVisitModal
-        isOpen={isScheduleOpen}
-        onOpenChange={setIsScheduleOpen}
-        onSuccess={() => {
-          toast.success(t("toast.scheduleSuccess"), {
-            description: t("toast.scheduleSuccessDescription"),
-          });
-        }}
       />
 
       <RescheduleVisitModal

@@ -34,6 +34,8 @@ import { PropertyLocationMap } from "@/modules/properties/components/show/compon
 import { RentPropertyModal } from "@/modules/rentals/components/RentPropertyModal";
 import { toast } from "sonner";
 import { CheckoutPaymentModal } from "@/modules/payments/components/CheckoutPaymentModal";
+import { ScheduleVisitModal } from "@/modules/visits/components/ScheduleVisitModal";
+import { useVisitsTranslation } from "@/modules/visits/i18n/useVisitsTranslation";
 import {
   exploreTypeMeta,
   type ExploreListingType,
@@ -242,8 +244,10 @@ export function PropertyDetailPageContent({
   const { role, user } = useAuth();
   const router = useRouter();
   const { intlLocale, t } = usePropertiesTranslation();
+  const { t: tVisits } = useVisitsTranslation();
   const [isRentModalOpen, setIsRentModalOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isScheduleVisitOpen, setIsScheduleVisitOpen] = useState(false);
   const [checkoutContext, setCheckoutContext] =
     useState<CheckoutContext | null>(null);
 
@@ -381,6 +385,15 @@ export function PropertyDetailPageContent({
     if (preferredMode === "rent" && canOpenRentModal) {
       setIsRentModalOpen(true);
     }
+  };
+
+  const handleScheduleVisitAction = () => {
+    if (!isAuthenticated) {
+      router.push("/auth/login");
+      return;
+    }
+
+    setIsScheduleVisitOpen(true);
   };
 
   if (propertyQuery.isLoading) {
@@ -724,8 +737,13 @@ export function PropertyDetailPageContent({
                 </Button>
               ) : null}
 
-              <Button variant="outline" className="mt-3 w-full rounded-full">
-                {t("exploreDetail.actions.contactAgent")}
+              <Button
+                variant="outline"
+                className="mt-3 w-full rounded-full"
+                disabled={!cardProperty?.propertyId}
+                onClick={handleScheduleVisitAction}
+              >
+                {tVisits("actions.schedule")}
               </Button>
             </Card>
 
@@ -845,6 +863,25 @@ export function PropertyDetailPageContent({
           }}
         />
       </main>
+
+      <ScheduleVisitModal
+        isOpen={isScheduleVisitOpen}
+        onOpenChange={setIsScheduleVisitOpen}
+        initialProperty={
+          cardProperty
+            ? {
+                propertyId: cardProperty.propertyId,
+                title: cardProperty.title,
+              }
+            : null
+        }
+        isPropertyLocked
+        onSuccess={() => {
+          toast.success(tVisits("toast.scheduleSuccess"), {
+            description: tVisits("toast.scheduleSuccessDescription"),
+          });
+        }}
+      />
     </ExploreShell>
   );
 }

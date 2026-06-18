@@ -39,6 +39,8 @@
   "actions": {
     "ariaLabel": "Acciones del pago",
     "viewDetails": "Ver detalle",
+    "pay": "Pagar",
+    "payNow": "Pagar ahora",
     "close": "Cerrar"
   },
   "labels": {
@@ -84,5 +86,46 @@
     },
     "loading": "Cargando detalle del pago...",
     "loadErrorTitle": "No pudimos cargar el detalle del pago"
+  },
+  "checkout": {
+    "title": "Pasarela de pago seguro",
+    "description": "Paga de forma segura e instantánea usando MercadoPago Checkout Transparente.",
+    "total": "Total a pagar",
+    "period": "Periodo",
+    "method": "Método de pago",
+    "card": "Tarjeta",
+    "oxxoCash": "OXXO (Efectivo)",
+    "oxxoLimit": "El pago por OXXO (Efectivo) tiene un límite máximo de $10,000.00 MXN. Para montos superiores, utiliza una tarjeta de crédito o débito.",
+    "contactEmail": "Correo electrónico de contacto",
+    "cardNumber": "Número de tarjeta",
+    "cardholderName": "Nombre del titular",
+    "cardholderPlaceholder": "Escribe como aparece en la tarjeta",
+    "expiry": "Vencimiento",
+    "payLater": "Pagar luego",
+    "payOnce": "Pagar de una vez",
+    "confirmAndPay": "Confirmar y pagar",
+    "generatingReference": "Generar referencia OXXO",
+    "processing": "Procesando pago...",
+    "understood": "Entendido",
+    "referenceGenerated": "¡Referencia generada!",
+    "paymentSuccess": "¡Pago exitoso!",
+    "paymentRejected": "Pago rechazado",
+    "qrAlt": "Código QR OXXO",
+    "oxxoInstructions": "Presenta este código QR o proporciona la siguiente referencia en caja para realizar tu pago en cualquier OXXO.",
+    "existingOxxoInstructions": "Esta referencia ya fue generada. Presenta este código QR o proporciona la siguiente referencia en caja para realizar tu pago en cualquier OXXO.",
+    "reference": "Referencia: {{reference}}",
+    "messages": {
+      "cardSuccess": "El pago se ha procesado y aprobado exitosamente.",
+      "pending": "El pago está en proceso de verificación por la pasarela de pagos.",
+      "oxxoReference": "Referencia de pago en OXXO generada correctamente."
+    },
+    "toasts": {
+      "success": "Pago completado exitosamente",
+      "pending": "El pago se encuentra pendiente",
+      "oxxoReference": "Referencia OXXO generada",
+      "rejected": "Pago rechazado",
+      "error": "Error al procesar el pago",
+      "contractError": "Error al obtener los detalles del contrato"
+    }
   }
 }

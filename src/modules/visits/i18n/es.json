@@ -1,7 +1,7 @@
 {
   "title": "AGENDA DE VISITAS",
   "actions": {
-    "schedule": "AGENDAR VISITA",
+    "schedule": "Agendar Visita",
     "reschedule": "Reagendar",
     "confirm": "Confirmar",
     "complete": "Completar",
@@ -14,6 +14,23 @@
     "dateTo": "Fecha Hasta",
     "property": "Propiedad",
     "propertyAll": "Todas"
+  },
+  "modal": {
+    "unknownError": "Error desconocido",
+    "scheduleError": "No se pudo agendar la visita: {{message}}",
+    "rescheduleError": "No se pudo reagendar la visita: {{message}}",
+    "loadingProperties": "Cargando propiedades...",
+    "emptyProperties": "No hay propiedades disponibles",
+    "advanceNotice": "* Debe agendar con al menos 48 horas de anticipación.",
+    "rescheduleAdvanceNotice": "* Debe haber al menos 48 horas de anticipación para el nuevo horario.",
+    "availableSlots": "Horarios Disponibles",
+    "selectPropertyAndDate": "Selecciona una propiedad y fecha para ver horarios",
+    "selectDate": "Selecciona una fecha para ver horarios",
+    "emptySlots": "No hay horarios disponibles para este día",
+    "scheduling": "Agendando...",
+    "scheduleSubmit": "Agendar Visita",
+    "rescheduling": "Reagendando...",
+    "rescheduleSubmit": "Reagendar Visita"
   },
   "calendar": {
     "visitWith": "Visita con {{name}} a las {{time}}",
