@@ -627,7 +627,8 @@ export function PaymentsPageContent() {
 
   React.useEffect(() => {
     if (page !== paginatedRows.currentPage) {
-      setPage(paginatedRows.currentPage);
+      const timer = window.setTimeout(() => setPage(paginatedRows.currentPage), 0);
+      return () => clearTimeout(timer);
     }
   }, [page, paginatedRows.currentPage]);
 
@@ -832,7 +833,7 @@ export function PaymentsPageContent() {
                       setIsCheckoutOpen(true);
                     } catch (err) {
                       toast.dismiss(toastId);
-                      toast.error("Error al obtener los detalles del contrato");
+                      toast.error(t("checkout.toasts.contractError"));
                       console.error("Error fetching contract detail:", err);
                     }
                   }}
@@ -842,7 +843,7 @@ export function PaymentsPageContent() {
                     size={16}
                     strokeWidth={1.8}
                   />
-                  <span>Pagar</span>
+                  <span>{t("actions.pay")}</span>
                 </Button>
               )}
               {!row.isSimulated && (
@@ -1165,7 +1166,7 @@ export function PaymentsPageContent() {
                   size={16}
                   strokeWidth={1.8}
                 />
-                <span>Pagar Ahora</span>
+                <span>{t("actions.payNow")}</span>
               </Button>
             )}
             <Button

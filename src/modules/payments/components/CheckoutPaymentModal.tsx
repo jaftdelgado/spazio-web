@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/auth/useAuth";
 import { HttpError } from "@/lib/http/http-errors";
 import { useProcessPayment } from "../application/hooks/usePayments";
+import { usePaymentsTranslation } from "../i18n/usePaymentsTranslation";
 import type { CheckoutContext } from "../domain/payments.entity";
 
 // Map of MercadoPago status_detail codes to friendly Spanish messages.
@@ -153,6 +154,7 @@ export function CheckoutPaymentModal({
   checkout,
   onSuccess,
 }: CheckoutPaymentModalProps) {
+  const { t } = usePaymentsTranslation();
   const { user } = useAuth();
   const processPaymentMutation = useProcessPayment();
 
@@ -179,7 +181,7 @@ export function CheckoutPaymentModal({
   // Generate QR code locally for new payment reference
   React.useEffect(() => {
     if (paymentResult?.referenceNumber) {
-      const timer = window.setTimeout(() => setIsQrLoading(true), 0);
+      setIsQrLoading(true);
       QRCode.toDataURL(paymentResult.referenceNumber, { width: 150, margin: 1 })
         .then((url) => {
           setNewQrCodeUrl(url);
@@ -189,10 +191,8 @@ export function CheckoutPaymentModal({
           console.error("Error generating QR code:", err);
           setIsQrLoading(false);
         });
-      return () => clearTimeout(timer);
     } else {
-      const timer = window.setTimeout(() => setNewQrCodeUrl(""), 0);
-      return () => clearTimeout(timer);
+      setNewQrCodeUrl("");
     }
   }, [paymentResult?.referenceNumber]);
 
@@ -207,7 +207,7 @@ export function CheckoutPaymentModal({
       : "";
 
     if (ref) {
-      const timer = window.setTimeout(() => setIsQrLoading(true), 0);
+      setIsQrLoading(true);
       QRCode.toDataURL(ref, { width: 150, margin: 1 })
         .then((url) => {
           setExistingQrCodeUrl(url);
@@ -217,40 +217,30 @@ export function CheckoutPaymentModal({
           console.error("Error generating QR code:", err);
           setIsQrLoading(false);
         });
-      return () => clearTimeout(timer);
     } else {
-      const timer = window.setTimeout(() => setExistingQrCodeUrl(""), 0);
-      return () => clearTimeout(timer);
+      setExistingQrCodeUrl("");
     }
   }, [isOpen, checkout?.existingPaymentUuid]);
 
   // Pre-populate email
   React.useEffect(() => {
     if (user?.email) {
-      const timer = setTimeout(() => {
-        setPayerEmail(user.email);
-      }, 0);
-      return () => clearTimeout(timer);
+      setPayerEmail(user.email);
     }
   }, [user]);
 
   React.useEffect(() => {
-    const timer = window.setTimeout(() => {
     if (isOpen && checkout?.existingPaymentMethod?.trim().toLowerCase() === "oxxo") {
       setPaymentType("oxxo");
     } else {
       setPaymentType("card");
     }
-    }, 0);
-
-    return () => clearTimeout(timer);
   }, [isOpen, checkout]);
 
   // If checkout amount exceeds OXXO limit, force card payment type
   React.useEffect(() => {
     if (checkout && checkout.amount > 10000) {
-      const timer = window.setTimeout(() => setPaymentType("card"), 0);
-      return () => clearTimeout(timer);
+      setPaymentType("card");
     }
   }, [checkout]);
 
@@ -269,19 +259,16 @@ export function CheckoutPaymentModal({
   // Reset form on close
   React.useEffect(() => {
     if (!isOpen) {
-      const timer = setTimeout(() => {
-        setCardNumber("");
-        setCardholderName("");
-        setExpiry("");
-        setCvv("");
-        setPaymentType("card");
-        setIsProcessing(false);
-        setPaymentResult(null);
-        setIsQrLoading(true);
-        setNewQrCodeUrl("");
-        setExistingQrCodeUrl("");
-      }, 0);
-      return () => clearTimeout(timer);
+      setCardNumber("");
+      setCardholderName("");
+      setExpiry("");
+      setCvv("");
+      setPaymentType("card");
+      setIsProcessing(false);
+      setPaymentResult(null);
+      setIsQrLoading(true);
+      setNewQrCodeUrl("");
+      setExistingQrCodeUrl("");
     }
   }, [isOpen]);
 
@@ -383,19 +370,19 @@ export function CheckoutPaymentModal({
         if (response.status === "Success" || response.statusId === 2) {
           setPaymentResult({
             success: true,
-            message: "El pago se ha procesado y aprobado exitosamente.",
+            message: t("checkout.messages.cardSuccess"),
             isOxxo: false,
           });
-          toast.success("Pago completado exitosamente");
+          toast.success(t("checkout.toasts.success"));
           if (onSuccess) onSuccess();
         } else {
           setPaymentResult({
             success: true, // transaccion creada pero pendiente
-            message: "El pago está en proceso de verificación por la pasarela de pagos.",
+            message: t("checkout.messages.pending"),
             referenceNumber: response.referenceNumber,
             isOxxo: false,
           });
-          toast.info("El pago se encuentra pendiente");
+          toast.info(t("checkout.toasts.pending"));
           if (onSuccess) onSuccess();
         }
       } else {
@@ -413,11 +400,11 @@ export function CheckoutPaymentModal({
 
         setPaymentResult({
           success: true,
-          message: "Referencia de pago en OXXO generada correctamente.",
+          message: t("checkout.messages.oxxoReference"),
           referenceNumber: response.referenceNumber,
           isOxxo: true,
         });
-        toast.info("Referencia OXXO generada");
+        toast.info(t("checkout.toasts.oxxoReference"));
         if (onSuccess) onSuccess();
       }
     } catch (err: unknown) {
@@ -476,7 +463,7 @@ export function CheckoutPaymentModal({
       }
 
       setPaymentResult({ success: false, message: errMsg });
-      toast.error(isRejection ? "Pago rechazado" : "Error al procesar el pago");
+      toast.error(isRejection ? t("checkout.toasts.rejected") : t("checkout.toasts.error"));
     } finally {
       setIsProcessing(false);
     }
@@ -501,9 +488,9 @@ export function CheckoutPaymentModal({
             <h3 className="mt-6 text-xl font-semibold text-foreground">
               {paymentResult.success
                 ? paymentResult.isOxxo
-                  ? "¡Referencia Generada!"
-                  : "¡Pago Exitoso!"
-                : "Pago Rechazado"}
+                  ? t("checkout.referenceGenerated")
+                  : t("checkout.paymentSuccess")
+                : t("checkout.paymentRejected")}
             </h3>
 
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
@@ -521,7 +508,7 @@ export function CheckoutPaymentModal({
                   {newQrCodeUrl && (
                     <img
                       src={newQrCodeUrl}
-                      alt="Código QR OXXO"
+                      alt={t("checkout.qrAlt")}
                       width={150}
                       height={150}
                       className="mx-auto"
@@ -529,10 +516,10 @@ export function CheckoutPaymentModal({
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground max-w-[280px]">
-                  Presenta este código QR o proporciona la siguiente referencia en caja para realizar tu pago en cualquier OXXO.
+                  {t("checkout.oxxoInstructions")}
                 </p>
                 <div className="rounded-2xl bg-muted/40 px-5 py-2.5 text-sm font-bold font-mono text-foreground border border-border/70 select-all">
-                  Referencia: {paymentResult.referenceNumber}
+                  {t("checkout.reference", { reference: paymentResult.referenceNumber })}
                 </div>
               </div>
             )}
@@ -542,7 +529,7 @@ export function CheckoutPaymentModal({
               type="button"
               onClick={() => onOpenChange(false)}
             >
-              Entendido
+              {t("checkout.understood")}
             </Button>
           </div>
         ) : (
@@ -553,10 +540,10 @@ export function CheckoutPaymentModal({
                 <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                   <HugeiconsIcon icon={CreditCardIcon} size={18} strokeWidth={1.8} />
                 </div>
-                <span>Pasarela de Pago Seguro</span>
+                <span>{t("checkout.title")}</span>
               </AlertDialogTitle>
               <AlertDialogDescription className="text-xs text-muted-foreground">
-                Paga de forma segura e instantánea usando MercadoPago Checkout Transparente.
+                {t("checkout.description")}
               </AlertDialogDescription>
             </AlertDialogHeader>
 
@@ -565,16 +552,16 @@ export function CheckoutPaymentModal({
               {checkout && (
                 <div className="rounded-3xl border border-border/80 bg-muted/15 p-4 flex justify-between items-center">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Total a Pagar</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t("checkout.total")}</span>
                     <h4 className="text-xl font-bold text-foreground tabular-nums mt-0.5">
-                      {new Intl.NumberFormat("es-MX", {
+                      {new Intl.NumberFormat(t("locale") === "es" ? "es-MX" : "en-US", {
                         style: "currency",
                         currency: checkout.currency,
                       }).format(checkout.amount)}
                     </h4>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Periodo</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t("checkout.period")}</span>
                     <p className="text-xs font-semibold text-foreground mt-0.5">
                       {checkout.periodName ?? "—"}
                     </p>
@@ -584,7 +571,7 @@ export function CheckoutPaymentModal({
 
               {/* Payment Method Selector */}
               <div className="space-y-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Método de Pago</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t("checkout.method")}</span>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
@@ -596,7 +583,7 @@ export function CheckoutPaymentModal({
                     }`}
                   >
                     <HugeiconsIcon icon={CreditCardIcon} size={22} className="mb-2" />
-                    <span className="text-xs font-semibold">Tarjeta</span>
+                    <span className="text-xs font-semibold">{t("checkout.card")}</span>
                   </button>
                   <button
                     type="button"
@@ -611,7 +598,7 @@ export function CheckoutPaymentModal({
                     }`}
                   >
                     <HugeiconsIcon icon={Mail01Icon} size={22} className="mb-2" />
-                    <span className="text-xs font-semibold">OXXO (Efectivo)</span>
+                    <span className="text-xs font-semibold">{t("checkout.oxxoCash")}</span>
                   </button>
                 </div>
               </div>
@@ -620,7 +607,7 @@ export function CheckoutPaymentModal({
                 <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-3.5 flex gap-2.5 text-xs text-amber-600 dark:text-amber-500 animate-fade-in">
                   <HugeiconsIcon icon={Alert02Icon} size={16} className="shrink-0 mt-0.5" />
                   <p className="leading-normal">
-                    El pago por **OXXO (Efectivo)** tiene un límite máximo de **$10,000.00 MXN**. Para montos superiores, por favor utiliza una tarjeta de crédito o débito.
+                    {t("checkout.oxxoLimit")}
                   </p>
                 </div>
               )}
@@ -636,7 +623,7 @@ export function CheckoutPaymentModal({
                     {existingQrCodeUrl && (
                       <img
                         src={existingQrCodeUrl}
-                        alt="Código QR OXXO"
+                        alt={t("checkout.qrAlt")}
                         width={150}
                         height={150}
                         className="mx-auto"
@@ -644,10 +631,10 @@ export function CheckoutPaymentModal({
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground max-w-[280px]">
-                    Esta referencia ya fue generada. Presenta este código QR o proporciona la siguiente referencia en caja para realizar tu pago en cualquier OXXO.
+                    {t("checkout.existingOxxoInstructions")}
                   </p>
                   <div className="rounded-2xl bg-muted/40 px-5 py-2.5 text-sm font-bold font-mono text-foreground border border-border/70 select-all">
-                    Referencia: {"REF-" + checkout.existingPaymentUuid?.slice(0, 8).toUpperCase()}
+                    {t("checkout.reference", { reference: "REF-" + checkout.existingPaymentUuid?.slice(0, 8).toUpperCase() })}
                   </div>
                 </div>
               ) : (
@@ -656,7 +643,7 @@ export function CheckoutPaymentModal({
                   <div className="space-y-1.5">
                     <label htmlFor="checkout-payer-email" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
                       <HugeiconsIcon icon={Mail01Icon} size={12} />
-                      <span>Correo Electrónico de Contacto</span>
+                      <span>{t("checkout.contactEmail")}</span>
                     </label>
                     <Input
                       id="checkout-payer-email"
@@ -675,7 +662,7 @@ export function CheckoutPaymentModal({
                       <div className="space-y-1.5">
                         <label htmlFor="checkout-card-number" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
                           <HugeiconsIcon icon={CreditCardIcon} size={12} />
-                          <span>Número de Tarjeta</span>
+                          <span>{t("checkout.cardNumber")}</span>
                         </label>
                         <Input
                           id="checkout-card-number"
@@ -692,13 +679,13 @@ export function CheckoutPaymentModal({
                       <div className="space-y-1.5">
                         <label htmlFor="checkout-cardholder-name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
                           <HugeiconsIcon icon={UserIcon} size={12} />
-                          <span>Nombre del Titular</span>
+                          <span>{t("checkout.cardholderName")}</span>
                         </label>
                         <Input
                           id="checkout-cardholder-name"
                           type="text"
                           required
-                          placeholder="Escribe como aparece en la tarjeta"
+                          placeholder={t("checkout.cardholderPlaceholder")}
                           value={cardholderName}
                           onChange={(e) => setCardholderName(e.target.value)}
                           className="rounded-2xl"
@@ -710,7 +697,7 @@ export function CheckoutPaymentModal({
                         <div className="space-y-1.5">
                           <label htmlFor="checkout-card-expiry" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
                             <HugeiconsIcon icon={Calendar01Icon} size={12} />
-                            <span>Vencimiento</span>
+                            <span>{t("checkout.expiry")}</span>
                           </label>
                           <Input
                             id="checkout-card-expiry"
@@ -753,7 +740,7 @@ export function CheckoutPaymentModal({
                 onClick={() => onOpenChange(false)}
                 className="rounded-2xl px-5"
               >
-                {paymentType === "oxxo" && checkout?.existingPaymentMethod?.trim().toLowerCase() === "oxxo" ? "Cerrar" : "Pagar luego"}
+                {paymentType === "oxxo" && checkout?.existingPaymentMethod?.trim().toLowerCase() === "oxxo" ? t("actions.close") : t("checkout.payLater")}
               </Button>
               {!(paymentType === "oxxo" && checkout?.existingPaymentMethod?.trim().toLowerCase() === "oxxo") && (
                 <Button
@@ -762,12 +749,12 @@ export function CheckoutPaymentModal({
                   className="rounded-2xl flex-1 py-5 text-sm font-semibold cursor-pointer"
                 >
                   {isProcessing
-                    ? "Procesando pago..."
+                    ? t("checkout.processing")
                     : paymentType === "card"
                       ? checkout?.existingPaymentMethod
-                        ? "Pagar de una vez"
-                        : "Confirmar y Pagar"
-                      : "Generar Referencia OXXO"}
+                        ? t("checkout.payOnce")
+                        : t("checkout.confirmAndPay")
+                      : t("checkout.generatingReference")}
                 </Button>
               )}
             </AlertDialogFooter>

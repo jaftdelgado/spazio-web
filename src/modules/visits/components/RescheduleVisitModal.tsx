@@ -92,8 +92,8 @@ export function RescheduleVisitModal({ isOpen, onOpenChange, visit, onSuccess }:
         setSelectedSlot(null);
       },
       onError: (error: unknown) => {
-        const errorMsg = getErrorMessage(error, "Error desconocido");
-        alert(`No se pudo reagendar la visita: ${errorMsg}`);
+        const errorMsg = getErrorMessage(error, t("modal.unknownError"));
+        alert(t("modal.rescheduleError", { message: errorMsg }));
       },
     });
   };
@@ -120,7 +120,7 @@ export function RescheduleVisitModal({ isOpen, onOpenChange, visit, onSuccess }:
                 <div className="flex items-center gap-2">
                   <HugeiconsIcon icon={Home01Icon} size={16} />
                   <span className="truncate font-medium">
-                    {visit?.propertyTitle || "Sin título"}
+                    {visit?.propertyTitle || t("table.fallbacks.untitled")}
                   </span>
                 </div>
               </div>
@@ -129,7 +129,7 @@ export function RescheduleVisitModal({ isOpen, onOpenChange, visit, onSuccess }:
             {/* 2. Seleccionar Nueva Fecha */}
             <div className="flex flex-col gap-1.5">
               <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                Nueva Fecha
+                {t("filters.dateFrom")}
               </Label>
               <div className="relative">
                 <Input 
@@ -144,19 +144,19 @@ export function RescheduleVisitModal({ isOpen, onOpenChange, visit, onSuccess }:
                 />
               </div>
               <p className="text-[10px] text-muted-foreground/60 italic mt-0.5">
-                * Debe haber al menos 48 horas de anticipación para el nuevo horario.
+                {t("modal.rescheduleAdvanceNotice")}
               </p>
             </div>
 
             {/* 3. Seleccionar Nuevo Horario (Slots) */}
             <div className="flex flex-col gap-2">
               <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                Horarios Disponibles
+                {t("modal.availableSlots")}
               </Label>
               
               {!selectedDate ? (
                 <div className="text-xs text-muted-foreground bg-muted/20 p-4 rounded-lg border border-dashed border-divider text-center">
-                  Selecciona una fecha para ver horarios
+                  {t("modal.selectDate")}
                 </div>
               ) : isLoadingSlots ? (
                 <div className="grid grid-cols-3 gap-2">
@@ -164,7 +164,7 @@ export function RescheduleVisitModal({ isOpen, onOpenChange, visit, onSuccess }:
                 </div>
               ) : slots.length === 0 ? (
                 <div className="text-xs text-danger bg-danger/10 p-4 rounded-lg border border-danger/20 text-center">
-                  No hay horarios disponibles para este día
+                  {t("modal.emptySlots")}
                 </div>
               ) : (
                 <div className="grid grid-cols-3 gap-2">
@@ -201,7 +201,7 @@ export function RescheduleVisitModal({ isOpen, onOpenChange, visit, onSuccess }:
               isDisabled={!isFormValid || rescheduleVisit.isPending}
               onPress={handleReschedule}
             >
-              {rescheduleVisit.isPending ? "Confirmando..." : "Confirmar Cambio"}
+              {rescheduleVisit.isPending ? t("modal.rescheduling") : t("modal.rescheduleSubmit")}
             </Button>
           </AlertDialog.Footer>
         </AlertDialog.Dialog>

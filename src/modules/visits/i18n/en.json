@@ -1,7 +1,7 @@
 {
   "title": "VISITS AGENDA",
   "actions": {
-    "schedule": "SCHEDULE VISIT",
+    "schedule": "Schedule Visit",
     "reschedule": "Reschedule",
     "confirm": "Confirm",
     "complete": "Complete",
@@ -14,6 +14,23 @@
     "dateTo": "Date To",
     "property": "Property",
     "propertyAll": "All"
+  },
+  "modal": {
+    "unknownError": "Unknown error",
+    "scheduleError": "Could not schedule the visit: {{message}}",
+    "rescheduleError": "Could not reschedule the visit: {{message}}",
+    "loadingProperties": "Loading properties...",
+    "emptyProperties": "No properties available",
+    "advanceNotice": "* Schedule at least 48 hours in advance.",
+    "rescheduleAdvanceNotice": "* The new time must be at least 48 hours in advance.",
+    "availableSlots": "Available Slots",
+    "selectPropertyAndDate": "Select a property and date to see available times",
+    "selectDate": "Select a date to see available times",
+    "emptySlots": "No available times for this day",
+    "scheduling": "Scheduling...",
+    "scheduleSubmit": "Schedule Visit",
+    "rescheduling": "Rescheduling...",
+    "rescheduleSubmit": "Reschedule Visit"
   },
   "calendar": {
     "visitWith": "Visit with {{name}} at {{time}}",
