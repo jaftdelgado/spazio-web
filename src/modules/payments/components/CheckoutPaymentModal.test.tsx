@@ -13,6 +13,36 @@ import { CheckoutPaymentModal } from "./CheckoutPaymentModal";
 import { useProcessPayment } from "../application/hooks/usePayments";
 import { useAuth } from "@/lib/auth/useAuth";
 
+const translationMap: Record<string, string> = {
+  locale: "es",
+  "checkout.title": "Pasarela de pago seguro",
+  "checkout.description":
+    "Paga de forma segura e instantánea usando MercadoPago Checkout Transparente.",
+  "checkout.total": "Total a pagar",
+  "checkout.period": "Periodo",
+  "checkout.method": "Método de pago",
+  "checkout.card": "Tarjeta",
+  "checkout.oxxoCash": "OXXO (Efectivo)",
+  "checkout.contactEmail": "Correo electrónico de contacto",
+  "checkout.cardNumber": "Número de tarjeta",
+  "checkout.cardholderName": "Nombre del titular",
+  "checkout.expiry": "Vencimiento",
+  "checkout.payLater": "Pagar luego",
+  "checkout.payOnce": "Pagar de una vez",
+  "checkout.confirmAndPay": "Confirmar y pagar",
+  "checkout.generatingReference": "Generar referencia OXXO",
+  "checkout.processing": "Procesando pago...",
+  "checkout.understood": "Entendido",
+  "checkout.referenceGenerated": "¡Referencia generada!",
+  "checkout.paymentSuccess": "¡Pago exitoso!",
+  "checkout.paymentRejected": "Pago rechazado",
+  "checkout.messages.cardSuccess": "El pago se ha procesado y aprobado exitosamente.",
+  "checkout.messages.pending":
+    "El pago está en proceso de verificación por la pasarela de pagos.",
+  "checkout.messages.oxxoReference": "Referencia de pago en OXXO generada correctamente.",
+  "actions.close": "Cerrar",
+};
+
 // Mock hooks
 vi.mock("../application/hooks/usePayments", () => ({
   useProcessPayment: vi.fn(),
@@ -20,6 +50,20 @@ vi.mock("../application/hooks/usePayments", () => ({
 
 vi.mock("@/lib/auth/useAuth", () => ({
   useAuth: vi.fn(),
+}));
+
+vi.mock("../i18n/usePaymentsTranslation", () => ({
+  usePaymentsTranslation: () => ({
+    t: (key: string, options?: { reference?: string }) => {
+      if (key === "checkout.reference") {
+        return `Referencia: ${options?.reference ?? ""}`;
+      }
+
+      return translationMap[key] ?? key;
+    },
+    locale: "es",
+    intlLocale: "es-MX",
+  }),
 }));
 
 // Mock sonner toast
@@ -65,7 +109,7 @@ describe("CheckoutPaymentModal", () => {
         checkout={mockCheckout}
       />
     );
-    expect(screen.queryByText("Pasarela de Pago Seguro")).toBeNull();
+    expect(screen.queryByText("Pasarela de pago seguro")).toBeNull();
   });
 
   it("renders checkout details and pre-populates email when open", () => {
@@ -77,10 +121,14 @@ describe("CheckoutPaymentModal", () => {
       />
     );
 
-    expect(screen.getByText("Pasarela de Pago Seguro")).toBeDefined();
+    expect(screen.getByText("Pasarela de pago seguro")).toBeDefined();
     expect(screen.getByText("$1,500.00")).toBeDefined();
     expect(screen.getByText("Monthly")).toBeDefined();
-    expect((screen.getByLabelText(/Correo Electrónico/) as HTMLInputElement).value).toBe("tenant@example.com");
+    expect(
+      (
+        screen.getByLabelText("Correo electrónico de contacto") as HTMLInputElement
+      ).value,
+    ).toBe("tenant@example.com");
   });
 
   it("renders credit card inputs by default", () => {
@@ -92,8 +140,8 @@ describe("CheckoutPaymentModal", () => {
       />
     );
 
-    expect(screen.getByText("Número de Tarjeta")).toBeDefined();
-    expect(screen.getByText("Nombre del Titular")).toBeDefined();
+    expect(screen.getByText("Número de tarjeta")).toBeDefined();
+    expect(screen.getByText("Nombre del titular")).toBeDefined();
     expect(screen.getByText("Vencimiento")).toBeDefined();
     expect(screen.getByText("CVV")).toBeDefined();
   });
@@ -126,13 +174,13 @@ describe("CheckoutPaymentModal", () => {
     );
 
     // Fill card inputs
-    fireEvent.change(screen.getByLabelText("Número de Tarjeta"), { target: { value: "4111 1111 1111 1111" } });
-    fireEvent.change(screen.getByLabelText("Nombre del Titular"), { target: { value: "John Doe" } });
+    fireEvent.change(screen.getByLabelText("Número de tarjeta"), { target: { value: "4111 1111 1111 1111" } });
+    fireEvent.change(screen.getByLabelText("Nombre del titular"), { target: { value: "John Doe" } });
     fireEvent.change(screen.getByLabelText("Vencimiento"), { target: { value: "12/28" } });
     fireEvent.change(screen.getByLabelText("CVV"), { target: { value: "123" } });
 
     // Submit form
-    const submitBtn = screen.getByRole("button", { name: "Confirmar y Pagar" });
+    const submitBtn = screen.getByRole("button", { name: "Confirmar y pagar" });
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
@@ -161,7 +209,7 @@ describe("CheckoutPaymentModal", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("¡Pago Exitoso!")).toBeDefined();
+      expect(screen.getByText("¡Pago exitoso!")).toBeDefined();
     });
   });
 
@@ -191,11 +239,11 @@ describe("CheckoutPaymentModal", () => {
     fireEvent.click(oxxoBtn);
 
     // Verify card fields are gone
-    expect(screen.queryByLabelText("Número de Tarjeta")).toBeNull();
-    expect(screen.queryByLabelText("Nombre del Titular")).toBeNull();
+    expect(screen.queryByLabelText("Número de tarjeta")).toBeNull();
+    expect(screen.queryByLabelText("Nombre del titular")).toBeNull();
 
     // Submit form
-    const submitBtn = screen.getByRole("button", { name: "Generar Referencia OXXO" });
+    const submitBtn = screen.getByRole("button", { name: "Generar referencia OXXO" });
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
@@ -212,7 +260,7 @@ describe("CheckoutPaymentModal", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("¡Referencia Generada!")).toBeDefined();
+      expect(screen.getByText("¡Referencia generada!")).toBeDefined();
       expect(screen.getByText("Referencia: REF-OXXO123")).toBeDefined();
     });
   });
