@@ -29,6 +29,97 @@ import { HttpError } from "@/lib/http/http-errors";
 import { useProcessPayment } from "../application/hooks/usePayments";
 import type { CheckoutContext } from "../domain/payments.entity";
 
+// Map of MercadoPago status_detail codes to friendly Spanish messages.
+// Covers all test scenarios from the MercadoPago sandbox.
+const MP_STATUS_DETAIL_MESSAGES: Record<string, string> = {
+  // Approved
+  accredited: "¡Pago aprobado y acreditado exitosamente!",
+
+  // Pending / in process
+  pending_contingency:
+    "El pago está pendiente. Te notificaremos cuando sea procesado (puede tardar hasta 2 días hábiles).",
+  pending_waiting_payment:
+    "El pago está pendiente de confirmación. Si pagaste en OXXO, puede tardar hasta 3 días hábiles.",
+  pending_review_manual:
+    "Tu pago está en revisión. Te notificaremos cuando sea aprobado.",
+
+  // Rejection reasons
+  cc_rejected_other_reason:
+    "Tu tarjeta fue rechazada por un error general. Intenta con otra tarjeta o contacta a tu banco.",
+  cc_rejected_call_for_authorize:
+    "Tu banco requiere que autorices este pago. Llama al número que aparece en el reverso de tu tarjeta y luego intenta de nuevo.",
+  cc_rejected_insufficient_amount:
+    "Fondos insuficientes. Verifica el saldo disponible en tu tarjeta e intenta de nuevo.",
+  cc_rejected_bad_cvv:
+    "El código de seguridad (CVV) es inválido. Revisa los 3 o 4 dígitos en el reverso de tu tarjeta.",
+  cc_rejected_bad_filled_date:
+    "La fecha de vencimiento es incorrecta. Verifica el mes y año de expiración.",
+  cc_rejected_bad_filled_card_number:
+    "El número de tarjeta es inválido. Revisa que los 16 dígitos sean correctos.",
+  cc_rejected_bad_filled_other:
+    "Algunos datos del formulario son incorrectos. Revisa la información de tu tarjeta e intenta de nuevo.",
+  cc_rejected_blacklist:
+    "Tu tarjeta no puede procesar este pago. Contacta a tu banco para más información.",
+  cc_rejected_high_risk:
+    "El pago fue rechazado por seguridad. Intenta con otra tarjeta o método de pago.",
+  cc_rejected_card_disabled:
+    "Tu tarjeta está desactivada. Actívala desde la app de tu banco o solicita una nueva.",
+  cc_rejected_duplicated_payment:
+    "Ya existe un pago idéntico reciente. Espera unos minutos antes de intentarlo de nuevo.",
+  cc_rejected_max_attempts:
+    "Superaste el límite de intentos. Intenta de nuevo en 24 horas o usa otra tarjeta.",
+  cc_rejected_card_error:
+    "Error al procesar la tarjeta. Verifica los datos o intenta con otra tarjeta.",
+  cc_amount_rate_limit_exceeded:
+    "Superaste el límite de monto permitido para esta tarjeta. Intenta con un monto menor o usa otra tarjeta.",
+
+  // Bank transfer / offline
+  bank_rejected: "El pago fue rechazado por el banco. Contacta a tu banco para más información.",
+
+  // Generic
+  rejected_by_bank:
+    "Tu banco rechazó el pago. Contacta a tu banco o intenta con otra tarjeta.",
+};
+
+/**
+ * Resolves a user-friendly error message from a backend error string.
+ * The backend sends errors in two formats:
+ *   1. Rejections: "el pago fue rechazado por la pasarela (Motivo: <status_detail>)"
+ *   2. Gateway errors: "error al procesar pago en pasarela: <raw MP error JSON>"
+ */
+function resolveGatewayErrorMessage(rawError: string): string {
+  // Try to extract the status_detail code from the rejection format
+  const motivoMatch = rawError.match(/\(Motivo:\s*([^)]+)\)/);
+  if (motivoMatch) {
+    const code = motivoMatch[1].trim();
+    if (MP_STATUS_DETAIL_MESSAGES[code]) {
+      return MP_STATUS_DETAIL_MESSAGES[code];
+    }
+    // Unknown code — still readable
+    return `Tu pago fue rechazado. Razón: ${code.replace(/_/g, " ")}. Intenta con otra tarjeta o contacta a tu banco.`;
+  }
+
+  // Gateway communication errors (bin_not_found, etc.)
+  if (rawError.includes("bin_not_found") || rawError.includes("Bin not found")) {
+    return "El número de tarjeta no fue reconocido. Verifica que sea correcto o usa una tarjeta diferente.";
+  }
+  if (rawError.includes("bad_request")) {
+    return "Los datos de la tarjeta son inválidos. Revisa el número, fecha y CVV.";
+  }
+
+  // Fall back to a generic but informative message stripping internal prefixes
+  const cleaned = rawError
+    .replace(/^error al procesar pago en pasarela:\s*/i, "")
+    .replace(/^el pago fue rechazado por la pasarela[^:]*:\s*/i, "")
+    .trim();
+
+  return cleaned.length > 0
+    ? `Error de pasarela: ${cleaned}`
+    : "Ocurrió un error al procesar el pago con la pasarela. Intenta de nuevo.";
+}
+
+// ─── MercadoPago SDK types ────────────────────────────────────────────────────
+
 // Extend global window type to include MercadoPago
 declare global {
   interface Window {
@@ -103,8 +194,12 @@ export function CheckoutPaymentModal({
     }
   }, [paymentResult?.referenceNumber]);
 
-  // Generate QR code locally for existing payment reference
+  // Generate QR code locally for existing payment reference.
+  // isOpen is included so the QR regenerates each time the modal opens,
+  // even when the UUID hasn't changed (state was reset on close).
   React.useEffect(() => {
+    if (!isOpen) return;
+
     const ref = checkout?.existingPaymentUuid
       ? "REF-" + checkout.existingPaymentUuid.slice(0, 8).toUpperCase()
       : "";
@@ -123,7 +218,7 @@ export function CheckoutPaymentModal({
     } else {
       setExistingQrCodeUrl("");
     }
-  }, [checkout?.existingPaymentUuid]);
+  }, [isOpen, checkout?.existingPaymentUuid]);
 
   // Pre-populate email
   React.useEffect(() => {
@@ -318,11 +413,16 @@ export function CheckoutPaymentModal({
       }
     } catch (err: unknown) {
       console.error("Payment error:", err);
-      let errMsg = "Ocurrió un error inesperado al procesar el pago.";
+      let errMsg = "Ocurrió un error inesperado al procesar el pago. Intenta de nuevo.";
+      let isRejection = false;
+
       if (err instanceof HttpError) {
         const body = err.body as { error?: string } | null;
-        if (body?.error && body.error.trim() !== "") {
-          errMsg = body.error;
+        const rawMsg = body?.error?.trim() ?? "";
+
+        if (rawMsg) {
+          isRejection = rawMsg.includes("rechazado") || rawMsg.includes("Motivo:");
+          errMsg = resolveGatewayErrorMessage(rawMsg);
         } else {
           errMsg = `Error del servidor (${err.status}): No se pudo procesar el pago.`;
         }
@@ -331,20 +431,43 @@ export function CheckoutPaymentModal({
       } else if (err && typeof err === "object") {
         // El SDK de MercadoPago lanza objetos planos (no instancias de Error)
         // Estructura típica: { message: "...", cause: [{ code, description }] }
-        const mpErr = err as { message?: string; cause?: Array<{ description?: string; code?: number }> };
-        if (mpErr.cause?.[0]?.description) {
-          errMsg = `Error de tarjeta: ${mpErr.cause[0].description}`;
+        const mpErr = err as {
+          message?: string;
+          error?: string;
+          status?: number;
+          cause?: Array<{ description?: string; code?: number }>;
+        };
+
+        // Map known MP SDK error codes
+        const causeCode = mpErr.cause?.[0]?.code;
+        const causeDesc = mpErr.cause?.[0]?.description ?? "";
+
+        if (causeCode === 10105 || mpErr.message === "bin_not_found") {
+          errMsg = "El número de tarjeta no fue reconocido. Verifica los primeros dígitos o usa una tarjeta diferente.";
+        } else if (causeCode === 205 || causeDesc.toLowerCase().includes("cardNumber")) {
+          errMsg = "El número de tarjeta es inválido. Verifica que sean 15 o 16 dígitos correctos.";
+        } else if (causeCode === 208 || causeDesc.toLowerCase().includes("expirationMonth")) {
+          errMsg = "El mes de vencimiento es inválido. Usa el formato MM (01-12).";
+        } else if (causeCode === 209 || causeDesc.toLowerCase().includes("expirationYear")) {
+          errMsg = "El año de vencimiento es inválido.";
+        } else if (causeCode === 214 || causeDesc.toLowerCase().includes("securityCode")) {
+          errMsg = "El código de seguridad (CVV) es inválido.";
+        } else if (causeCode === 316 || causeDesc.toLowerCase().includes("cardholderName")) {
+          errMsg = "El nombre del titular es inválido. Usa el nombre como aparece en la tarjeta.";
+        } else if (causeCode === 324) {
+          errMsg = "El tipo de documento de identificación es inválido.";
+        } else if (mpErr.cause?.[0]?.description) {
+          errMsg = `Error de tarjeta: ${causeDesc}`;
         } else if (mpErr.message) {
-          errMsg = mpErr.message;
+          errMsg = resolveGatewayErrorMessage(mpErr.message);
         } else {
-          errMsg = "Error al validar la tarjeta. Verifique los datos e intente de nuevo.";
+          errMsg = "Error al validar la tarjeta. Revisa los datos e intenta de nuevo.";
         }
+        isRejection = true;
       }
-      setPaymentResult({
-        success: false,
-        message: errMsg,
-      });
-      toast.error("Error al procesar el pago");
+
+      setPaymentResult({ success: false, message: errMsg });
+      toast.error(isRejection ? "Pago rechazado" : "Error al procesar el pago");
     } finally {
       setIsProcessing(false);
     }
