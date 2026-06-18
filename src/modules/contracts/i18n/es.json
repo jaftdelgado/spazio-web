@@ -1,6 +1,10 @@
 {
   "title": "Mis contratos",
   "description": "Consulta tus contratos de compra y renta digitalizados.",
+  "admin": {
+    "title": "Contratos",
+    "description": "Consulta los contratos generados para rentas y ventas."
+  },
   "table": {
     "columns": {
       "property": "Propiedad",
@@ -28,6 +32,17 @@
     "inactive": "Inactivo",
     "pending": "Pendiente",
     "completed": "Completado",
-    "closed": "Cerrado"
+    "closed": "Cerrado",
+    "draft": "Borrador"
+  },
+  "actions": {
+    "loading": "Cargando...",
+    "explore": "Explorar propiedades"
+  },
+  "errors": {
+    "unauthorized": "Acceso denegado",
+    "noPdfUrl": "No se encontró la URL del PDF.",
+    "downloadFailed": "No fue posible recuperar el PDF.",
+    "popupBlocked": "No pudimos abrir el PDF. Permite ventanas emergentes e inténtalo de nuevo."
   }
 }

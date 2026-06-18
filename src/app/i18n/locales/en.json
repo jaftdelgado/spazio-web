@@ -25,15 +25,15 @@
       "settingsDescription": "Account settings are not available yet."
     }
   },
-  "adminTopbarNav": {
-    "ariaLabel": "Admin panel navigation",
-    "items": {
-      "explore": "Public view",
-      "summary": "Overview",
-      "properties": "Properties",
-      "visits": "Visits",
-      "payments": "Payments",
-      "users": "Users"
-    }
+ "adminTopbarNav": {
+  "items": {
+    "explore": "Public view",
+    "summary": "Overview",
+    "properties": "Properties",
+    "contracts": "Contracts",
+    "visits": "Visits",
+    "payments": "Payments",
+    "users": "Users"
   }
+}
 }

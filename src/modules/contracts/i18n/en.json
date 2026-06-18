@@ -1,6 +1,10 @@
 {
   "title": "My contracts",
-  "description": "View your digitized purchase and rent contracts.",
+  "description": "View your digitized purchase and rental contracts.",
+  "admin": {
+    "title": "Contracts",
+    "description": "View generated contracts for rentals and sales."
+  },
   "table": {
     "columns": {
       "property": "Property",
@@ -20,7 +24,7 @@
       "view": "View",
       "pay": "Pay"
     },
-    "empty": "No registered contracts found.",
+    "empty": "You do not have registered contracts.",
     "emptyDescription": "When you rent or buy a property, your digital contract will appear here."
   },
   "status": {
@@ -28,6 +32,17 @@
     "inactive": "Inactive",
     "pending": "Pending",
     "completed": "Completed",
-    "closed": "Closed"
+    "closed": "Closed",
+    "draft": "Draft"
+  },
+  "actions": {
+    "loading": "Loading...",
+    "explore": "Explore properties"
+  },
+  "errors": {
+    "unauthorized": "Access denied",
+    "noPdfUrl": "PDF URL was not found.",
+    "downloadFailed": "Could not retrieve the PDF.",
+    "popupBlocked": "We could not open the PDF. Allow pop-ups and try again."
   }
 }
