@@ -25,15 +25,15 @@
       "settingsDescription": "La configuración de la cuenta todavía no está disponible."
     }
   },
-  "adminTopbarNav": {
-    "ariaLabel": "Navegación del panel de administración",
-    "items": {
-      "explore": "Vista pública",
-      "summary": "Resumen",
-      "properties": "Propiedades",
-      "visits": "Visitas",
-      "payments": "Pagos",
-      "users": "Usuarios"
-    }
+"adminTopbarNav": {
+  "items": {
+    "explore": "Vista pública",
+    "summary": "Resumen",
+    "properties": "Propiedades",
+    "contracts": "Contratos",
+    "visits": "Visitas",
+    "payments": "Pagos",
+    "users": "Usuarios"
   }
+}
 }
