@@ -30,7 +30,7 @@ export function usePropertyShowResource(propertyUuid: string) {
   const clausesCatalogQuery = useClauses({
     modalityId: supportsClausesCatalog ? (detailQuery.data?.modalityId ?? null) : null,
     page: 1,
-    pageSize: 200,
+    pageSize: 50,
   });
 
   const propertyType = React.useMemo(

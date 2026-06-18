@@ -16,6 +16,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/lib/auth/useAuth";
 import { usePropertyTypes } from "@catalogs/application/hooks/useCatalogs";
 import type { DataGridRowBase } from "@components/core/DataGrid";
 import { usePropertyList } from "@properties/application/get/hooks/useProperty";
@@ -82,6 +83,7 @@ function PropertiesGridSkeleton() {
 
 export function PropertiesPageContent() {
   const { t } = usePropertiesTranslation();
+  const { role } = useAuth();
   const [searchValue, setSearchValue] = React.useState("");
   const [isRetrying, setIsRetrying] = React.useState(false);
   const [viewMode, setViewMode] = React.useState<PropertiesViewMode>("table");
@@ -274,8 +276,14 @@ export function PropertiesPageContent() {
       ) : !isPropertiesLoading && rows.length === 0 ? (
         <Empty className="min-h-60 rounded-3xl border border-dashed border-border/70 bg-muted/15 p-6">
           <EmptyHeader>
-            <EmptyTitle>{t("states.emptyTitle")}</EmptyTitle>
-            <EmptyDescription>{t("states.emptyDescription")}</EmptyDescription>
+            <EmptyTitle>
+              {role === 2 ? t("states.agentEmptyTitle") : t("states.emptyTitle")}
+            </EmptyTitle>
+            <EmptyDescription>
+              {role === 2
+                ? t("states.agentEmptyDescription")
+                : t("states.emptyDescription")}
+            </EmptyDescription>
           </EmptyHeader>
         </Empty>
       ) : viewMode === "table" ? (
