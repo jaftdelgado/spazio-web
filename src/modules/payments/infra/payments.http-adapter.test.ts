@@ -49,6 +49,22 @@ describe("paymentsHttpAdapter", () => {
         "/api/v1/payments?property_id=5&status_id=2&date_from=2024-03-01&date_to=2024-03-10&limit=10&offset=0",
       );
     });
+
+    it("caps the requested limit at the api maximum", async () => {
+      vi.mocked(httpClient.get).mockResolvedValue({
+        data: [],
+        meta: { total: 0, shown: 0 },
+      });
+
+      await paymentsHttpAdapter.list({
+        limit: 250,
+        offset: 0,
+      });
+
+      expect(httpClient.get).toHaveBeenCalledWith(
+        "/api/v1/payments?limit=100&offset=0",
+      );
+    });
   });
 
   describe("getById", () => {

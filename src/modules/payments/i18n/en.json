@@ -6,12 +6,23 @@
   "filters": {
     "propertyId": "Property",
     "propertyIdPlaceholder": "Filter property",
+    "allProperties": "All properties",
     "statusId": "Status",
     "statusIdPlaceholder": "Filter status",
+    "allStatuses": "All statuses",
     "dateFrom": "Date from",
     "dateTo": "Date to",
     "apply": "Apply filters",
-    "clear": "Clear"
+    "clear": "Clear",
+    "statusOptions": {
+      "approved": "Approved",
+      "cancelled": "Cancelled",
+      "completed": "Completed",
+      "failed": "Failed",
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "unknown": "Not available"
+    }
   },
   "columns": {
     "property": "Property",
