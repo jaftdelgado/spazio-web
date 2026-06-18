@@ -116,6 +116,18 @@ describe("property http adapters", () => {
     });
   });
 
+  it("sends agent_id as null when unassigning an agent", async () => {
+    vi.mocked(httpClient.patch).mockResolvedValue({ updated: true });
+
+    await propertyPatchHttpAdapter.updateProperty("uuid-1", {
+      agentId: null,
+    });
+
+    expect(httpClient.patch).toHaveBeenCalledWith("/api/v1/properties/uuid-1", {
+      agent_id: null,
+    });
+  });
+
   it("updates prices, photos, clauses, and services", async () => {
     vi.mocked(httpClient.put).mockResolvedValue(undefined);
 

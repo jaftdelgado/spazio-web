@@ -285,7 +285,7 @@ export type UpdatePropertyInput = {
   description?: string;
   lotArea?: number;
   isFeatured?: boolean;
-  agentId?: number;
+  agentId?: number | null;
   residential?: UpdateResidentialInput;
   commercial?: UpdateCommercialInput;
   location?: UpdateLocationInput;

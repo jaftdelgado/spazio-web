@@ -8,6 +8,7 @@ import {
   Sofa01Icon,
   TaskDone02Icon,
   UserIcon,
+  UserAccountIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 
@@ -64,6 +65,26 @@ export function PropertySummaryCard({
       label: t("create.fields.title.label"),
       value: detail.title,
     },
+    ...(registeredByName
+      ? [
+          {
+            key: "registeredBy",
+            icon: UserIcon,
+            label: t("show.summary.registeredByLabel"),
+            value: registeredByName,
+          },
+        ]
+      : []),
+    ...(assignedAgentName
+      ? [
+          {
+            key: "assignedAgent",
+            icon: UserAccountIcon,
+            label: t("show.summary.assignedAgentLabel"),
+            value: assignedAgentName,
+          },
+        ]
+      : []),
     {
       key: "propertyType",
       icon: Home04Icon,
@@ -98,30 +119,10 @@ export function PropertySummaryCard({
           : t("show.values.no")
         : t("show.values.notAvailable"),
     },
-    ...(registeredByName
-      ? [
-          {
-            key: "registeredBy",
-            icon: UserIcon,
-            label: t("show.summary.registeredByLabel"),
-            value: registeredByName,
-          },
-        ]
-      : []),
-    ...(assignedAgentName
-      ? [
-          {
-            key: "assignedAgent",
-            icon: UserIcon,
-            label: t("show.summary.assignedAgentLabel"),
-            value: assignedAgentName,
-          },
-        ]
-      : []),
   ];
 
   return (
-    <Card className="rounded-[28px] bg-background shadow-border">
+    <Card className="rounded-[28px] bg-card/60 shadow-border">
       <CardHeader className="pb-0">
         <CardTitle className="text-xl font-semibold">
           {t("show.sections.summaryTitle")}
@@ -132,7 +133,7 @@ export function PropertySummaryCard({
           {items.map((item) => (
             <div
               key={item.key}
-              className="grid grid-cols-[28px_minmax(0,1fr)] items-start gap-3 border-b border-border/60 py-4 last:border-b-0"
+              className="grid grid-cols-[28px_minmax(0,1fr)] items-start gap-3 border-b border-border py-4 last:border-b-0"
             >
               <div className="flex size-7 items-center justify-center text-foreground">
                 <HugeiconsIcon icon={item.icon} size={20} strokeWidth={1.8} />
@@ -143,21 +144,23 @@ export function PropertySummaryCard({
                 </p>
                 {item.key === "assignedAgent" && detail.assignedAgent ? (
                   <div className="mt-1 flex items-center gap-3">
-                    <Avatar className="size-8 border-border/70">
+                    <Avatar className="size-6 border-border/70">
                       {detail.assignedAgent.profilePictureUrl ? (
                         <AvatarImage
                           alt={assignedAgentName ?? ""}
                           src={detail.assignedAgent.profilePictureUrl}
                         />
                       ) : null}
-                      <AvatarFallback>{assignedAgentInitials}</AvatarFallback>
+                      <AvatarFallback className="text-[10px] items-center justify-center">
+                        {assignedAgentInitials}
+                      </AvatarFallback>
                     </Avatar>
-                    <p className="text-[15px] font-normal leading-[1.4] text-muted-foreground">
+                    <p className="text-[15px] leading-[1.4] text-muted-foreground">
                       {item.value}
                     </p>
                   </div>
                 ) : (
-                  <p className="mt-1 text-[15px] font-normal leading-[1.4] text-muted-foreground">
+                  <p className="mt-1 text-[15px] leading-[1.4] text-muted-foreground">
                     {item.value}
                   </p>
                 )}
