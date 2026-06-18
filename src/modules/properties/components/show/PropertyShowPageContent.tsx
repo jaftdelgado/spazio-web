@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/config/routes";
 import { useAuth } from "@lib/auth/useAuth";
 import { saveEditingPropertyUuid } from "@properties/application/edit/property-edit-session";
@@ -9,6 +10,7 @@ import { usePropertyHistory } from "@properties/application/get/hooks/usePropert
 import { PropertyClausesList } from "./components/PropertyClausesList";
 import { PropertyPhotoCarousel } from "./components/PropertyPhotoCarousel";
 import { PropertyPricingCard } from "./components/PropertyPricingCard";
+import { PropertySaleAlertDialog } from "./components/PropertySaleAlertDialog";
 import { PropertyServicesList } from "./components/PropertyServicesList";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 import { PropertyShowSkeleton } from "./components/PropertyShowSkeleton";
@@ -37,6 +39,7 @@ export function PropertyShowPageContent({
   const router = useRouter();
   const { role } = useAuth();
   const { intlLocale, t } = usePropertiesTranslation();
+  const [isSaleDialogOpen, setIsSaleDialogOpen] = React.useState(false);
 
   const historyQuery = usePropertyHistory(propertyUuid);
 
@@ -118,6 +121,11 @@ export function PropertyShowPageContent({
   const locationAddressLine = [address, detail.location?.postalCode]
     .filter(Boolean)
     .join(" · ");
+  const canSellProperty =
+    role === 2 &&
+    (detail.modalityId === 1 || detail.modalityId === 3) &&
+    detail.statusId === 2 &&
+    prices.salePrice !== null;
 
   return (
     <div className="admin-page-view flex min-h-full flex-col gap-8 pb-8 text-foreground">
@@ -180,6 +188,26 @@ export function PropertyShowPageContent({
 
         <aside className="space-y-5 lg:sticky lg:top-[calc(var(--admin-topbar-height)+1.5rem)] lg:self-start">
           <PropertyPricingCard items={priceItems} />
+          {canSellProperty ? (
+            <>
+              <Button
+                className="w-full"
+                size="lg"
+                type="button"
+                onClick={() => setIsSaleDialogOpen(true)}
+              >
+                {t("show.sale.openButton")}
+              </Button>
+              <PropertySaleAlertDialog
+                agreedAmount={prices.salePrice.salePrice}
+                currency={prices.salePrice.currency}
+                isOpen={isSaleDialogOpen}
+                onOpenChange={setIsSaleDialogOpen}
+                propertyTitle={detail.title}
+                propertyUuid={detail.propertyUuid}
+              />
+            </>
+          ) : null}
           <PropertySummaryCard
             detail={detail}
             intlLocale={intlLocale}

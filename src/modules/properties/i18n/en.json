@@ -651,6 +651,26 @@
       "deposit": "Deposit",
       "negotiable": "Negotiable"
     },
+    "sale": {
+      "openButton": "Sell",
+      "dialogTitle": "Confirm sale",
+      "dialogDescription": "This action will formalize the property sale and cannot be undone.",
+      "summaryTitle": "Sale summary",
+      "fields": {
+        "property": "Property",
+        "salePrice": "Current sale price",
+        "currency": "Currency"
+      },
+      "lockedAmountNote": "The agreed amount will be sent exactly as the current registered sale price for this property. This value cannot be edited.",
+      "cancel": "Cancel",
+      "confirm": "Confirm sale",
+      "submitting": "Confirming sale...",
+      "errorFallback": "We couldn't formalize the sale. Please try again.",
+      "toast": {
+        "successTitle": "Sale formalized",
+        "successDescription": "The sale was formalized successfully."
+      }
+    },
     "history": {
       "loading": "Loading property history...",
       "empty": "This property does not have history records yet.",
