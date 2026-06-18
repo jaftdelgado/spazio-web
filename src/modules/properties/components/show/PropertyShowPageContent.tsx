@@ -100,7 +100,7 @@ export function PropertyShowPageContent({
     return (
       <PropertyShowErrorState
         backLabel={t("show.actions.backToList")}
-      message={getFriendlyPropertyErrorMessage(error, t)}
+        message={getFriendlyPropertyErrorMessage(error, t)}
         onBack={() => router.push(ROUTES.admin.properties)}
         onRetry={() => {
           void detailQuery.refetch();
@@ -121,11 +121,13 @@ export function PropertyShowPageContent({
   const locationAddressLine = [address, detail.location?.postalCode]
     .filter(Boolean)
     .join(" · ");
+
   const canSellProperty =
     role === 2 &&
     (detail.modalityId === 1 || detail.modalityId === 3) &&
     detail.statusId === 2 &&
     prices.salePrice !== null;
+
   const salePrice = prices.salePrice;
 
   return (
@@ -165,7 +167,10 @@ export function PropertyShowPageContent({
           />
 
           <PropertyShowSection title={t("show.sections.servicesTitle")}>
-            <PropertyServicesList isLoading={servicesLoading} services={services} />
+            <PropertyServicesList
+              isLoading={servicesLoading}
+              services={services}
+            />
           </PropertyShowSection>
 
           <PropertyShowSection title={t("show.sections.clausesTitle")}>
@@ -189,6 +194,7 @@ export function PropertyShowPageContent({
 
         <aside className="space-y-5 lg:sticky lg:top-[calc(var(--admin-topbar-height)+1.5rem)] lg:self-start">
           <PropertyPricingCard items={priceItems} />
+
           {canSellProperty && salePrice ? (
             <>
               <Button
@@ -199,6 +205,7 @@ export function PropertyShowPageContent({
               >
                 {t("show.sale.openButton")}
               </Button>
+
               <PropertySaleAlertDialog
                 agreedAmount={salePrice.salePrice}
                 currency={salePrice.currency}
@@ -209,6 +216,7 @@ export function PropertyShowPageContent({
               />
             </>
           ) : null}
+
           <PropertySummaryCard
             detail={detail}
             intlLocale={intlLocale}
