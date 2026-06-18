@@ -722,37 +722,51 @@ export function PaymentsPageContent() {
                   size="sm"
                   type="button"
                   onClick={async () => {
-                    if (row.isSimulated && !row.contractId) {
-                      const toastId = toast.loading("Obteniendo detalles del contrato...");
-                      try {
-                        const detail = await contractsHttpAdapter.getById(row.id);
-                        toast.dismiss(toastId);
-                        setCheckoutContext({
-                          contractId: detail.contractId,
-                          contractUuid: row.id,
-                          currency: row.currency,
-                          amount: Number(row.amount),
-                          periodName: formatDate(
-                            row.billingPeriod,
-                            intlLocale,
-                            t("labels.notAvailable"),
-                            { year: "numeric", month: "long" }
-                          ),
-                          existingPaymentUuid: undefined,
-                          existingPaymentMethod: undefined,
-                        });
-                        setIsCheckoutOpen(true);
-                      } catch (err) {
-                        toast.dismiss(toastId);
-                        toast.error("Error al obtener los detalles del contrato");
-                        console.error("Error fetching contract detail:", err);
+                    // For all payment rows, look up the contract to compute the correct amount.
+                    // The backend always validates: agreedAmount + securityDeposit for first payment.
+                    const toastId = toast.loading("Obteniendo detalles del contrato...");
+                    try {
+                      // Resolve the contract UUID: simulated rows use row.id, real rows need contractId lookup
+                      let contractUuid = row.isSimulated ? row.id : "";
+                      let contractDetail;
+
+                      if (!contractUuid && row.contractId) {
+                        // Find in cached contracts list first
+                        const cached = contractsQuery.data?.find(c => c.contractId === row.contractId);
+                        if (cached) {
+                          contractUuid = cached.contractUuid;
+                        }
                       }
-                    } else {
+
+                      if (contractUuid) {
+                        contractDetail = await contractsHttpAdapter.getById(contractUuid);
+                      }
+
+                      toast.dismiss(toastId);
+
+                      // Determine if this is the first payment: no completed payments for this contract
+                      const completedPayments = (paymentsQuery.data?.data ?? []).filter(p =>
+                        p.contractId === row.contractId &&
+                        ["completed", "completado", "approved", "aprobado", "success", "exitoso"].includes(
+                          (p.status ?? "").toLowerCase()
+                        )
+                      );
+                      const isFirstPayment = completedPayments.length === 0;
+
+                      // Compute the correct amount the backend expects
+                      const baseAmount = contractDetail
+                        ? Number(contractDetail.agreedAmount)
+                        : Number(row.amount);
+                      const depositAmount = (contractDetail && isFirstPayment)
+                        ? Number(contractDetail.securityDeposit || 0)
+                        : 0;
+                      const correctAmount = baseAmount + depositAmount;
+
                       setCheckoutContext({
-                        contractId: row.contractId,
-                        contractUuid: row.isSimulated ? row.id : "",
+                        contractId: row.contractId || contractDetail?.contractId || 0,
+                        contractUuid,
                         currency: row.currency,
-                        amount: Number(row.amount),
+                        amount: correctAmount,
                         periodName: formatDate(
                           row.billingPeriod,
                           intlLocale,
@@ -763,6 +777,10 @@ export function PaymentsPageContent() {
                         existingPaymentMethod: row.isSimulated ? undefined : row.paymentMethod,
                       });
                       setIsCheckoutOpen(true);
+                    } catch (err) {
+                      toast.dismiss(toastId);
+                      toast.error("Error al obtener los detalles del contrato");
+                      console.error("Error fetching contract detail:", err);
                     }
                   }}
                 >
@@ -800,7 +818,7 @@ export function PaymentsPageContent() {
           return null;
       }
     },
-    [intlLocale, propertyTitleById, t, role],
+    [intlLocale, propertyTitleById, t, role, contractsQuery.data, paymentsQuery.data],
   );
 
   if (!canAccess) {
