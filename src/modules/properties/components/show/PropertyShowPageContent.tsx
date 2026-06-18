@@ -100,7 +100,7 @@ export function PropertyShowPageContent({
     return (
       <PropertyShowErrorState
         backLabel={t("show.actions.backToList")}
-      message={getFriendlyPropertyErrorMessage(error, t)}
+        message={getFriendlyPropertyErrorMessage(error, t)}
         onBack={() => router.push(ROUTES.admin.properties)}
         onRetry={() => {
           void detailQuery.refetch();
@@ -121,11 +121,14 @@ export function PropertyShowPageContent({
   const locationAddressLine = [address, detail.location?.postalCode]
     .filter(Boolean)
     .join(" · ");
+
   const canSellProperty =
     role === 2 &&
     (detail.modalityId === 1 || detail.modalityId === 3) &&
     detail.statusId === 2 &&
     prices.salePrice !== null;
+
+  const salePrice = prices.salePrice;
 
   return (
     <div className="admin-page-view flex min-h-full flex-col gap-8 pb-8 text-foreground">
@@ -164,7 +167,10 @@ export function PropertyShowPageContent({
           />
 
           <PropertyShowSection title={t("show.sections.servicesTitle")}>
-            <PropertyServicesList isLoading={servicesLoading} services={services} />
+            <PropertyServicesList
+              isLoading={servicesLoading}
+              services={services}
+            />
           </PropertyShowSection>
 
           <PropertyShowSection title={t("show.sections.clausesTitle")}>
@@ -188,7 +194,8 @@ export function PropertyShowPageContent({
 
         <aside className="space-y-5 lg:sticky lg:top-[calc(var(--admin-topbar-height)+1.5rem)] lg:self-start">
           <PropertyPricingCard items={priceItems} />
-          {canSellProperty ? (
+
+          {canSellProperty && salePrice ? (
             <>
               <Button
                 className="w-full"
@@ -198,9 +205,10 @@ export function PropertyShowPageContent({
               >
                 {t("show.sale.openButton")}
               </Button>
+
               <PropertySaleAlertDialog
-                agreedAmount={prices.salePrice.salePrice}
-                currency={prices.salePrice.currency}
+                agreedAmount={salePrice.salePrice}
+                currency={salePrice.currency}
                 isOpen={isSaleDialogOpen}
                 onOpenChange={setIsSaleDialogOpen}
                 propertyTitle={detail.title}
@@ -208,6 +216,7 @@ export function PropertyShowPageContent({
               />
             </>
           ) : null}
+
           <PropertySummaryCard
             detail={detail}
             intlLocale={intlLocale}
