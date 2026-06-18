@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
-import { useAuth } from "@lib/auth/useAuth";
 import {
   useModalities,
   usePropertyTypes,
@@ -75,66 +74,14 @@ function mapExploreModeToModalityId(mode: "all" | "sale" | "rent") {
   return undefined;
 }
 
-function isRentModality(modalityName?: string) {
-  const normalizedName = modalityName?.toLowerCase() ?? "";
-
-  return (
-    normalizedName.includes("rent") ||
-    normalizedName.includes("renta") ||
-    normalizedName.includes("rentar")
-  );
-}
-
-function isMixedModality(modalityName?: string) {
-  const normalizedName = modalityName?.toLowerCase() ?? "";
-
-  return (
-    normalizedName.includes("mixed") ||
-    normalizedName.includes("mixta") ||
-    normalizedName.includes("mixto") ||
-    normalizedName.includes("venta y renta")
-  );
-}
-
-function isSaleBudget(priceCap: ExploreListing["price"] | "all" | number) {
-  return priceCap === 3000000 || priceCap === 8000000;
-}
-
 export function ExplorePageContent() {
   const [filters, setFilters] = useState(initialExploreFilters);
   const [heroSearch, setHeroSearch] = useState("");
 
   const { t } = usePropertiesTranslation();
-  const { isLoading, role } = useAuth();
-
-  const numericRole =
-    typeof role === "number"
-      ? role
-      : typeof role === "string"
-        ? Number(role)
-        : 0;
-
-  const canSeeSaleOption = numericRole === 1 || numericRole === 2;
 
   const propertyTypesQuery = usePropertyTypes();
   useModalities();
-
-  useEffect(() => {
-    if (isLoading || canSeeSaleOption) {
-      return;
-    }
-
-    const shouldCleanSaleMode = filters.mode === "sale";
-    const shouldCleanSaleBudget = isSaleBudget(filters.priceCap);
-
-    if (shouldCleanSaleMode || shouldCleanSaleBudget) {
-      setFilters((current) => ({
-        ...current,
-        mode: current.mode === "sale" ? "all" : current.mode,
-        priceCap: isSaleBudget(current.priceCap) ? "all" : current.priceCap,
-      }));
-    }
-  }, [canSeeSaleOption, filters.mode, filters.priceCap, isLoading]);
 
   const propertyTypeIds = mapExploreTypesToPropertyTypeIds(
     filters.types,
@@ -146,16 +93,10 @@ export function ExplorePageContent() {
       ? propertyTypeIds[0]
       : undefined;
 
-  const modalityId = canSeeSaleOption
-    ? mapExploreModeToModalityId(filters.mode)
-    : undefined;
+  const modalityId = mapExploreModeToModalityId(filters.mode);
 
   const maxPrice =
-    !canSeeSaleOption && isSaleBudget(filters.priceCap)
-      ? undefined
-      : filters.priceCap === "all"
-        ? undefined
-        : filters.priceCap;
+    filters.priceCap === "all" ? undefined : filters.priceCap;
 
   const propertiesQuery = usePropertyList({
     page: 1,
@@ -173,54 +114,38 @@ export function ExplorePageContent() {
 
   const backendListings = useMemo<ExploreListing[]>(
     () =>
-      propertiesQuery.data?.data
-        .filter((property) => {
-          if (canSeeSaleOption) {
-            return true;
-          }
+      propertiesQuery.data?.data.map((property) => {
+        const type = mapPropertyTypeToExploreType(property.propertyType.name);
 
-          const isRent = isRentModality(property.modality.name);
-          const isMixed = isMixedModality(property.modality.name);
+        const city =
+          property.city ??
+          property.location?.cityName ??
+          t("explore.values.noCity");
 
-          if (filters.mode === "rent") {
-            return isRent && !isMixed;
-          }
+        const neighborhood =
+          property.neighborhood ?? t("explore.values.noNeighborhood");
 
-          return isMixed;
-        })
-        .map((property) => {
-          const type = mapPropertyTypeToExploreType(property.propertyType.name);
-          const city =
-            property.city ??
-            property.location?.cityName ??
-            t("explore.values.noCity");
-          const neighborhood =
-            property.neighborhood ?? t("explore.values.noNeighborhood");
-          const hasParking = (property.parkingSpots ?? 0) > 0;
+        const hasParking = (property.parkingSpots ?? 0) > 0;
 
-          return {
-            id: property.propertyUuid,
-            title: property.title,
-            type,
-            mode: canSeeSaleOption
-              ? property.price?.priceType === "rent"
-                ? "rent"
-                : "sale"
-              : "rent",
-            city,
-            neighborhood,
-            price: property.price?.amount ?? 0,
-            bedrooms: property.bedrooms,
-            bathrooms: property.bathrooms,
-            area: property.builtArea ?? 0,
-            featured: property.isFeatured,
-            parking: hasParking,
-            petFriendly: property.petFriendly,
-            imageSrc: exploreTypeMeta[type].imageSrc,
-            coverPhotoUrl: property.coverPhotoUrl,
-          };
-        }) ?? [],
-    [canSeeSaleOption, filters.mode, propertiesQuery.data, t],
+        return {
+          id: property.propertyUuid,
+          title: property.title,
+          type,
+          mode: property.price?.priceType === "rent" ? "rent" : "sale",
+          city,
+          neighborhood,
+          price: property.price?.amount ?? 0,
+          bedrooms: property.bedrooms,
+          bathrooms: property.bathrooms,
+          area: property.builtArea ?? 0,
+          featured: property.isFeatured,
+          parking: hasParking,
+          petFriendly: property.petFriendly,
+          imageSrc: exploreTypeMeta[type].imageSrc,
+          coverPhotoUrl: property.coverPhotoUrl,
+        };
+      }) ?? [],
+    [propertiesQuery.data, t],
   );
 
   const listings = useMemo(
@@ -257,7 +182,7 @@ export function ExplorePageContent() {
           filters={filters}
           onChange={setFilters}
           resultCount={listings.length}
-          showSaleOption={canSeeSaleOption}
+          showSaleOption
         />
 
         <ExploreListingsSection
