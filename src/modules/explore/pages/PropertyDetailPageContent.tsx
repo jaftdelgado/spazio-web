@@ -432,22 +432,11 @@ export function PropertyDetailPageContent({
           </Button>
         </div>
 
-      <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
-        <div className="space-y-6">
-          <Card className="overflow-hidden rounded-[2rem] border bg-card p-0">
-            <div className="relative h-95 overflow-hidden bg-muted">
-              {coverPhotoUrl ? (
-                <Image
-                  fill
-                  unoptimized
-                  priority
-                  alt={property.title}
-                  className="object-cover"
-                  sizes="(min-width: 1024px) 760px, 100vw"
-                  src={coverPhotoUrl}
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center bg-muted">
+        <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
+          <div className="space-y-6">
+            <Card className="overflow-hidden rounded-[2rem] border bg-card p-0">
+              <div className="relative h-[380px] overflow-hidden bg-muted">
+                {coverPhotoUrl ? (
                   <Image
                     fill
                     unoptimized
@@ -794,205 +783,62 @@ export function PropertyDetailPageContent({
                   </>
                 ) : null}
               </div>
-            ) : null}
-          </Card>
-        </div>
+            </Card>
 
-        <aside className="space-y-4 lg:sticky lg:top-24 lg:h-fit">
-          <Card className="rounded-[2rem] p-6">
-            <p className="text-sm text-muted-foreground">
-              {t("exploreDetail.pricing.price")}
-            </p>
-            <p className="mt-1 text-3xl font-semibold text-foreground">
-              {displayPrice > 0
-                ? formatPrice(
-                    displayPrice,
-                    preferredMode,
-                    intlLocale,
-                    t("exploreDetail.pricing.perMonth"),
-                  )
-                : t("exploreDetail.pricing.consult")}
-            </p>
+            <Card className="rounded-[2rem] p-6">
+              <h3 className="text-sm font-semibold text-foreground">
+                {t("exploreDetail.sections.importantTitle")}
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {t("exploreDetail.important.description")}
+              </p>
+            </Card>
+          </aside>
+        </section>
 
-            {preferredMode === "rent" && rentPrice?.deposit ? (
-              <div className="mt-4 rounded-3xl bg-muted/40 px-4 py-3">
-                <p className="text-xs text-muted-foreground">
-                  {t("exploreDetail.pricing.deposit")}
-                </p>
-                <p className="mt-1 text-sm font-semibold text-foreground">
-                  {formatPrice(
-                    rentPrice.deposit,
-                    "sale",
-                    intlLocale,
-                    t("exploreDetail.pricing.perMonth"),
-                  )}
-                </p>
-              </div>
-            ) : null}
+        <RentPropertyModal
+          availablePeriodIds={availableRentPeriodIds}
+          clientUuid={user?.userUuid ?? null}
+          isOpen={isRentModalOpen}
+          propertyTitle={property.title}
+          propertyUuid={property.propertyUuid}
+          onOpenChange={setIsRentModalOpen}
+          onSuccess={async (confirmation) => {
+            setIsRentModalOpen(false);
 
-            <div className="mt-5 space-y-3">
-              <SummaryRow
-                label={t("exploreDetail.pricing.operation")}
-                value={
-                  preferredMode === "rent"
-                    ? t("exploreDetail.pricing.rent")
-                    : t("exploreDetail.pricing.sale")
-                }
-              />
-              <SummaryRow
-                label={t("exploreDetail.pricing.type")}
-                value={typeLabel}
-              />
-              <SummaryRow
-                label={t("exploreDetail.pricing.modality")}
-                value={modalityLabel}
-              />
-              <SummaryRow
-                label={t("exploreDetail.pricing.status")}
-                value={statusLabel}
-              />
-              <SummaryRow
-                label={t("exploreDetail.pricing.negotiable")}
-                value={
-                  preferredMode === "rent"
-                    ? rentPrice?.isNegotiable
-                      ? yesText
-                      : noText
-                    : salePrice?.isNegotiable
-                      ? yesText
-                      : noText
-                }
-              />
-            </div>
+            try {
+              const contractDetail = await contractsHttpAdapter.getById(
+                confirmation.contractUuid,
+              );
 
-            <Button
-              className="mt-6 w-full rounded-full"
-              disabled={preferredMode === "rent" && !canOpenRentModal}
-              onClick={() => {
-                if (canOpenRentModal) {
-                  setIsRentModalOpen(true);
-                }
-              }}
-            >
-              {getActionLabel({
-                isClient,
-                mode: preferredMode,
-                t,
-              })}
-            </Button>
+              setCheckoutContext({
+                contractId: contractDetail.contractId,
+                contractUuid: contractDetail.contractUuid,
+                currency: contractDetail.currency,
+                amount: contractDetail.agreedAmount,
+                periodName: contractDetail.periodName,
+              });
 
-            <Button variant="outline" className="mt-3 w-full">
-              {t("exploreDetail.actions.contactAgent")}
-            </Button>
-          </Card>
+              setIsCheckoutOpen(true);
+            } catch (err) {
+              console.error("Error fetching contract detail", err);
+              toast.error(
+                "La renta se confirmó, pero no se pudo abrir la pasarela de pago. Busca tu contrato en 'Mis pagos'.",
+              );
+            }
+          }}
+        />
 
-          <Card className="rounded-[2rem] p-6">
-            <h2 className="text-lg font-semibold text-foreground">
-              {t("exploreDetail.sections.summaryTitle")}
-            </h2>
-
-            <div className="mt-5 divide-y">
-              <SummaryBlock
-                icon={Building03Icon}
-                label={t("exploreDetail.summary.title")}
-                value={property.title}
-              />
-              <SummaryBlock
-                icon={Home01Icon}
-                label={t("exploreDetail.summary.propertyType")}
-                value={typeLabel}
-              />
-              <SummaryBlock
-                icon={DollarCircleIcon}
-                label={t("exploreDetail.summary.modality")}
-                value={modalityLabel}
-              />
-              <SummaryBlock
-                icon={StarIcon}
-                label={t("exploreDetail.summary.status")}
-                value={statusLabel}
-              />
-              <SummaryBlock
-                icon={RulerIcon}
-                label={t("exploreDetail.summary.lotArea")}
-                value={
-                  property.lotArea
-                    ? `${formatNumber(property.lotArea, intlLocale)} m2`
-                    : notSpecifiedText
-                }
-              />
-              {residential ? (
-                <>
-                  <SummaryBlock
-                    icon={Home01Icon}
-                    label={t("exploreDetail.features.furnished")}
-                    value={residential.isFurnished ? yesText : noText}
-                  />
-                  <SummaryBlock
-                    icon={BedSingle01Icon}
-                    label={t("exploreDetail.features.bedrooms")}
-                    value={residential.bedrooms}
-                  />
-                  <SummaryBlock
-                    icon={Bathtub01Icon}
-                    label={t("exploreDetail.features.bathrooms")}
-                    value={residential.bathrooms}
-                  />
-                </>
-              ) : null}
-            </div>
-          </Card>
-
-          <Card className="rounded-[2rem] p-6">
-            <h3 className="text-sm font-semibold text-foreground">
-              {t("exploreDetail.sections.importantTitle")}
-            </h3>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              {t("exploreDetail.important.description")}
-            </p>
-          </Card>
-        </aside>
-      </section>
-
-      <RentPropertyModal
-        availablePeriodIds={availableRentPeriodIds}
-        clientUuid={user?.userUuid ?? null}
-        isOpen={isRentModalOpen}
-        propertyTitle={property.title}
-        propertyUuid={property.propertyUuid}
-        onOpenChange={setIsRentModalOpen}
-        onSuccess={async (confirmation) => {
-          setIsRentModalOpen(false);
-          try {
-            const contractDetail = await contractsHttpAdapter.getById(
-              confirmation.contractUuid,
-            );
-            setCheckoutContext({
-              contractId: contractDetail.contractId,
-              contractUuid: contractDetail.contractUuid,
-              currency: contractDetail.currency,
-              amount: contractDetail.agreedAmount,
-              periodName: contractDetail.periodName,
-            });
-            setIsCheckoutOpen(true);
-          } catch (err) {
-            console.error("Error fetching contract detail", err);
-            toast.error(
-              "La renta se confirmó, pero no se pudo abrir la pasarela de pago. Busca tu contrato en 'Mis pagos'.",
-            );
-          }
-        }}
-      />
-
-      <CheckoutPaymentModal
-        isOpen={isCheckoutOpen}
-        onOpenChange={setIsCheckoutOpen}
-        checkout={checkoutContext}
-        onSuccess={() => {
-          void propertyQuery.refetch();
-        }}
-      />
-    </main>
+        <CheckoutPaymentModal
+          isOpen={isCheckoutOpen}
+          onOpenChange={setIsCheckoutOpen}
+          checkout={checkoutContext}
+          onSuccess={() => {
+            void propertyQuery.refetch();
+          }}
+        />
+      </main>
+    </ExploreShell>
   );
 }
 
