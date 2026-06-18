@@ -360,6 +360,8 @@ export function PropertyDetailPageContent({
     isAuthenticated &&
     availableRentPeriodIds.length > 0;
 
+  const shouldShowPrimaryAction = !isClient || preferredMode === "rent";
+
   const shouldDisablePrimaryAction =
     isClient &&
     isAuthenticated &&
@@ -709,17 +711,19 @@ export function PropertyDetailPageContent({
                 )}
               </div>
 
-              <Button
-                className="mt-6 w-full rounded-full"
-                disabled={shouldDisablePrimaryAction}
-                onClick={handlePrimaryAction}
-              >
-                {getActionLabel({
-                  isClient,
-                  mode: preferredMode,
-                  t,
-                })}
-              </Button>
+              {shouldShowPrimaryAction ? (
+                <Button
+                  className="mt-6 w-full rounded-full"
+                  disabled={shouldDisablePrimaryAction}
+                  onClick={handlePrimaryAction}
+                >
+                  {getActionLabel({
+                    isClient,
+                    mode: preferredMode,
+                    t,
+                  })}
+                </Button>
+              ) : null}
 
               <Button variant="outline" className="mt-3 w-full rounded-full">
                 {t("exploreDetail.actions.contactAgent")}
