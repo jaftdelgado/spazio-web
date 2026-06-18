@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import localFont from "next/font/local";
 import { usePathname } from "next/navigation";
 
+import { FontProvider } from "@/app/font/FontProvider";
 import { DEFAULT_LOCALE } from "@/app/i18n/config";
 import { I18nProvider } from "@/app/i18n/I18nProvider";
 import { ThemeProvider } from "@/app/theme/ThemeProvider";
@@ -21,6 +22,12 @@ const geistSans = localFont({
   display: "swap",
 });
 
+const openDyslexic = localFont({
+  src: "./fonts/OpenDyslexic-Regular.woff",
+  variable: "--font-open-dyslexic",
+  display: "swap",
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -34,26 +41,32 @@ export default function RootLayout({
   return (
     <html
       lang={DEFAULT_LOCALE}
-      className={geistSans.variable}
+      className={`${geistSans.variable} ${openDyslexic.variable}`}
       suppressHydrationWarning
     >
-      <body className={geistSans.className}>
+      <body>
         <ThemeProvider>
-          <I18nProvider>
-            <AppQueryClientProvider>
-              <TooltipProvider>
-                <Toaster position="bottom-right" richColors visibleToasts={5} />
-                {isAuthRoute || isExploreRoute || isSettingsRoute ? (
-                  children
-                ) : (
-                  <>
-                    <Navbar />
-                    <PageWrapper>{children}</PageWrapper>
-                  </>
-                )}
-              </TooltipProvider>
-            </AppQueryClientProvider>
-          </I18nProvider>
+          <FontProvider>
+            <I18nProvider>
+              <AppQueryClientProvider>
+                <TooltipProvider>
+                  <Toaster
+                    position="bottom-right"
+                    richColors
+                    visibleToasts={5}
+                  />
+                  {isAuthRoute || isExploreRoute || isSettingsRoute ? (
+                    children
+                  ) : (
+                    <>
+                      <Navbar />
+                      <PageWrapper>{children}</PageWrapper>
+                    </>
+                  )}
+                </TooltipProvider>
+              </AppQueryClientProvider>
+            </I18nProvider>
+          </FontProvider>
         </ThemeProvider>
       </body>
     </html>

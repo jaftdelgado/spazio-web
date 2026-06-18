@@ -2,6 +2,7 @@
 
 import {
   ComputerPhoneSyncIcon,
+  ViewIcon,
   Moon02Icon,
   Sun03Icon,
 } from "@hugeicons/core-free-icons";
@@ -11,24 +12,27 @@ import { Switch } from "@/components/ui/switch";
 import { SettingsSection } from "@/modules/settings/components/SettingsSection";
 import { PreferenceCard } from "@/modules/settings/components/preferences/PreferenceCard";
 import { SegmentedControl } from "@/modules/settings/components/preferences/SegmentedControl";
+import { useUsersTranslation } from "@users/i18n/useUsersTranslation";
 
 type AppearancePreferencesSectionProps = {
-  reduceMotion: boolean;
-  setReduceMotion: (value: boolean) => void;
+  setUseDyslexicFont: (value: boolean) => void;
   setTheme: (theme: AppTheme) => void;
   theme: AppTheme;
+  useDyslexicFont: boolean;
 };
 
 export function AppearancePreferencesSection({
-  reduceMotion,
-  setReduceMotion,
+  setUseDyslexicFont,
   setTheme,
   theme,
+  useDyslexicFont,
 }: AppearancePreferencesSectionProps) {
+  const { t } = useUsersTranslation();
+
   return (
     <SettingsSection
-      title="Apariencia"
-      hint="Define como quieres que se vea el sitio en tu dispositivo."
+      title={t("preferences.appearance.sectionTitle")}
+      hint={t("preferences.appearance.sectionHint")}
     >
       <PreferenceCard
         icon={
@@ -38,23 +42,23 @@ export function AppearancePreferencesSection({
               ? Sun03Icon
               : ComputerPhoneSyncIcon
         }
-        title="Tema"
-        description="Selecciona entre claro, oscuro o el modo del sistema."
+        title={t("preferences.appearance.themeTitle")}
+        description={t("preferences.appearance.themeDescription")}
       >
         <SegmentedControl
           options={[
             {
-              label: "SIS",
+              label: t("preferences.appearance.themeOptions.system"),
               active: theme === "system",
               onClick: () => setTheme("system" satisfies AppTheme),
             },
             {
-              label: "CL",
+              label: t("preferences.appearance.themeOptions.light"),
               active: theme === "light",
               onClick: () => setTheme("light" satisfies AppTheme),
             },
             {
-              label: "OSC",
+              label: t("preferences.appearance.themeOptions.dark"),
               active: theme === "dark",
               onClick: () => setTheme("dark" satisfies AppTheme),
             },
@@ -63,13 +67,13 @@ export function AppearancePreferencesSection({
       </PreferenceCard>
 
       <PreferenceCard
-        icon={ComputerPhoneSyncIcon}
-        title="Reducir movimiento"
-        description="Minimiza transiciones decorativas en futuras pantallas del sitio."
+        icon={ViewIcon}
+        title={t("preferences.appearance.fontTitle")}
+        description={t("preferences.appearance.fontDescription")}
       >
         <Switch
-          checked={reduceMotion}
-          onCheckedChange={(checked) => setReduceMotion(Boolean(checked))}
+          checked={useDyslexicFont}
+          onCheckedChange={(checked) => setUseDyslexicFont(Boolean(checked))}
         />
       </PreferenceCard>
     </SettingsSection>
