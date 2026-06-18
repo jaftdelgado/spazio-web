@@ -59,10 +59,12 @@ describe("contractsHttpAdapter", () => {
     it("fetches and maps contracts without filters", async () => {
       vi.mocked(httpClient.get).mockResolvedValue([
         {
+          contract_id: 1,
           contract_uuid: "aa55a695-e953-4604-9dbc-1297128b9187",
           transaction_type: "rent",
           property_title: "Casa en Xalapa",
           agreed_amount: 8000,
+          security_deposit: 0,
           currency: "MXN",
           start_date: "2026-06-18T00:00:00Z",
           status: "Status.Draft",
@@ -77,12 +79,15 @@ describe("contractsHttpAdapter", () => {
 
       expect(result).toEqual([
         {
+          contractId: 1,
           contractUuid: "aa55a695-e953-4604-9dbc-1297128b9187",
           transactionType: "rent",
           propertyTitle: "Casa en Xalapa",
           agreedAmount: 8000,
+          securityDeposit: 0,
           currency: "MXN",
           startDate: "2026-06-18T00:00:00Z",
+          endDate: null,
           status: "Status.Draft",
           clientName: "Cliente Renta",
           createdAt: "2026-06-17T00:00:00Z",

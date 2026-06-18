@@ -33,11 +33,8 @@ export function PhotoEditPanel({
   onRemove,
 }: PhotoEditPanelProps) {
   const { t } = usePropertiesTranslation();
-  const [isImageLoading, setIsImageLoading] = React.useState(Boolean(entry.previewUrl));
-
-  React.useEffect(() => {
-    setIsImageLoading(Boolean(entry.previewUrl));
-  }, [entry.previewUrl]);
+  const [loadedPreviewUrl, setLoadedPreviewUrl] = React.useState<string | null>(null);
+  const isImageLoading = Boolean(entry.previewUrl && loadedPreviewUrl !== entry.previewUrl);
 
   return (
     <div className="flex items-start gap-4">
@@ -54,8 +51,8 @@ export function PhotoEditPanel({
                 isImageLoading ? "opacity-0" : "opacity-100",
               )}
               src={entry.previewUrl}
-              onError={() => setIsImageLoading(false)}
-              onLoad={() => setIsImageLoading(false)}
+              onError={() => setLoadedPreviewUrl(entry.previewUrl)}
+              onLoad={() => setLoadedPreviewUrl(entry.previewUrl)}
             />
           </>
         ) : (

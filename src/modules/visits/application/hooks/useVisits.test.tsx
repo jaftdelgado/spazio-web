@@ -1,6 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
 
 import { createQueryClientWrapper } from "@/test/query-client-test-wrapper";
+import type { VisitEntity } from "../../domain/visits.entity";
 import { visitsHttpAdapter } from "../../infra/visits.http-adapter";
 import { useVisitsList, useAvailableSlots, useVisitsMutations } from "./useVisits";
 
@@ -72,8 +73,24 @@ describe("useVisits hooks", () => {
   });
 
   it("triggers mutations and invalidates related query keys", async () => {
-    vi.mocked(visitsHttpAdapter.schedule).mockResolvedValue({} as any);
-    vi.mocked(visitsHttpAdapter.reschedule).mockResolvedValue({} as any);
+    const visitMock: VisitEntity = {
+      visitUuid: "visit-1",
+      propertyId: 101,
+      propertyTitle: "Casa Centro",
+      agentId: 7,
+      agentName: "Agent",
+      agentPhone: "555-0101",
+      visitDate: "2026-06-20T09:00:00.000Z",
+      status: "Pending",
+      createdAt: "2026-06-18T00:00:00.000Z",
+      clientName: "Client",
+      clientPhone: "555-0202",
+      cityName: "Ciudad",
+      address: "Calle 1",
+    };
+
+    vi.mocked(visitsHttpAdapter.schedule).mockResolvedValue(visitMock);
+    vi.mocked(visitsHttpAdapter.reschedule).mockResolvedValue(visitMock);
     vi.mocked(visitsHttpAdapter.confirm).mockResolvedValue(undefined);
     vi.mocked(visitsHttpAdapter.complete).mockResolvedValue(undefined);
     vi.mocked(visitsHttpAdapter.cancel).mockResolvedValue(undefined);

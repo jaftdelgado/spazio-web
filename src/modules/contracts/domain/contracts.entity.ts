@@ -5,6 +5,7 @@ export interface ContractsEntity {
   ownerName: string;
   clientName: string;
   agreedAmount: number;
+  securityDeposit: number;
   currency: string;
   periodName?: string;
   startDate: string;
@@ -14,12 +15,15 @@ export interface ContractsEntity {
 }
 
 export interface ContractListItemEntity {
+  contractId: number;
   contractUuid: string;
   transactionType: string;
   propertyTitle: string;
   agreedAmount: number;
+  securityDeposit: number;
   currency: string;
   startDate: string;
+  endDate?: string | null;
   status: string;
   clientName: string;
   createdAt: string;

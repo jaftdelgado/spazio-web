@@ -73,9 +73,11 @@ describe("httpClient", () => {
       }),
     );
 
-    await expect(httpClient.get("/api/protected")).rejects.toMatchObject({
-      status: 401,
-      body: { error: "Unauthorized" },
-    });
+    await expect(httpClient.get("/api/protected")).rejects.toEqual(
+      expect.objectContaining({
+        status: 401,
+        body: { error: "Unauthorized" },
+      }),
+    );
   });
 });

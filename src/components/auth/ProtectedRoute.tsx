@@ -22,25 +22,27 @@ export function ProtectedRoute({
   const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const [isRedirecting, setIsRedirecting] = React.useState(false);
+  const redirectPath = React.useMemo(() => {
+    if (isLoading) return null;
+
+    if (!isAuthenticated && pathname !== redirectTo) {
+      return redirectTo;
+    }
+
+    if (allowedRoles && user && !allowedRoles.includes(user.roleId) && pathname !== "/explore") {
+      return "/explore";
+    }
+
+    return null;
+  }, [allowedRoles, isAuthenticated, isLoading, pathname, redirectTo, user]);
 
   useEffect(() => {
-    if (isLoading || isRedirecting) return;
-
-    if (!isAuthenticated) {
-      if (pathname !== redirectTo) {
-        setIsRedirecting(true);
-        router.push(redirectTo);
-      }
-    } else if (allowedRoles && user && !allowedRoles.includes(user.roleId)) {
-      if (pathname !== "/explore") {
-        setIsRedirecting(true);
-        router.push("/explore");
-      }
+    if (redirectPath) {
+      router.push(redirectPath);
     }
-  }, [isLoading, isAuthenticated, user, allowedRoles, router, redirectTo, pathname, isRedirecting]);
+  }, [redirectPath, router]);
 
-  if (isLoading || isRedirecting) {
+  if (isLoading || redirectPath) {
     return (
       <div className="flex min-h-svh items-center justify-center">
         <HugeiconsIcon

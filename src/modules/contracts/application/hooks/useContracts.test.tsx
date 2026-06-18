@@ -20,10 +20,12 @@ describe("useContracts hooks", () => {
   it("loads contracts list", async () => {
     const mockContracts = [
       {
+        contractId: 10,
         contractUuid: "bec14a91-902a-444f-ac0d-d65c6d750454",
         transactionType: "rent",
         propertyTitle: "Residencia acogedora en Xalapa",
         agreedAmount: 2600,
+        securityDeposit: 0,
         currency: "MXN",
         startDate: "2026-06-18T00:00:00Z",
         status: "Status.Draft",
@@ -84,6 +86,7 @@ describe("useContracts hooks", () => {
       ownerName: "Admin Spazio",
       clientName: "Cliente Prueba",
       agreedAmount: 2600,
+      securityDeposit: 0,
       currency: "MXN",
       periodName: "Monthly",
       startDate: "2026-06-18T00:00:00Z",

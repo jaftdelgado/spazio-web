@@ -55,6 +55,7 @@ import { PaymentsDataGridFooter } from "./PaymentsDataGridFooter";
 import { CheckoutPaymentModal } from "./CheckoutPaymentModal";
 import { useContractsList } from "@/modules/contracts/application/hooks/useContracts";
 import { contractsHttpAdapter } from "@/modules/contracts/infra/contracts.http-adapter";
+import { toast } from "sonner";
 
 
 type PaymentColumnId =
@@ -79,6 +80,62 @@ type PaymentFilterFormState = {
   statusId: string;
   dateFrom: string;
   dateTo: string;
+};
+
+const parseAsUTC = (dateStr: string): Date | null => {
+  if (!dateStr) return null;
+  const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (match) {
+    const y = parseInt(match[1], 10);
+    const m = parseInt(match[2], 10) - 1;
+    const d = parseInt(match[3], 10);
+    return new Date(Date.UTC(y, m, d));
+  }
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return null;
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+};
+
+const isSameDate = (d1: string, d2: string): boolean => {
+  try {
+    const date1 = parseAsUTC(d1);
+    const date2 = parseAsUTC(d2);
+    if (!date1 || !date2) return false;
+    
+    const diffMs = Math.abs(date1.getTime() - date2.getTime());
+    const diffDays = diffMs / (1000 * 60 * 60 * 24);
+    
+    return diffDays <= 2;
+  } catch {
+    return false;
+  }
+};
+
+
+const isPaymentForContract = (
+  p: PaymentListItem,
+  contract: {
+    contractId: number;
+    agreedAmount: number;
+    securityDeposit?: number;
+    currency: string;
+  },
+  expectedPeriod: string,
+  isFirstPayment: boolean
+): boolean => {
+  if (p.contractId && contract.contractId) {
+    return p.contractId === contract.contractId && isSameDate(p.billingPeriod, expectedPeriod);
+  }
+  
+  const expectedAmount = isFirstPayment 
+    ? Number(contract.agreedAmount) + Number(contract.securityDeposit || 0)
+    : Number(contract.agreedAmount);
+
+  const amountMatch = Math.round(Number(p.amount)) === Math.round(expectedAmount);
+  const currencyMatch = p.currency?.toUpperCase() === contract.currency?.toUpperCase();
+  const periodMatch = isSameDate(p.billingPeriod, expectedPeriod);
+  
+  return amountMatch && currencyMatch && periodMatch;
 };
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -321,7 +378,6 @@ export function PaymentsPageContent() {
   const [isDetailOpen, setIsDetailOpen] = React.useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = React.useState(false);
   const [checkoutContext, setCheckoutContext] = React.useState<CheckoutContext | null>(null);
-  const [payingContractUuid, setPayingContractUuid] = React.useState<string | null>(null);
   const [filterForm, setFilterForm] = React.useState<PaymentFilterFormState>({
     propertyId: "",
     statusId: "",
@@ -378,11 +434,41 @@ export function PaymentsPageContent() {
     [propertiesQuery.data?.data],
   );
 
+  const getPropertyTitle = React.useCallback(
+    (row: PaymentGridRow) => {
+      if (row.isSimulated) {
+        return row.propertyTitle || t("labels.property");
+      }
+
+      if (row.propertyId && propertyTitleById[row.propertyId]) {
+        return propertyTitleById[row.propertyId];
+      }
+
+      if (contractsQuery.data) {
+        const matchedContract = contractsQuery.data.find((c) =>
+          isPaymentForContract(row, c, row.billingPeriod, isSameDate(row.billingPeriod, c.startDate))
+        );
+
+        if (matchedContract) {
+          return matchedContract.propertyTitle;
+        }
+      }
+
+      return t("labels.property");
+    },
+    [propertyTitleById, contractsQuery.data, t],
+  );
+
   const simulatedRows = React.useMemo<PaymentGridRow[]>(() => {
     if (!canAccess || !contractsQuery.data) return [];
     
     const list: PaymentGridRow[] = [];
     const actualPayments = paymentsQuery.data?.data ?? [];
+    
+    // Filter actual payments that are NOT failed/cancelled
+    const activeActualPayments = actualPayments.filter(p => 
+      !p.status || !["failed", "fallido", "cancelled", "cancelado", "rejected", "rechazado"].includes(p.status.toLowerCase())
+    );
     
     for (const contract of contractsQuery.data) {
       const statusLower = contract.status.toLowerCase();
@@ -390,20 +476,19 @@ export function PaymentsPageContent() {
       const isActiveRent = (statusLower === "active" || statusLower === "activo") && contract.transactionType === "rent";
       
       if (isDraft) {
-        const hasActualPayment = actualPayments.some(p => {
-          const pTitle = propertyTitleById[p.propertyId];
-          return pTitle === contract.propertyTitle && p.currency === contract.currency;
-        });
+        const hasActualPayment = activeActualPayments.some(p => 
+          isPaymentForContract(p, contract, contract.startDate, true)
+        );
         if (!hasActualPayment) {
           list.push({
             id: contract.contractUuid,
             paymentUuid: `simulated-${contract.contractUuid}-initial`,
-            contractId: 0,
+            contractId: contract.contractId,
             propertyId: 0,
             propertyTitle: contract.propertyTitle,
             billingPeriod: contract.startDate,
             dueDate: contract.startDate,
-            amount: contract.agreedAmount,
+            amount: Number(contract.agreedAmount) + Number(contract.securityDeposit || 0),
             currency: contract.currency,
             paymentMethod: "-",
             gateway: "-",
@@ -413,10 +498,18 @@ export function PaymentsPageContent() {
           });
         }
       } else if (isActiveRent) {
-        const completed = actualPayments.filter(p => {
-          const pTitle = propertyTitleById[p.propertyId];
-          const isMatch = pTitle === contract.propertyTitle && p.currency === contract.currency;
-          return isMatch && p.status && ["completed", "completado", "approved", "aprobado", "success", "exitoso"].includes(p.status.toLowerCase());
+        const completed = activeActualPayments.filter(p => {
+          const isFirst = isSameDate(p.billingPeriod, contract.startDate);
+          const expectedAmt = isFirst 
+            ? Number(contract.agreedAmount) + Number(contract.securityDeposit || 0)
+            : Number(contract.agreedAmount);
+
+          const isMatch = p.contractId && contract.contractId
+            ? p.contractId === contract.contractId
+            : (Math.round(Number(p.amount)) === Math.round(expectedAmt) &&
+               p.currency?.toUpperCase() === contract.currency?.toUpperCase());
+          return isMatch && p.status && 
+            ["completed", "completado", "approved", "aprobado", "success", "exitoso"].includes(p.status.toLowerCase());
         });
         
         let lastBillingPeriod = contract.startDate;
@@ -426,17 +519,25 @@ export function PaymentsPageContent() {
         }
         
         const nextBillingPeriod = addPeriodToDate(lastBillingPeriod, undefined);
+
+        // No generar fila si el contrato ya terminó (next period > end_date)
+        if (contract.endDate) {
+          const endDate = parseAsUTC(contract.endDate);
+          const nextDate = parseAsUTC(nextBillingPeriod);
+          if (endDate && nextDate && nextDate > endDate) {
+            continue;
+          }
+        }
         
-        const alreadyHasPayment = actualPayments.some(p => {
-          const pTitle = propertyTitleById[p.propertyId];
-          return pTitle === contract.propertyTitle && p.billingPeriod === nextBillingPeriod;
-        });
+        const alreadyHasPayment = activeActualPayments.some(p => 
+          isPaymentForContract(p, contract, nextBillingPeriod, false)
+        );
         
         if (!alreadyHasPayment) {
           list.push({
             id: contract.contractUuid,
             paymentUuid: `simulated-${contract.contractUuid}-${nextBillingPeriod}`,
-            contractId: 0,
+            contractId: contract.contractId,
             propertyId: 0,
             propertyTitle: contract.propertyTitle,
             billingPeriod: nextBillingPeriod,
@@ -454,14 +555,17 @@ export function PaymentsPageContent() {
     }
     
     return list;
-  }, [canAccess, contractsQuery.data, paymentsQuery.data?.data, propertyTitleById]);
+  }, [canAccess, contractsQuery.data, paymentsQuery.data?.data]);
 
   const rows = React.useMemo<PaymentGridRow[]>(
     () => {
-      const actual = (paymentsQuery.data?.data ?? []).map((item) => ({
-        id: item.paymentUuid,
-        ...item,
-      }));
+      const HIDDEN_STATUSES = ["failed", "fallido", "cancelled", "cancelado", "rejected", "rechazado", "cancelled_by_new_attempt"];
+      const actual = (paymentsQuery.data?.data ?? [])
+        .filter((item) => !HIDDEN_STATUSES.includes((item.status ?? "").toLowerCase()))
+        .map((item) => ({
+          id: item.paymentUuid,
+          ...item,
+        }));
       if (page === 1) {
         return [...simulatedRows, ...actual];
       }
@@ -575,9 +679,7 @@ export function PaymentsPageContent() {
         case "property":
           return (
             <span className="font-medium text-foreground">
-              {row.isSimulated
-                ? row.propertyTitle || t("labels.property")
-                : propertyTitleById[row.propertyId] || t("labels.property")}
+              {getPropertyTitle(row)}
             </span>
           );
         case "billingPeriod":
@@ -611,7 +713,6 @@ export function PaymentsPageContent() {
         case "actions": {
           const isPending = !row.paymentDate || 
             ["pending", "pendiente", "unpaid"].includes(row.status?.toLowerCase());
-          const isPayingThis = payingContractUuid === row.id;
 
           return (
             <div className="flex w-full justify-end gap-2">
@@ -620,42 +721,75 @@ export function PaymentsPageContent() {
                   className="rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90"
                   size="sm"
                   type="button"
-                  disabled={payingContractUuid !== null}
                   onClick={async () => {
-                    if (row.isSimulated) {
-                      setPayingContractUuid(row.id);
-                      try {
-                        const detail = await contractsHttpAdapter.getById(row.id);
-                        setCheckoutContext({
-                          contractId: detail.contractId,
-                          contractUuid: detail.contractUuid,
-                          currency: detail.currency,
-                          amount: Number(detail.agreedAmount),
-                        });
-                        setIsCheckoutOpen(true);
-                      } catch (err) {
-                        console.error(err);
-                      } finally {
-                        setPayingContractUuid(null);
+                    // For all payment rows, look up the contract to compute the correct amount.
+                    // The backend always validates: agreedAmount + securityDeposit for first payment.
+                    const toastId = toast.loading("Obteniendo detalles del contrato...");
+                    try {
+                      // Resolve the contract UUID: simulated rows use row.id, real rows need contractId lookup
+                      let contractUuid = row.isSimulated ? row.id : "";
+                      let contractDetail;
+
+                      if (!contractUuid && row.contractId) {
+                        // Find in cached contracts list first
+                        const cached = contractsQuery.data?.find(c => c.contractId === row.contractId);
+                        if (cached) {
+                          contractUuid = cached.contractUuid;
+                        }
                       }
-                    } else {
+
+                      if (contractUuid) {
+                        contractDetail = await contractsHttpAdapter.getById(contractUuid);
+                      }
+
+                      toast.dismiss(toastId);
+
+                      // Determine if this is the first payment: no completed payments for this contract
+                      const completedPayments = (paymentsQuery.data?.data ?? []).filter(p =>
+                        p.contractId === row.contractId &&
+                        ["completed", "completado", "approved", "aprobado", "success", "exitoso"].includes(
+                          (p.status ?? "").toLowerCase()
+                        )
+                      );
+                      const isFirstPayment = completedPayments.length === 0;
+
+                      // Compute the correct amount the backend expects
+                      const baseAmount = contractDetail
+                        ? Number(contractDetail.agreedAmount)
+                        : Number(row.amount);
+                      const depositAmount = (contractDetail && isFirstPayment)
+                        ? Number(contractDetail.securityDeposit || 0)
+                        : 0;
+                      const correctAmount = baseAmount + depositAmount;
+
                       setCheckoutContext({
-                        contractId: row.contractId,
-                        contractUuid: "",
+                        contractId: row.contractId || contractDetail?.contractId || 0,
+                        contractUuid,
                         currency: row.currency,
-                        amount: Number(row.amount),
+                        amount: correctAmount,
+                        periodName: formatDate(
+                          row.billingPeriod,
+                          intlLocale,
+                          t("labels.notAvailable"),
+                          { year: "numeric", month: "long" }
+                        ),
+                        existingPaymentUuid: row.isSimulated ? undefined : row.paymentUuid,
+                        existingPaymentMethod: row.isSimulated ? undefined : row.paymentMethod,
                       });
                       setIsCheckoutOpen(true);
+                    } catch (err) {
+                      toast.dismiss(toastId);
+                      toast.error("Error al obtener los detalles del contrato");
+                      console.error("Error fetching contract detail:", err);
                     }
                   }}
                 >
                   <HugeiconsIcon
-                    icon={isPayingThis ? NoteIcon : CreditCardIcon}
+                    icon={CreditCardIcon}
                     size={16}
                     strokeWidth={1.8}
-                    className={isPayingThis ? "animate-spin" : ""}
                   />
-                  <span>{isPayingThis ? "Cargando..." : "Pagar"}</span>
+                  <span>Pagar</span>
                 </Button>
               )}
               {!row.isSimulated && (
@@ -684,7 +818,7 @@ export function PaymentsPageContent() {
           return null;
       }
     },
-    [intlLocale, propertyTitleById, t, role],
+    [intlLocale, t, role, contractsQuery.data, paymentsQuery.data, getPropertyTitle],
   );
 
   if (!canAccess) {
@@ -840,9 +974,7 @@ export function PaymentsPageContent() {
                 getRowLabel={(row) =>
                   isLoadingRow(row)
                     ? t("states.loadingRowLabel")
-                    : row.isSimulated
-                    ? row.propertyTitle || t("labels.property")
-                    : propertyTitleById[row.propertyId] || t("labels.property")
+                    : getPropertyTitle(row)
                 }
                 renderCell={renderCell}
                 rows={rowsToRender}
@@ -925,6 +1057,14 @@ export function PaymentsPageContent() {
                     contractUuid: "",
                     currency: paymentDetailQuery.data.currency,
                     amount: Number(paymentDetailQuery.data.amount),
+                    periodName: formatDate(
+                      paymentDetailQuery.data.billingPeriod,
+                      intlLocale,
+                      t("labels.notAvailable"),
+                      { year: "numeric", month: "long" }
+                    ),
+                    existingPaymentUuid: paymentDetailQuery.data.paymentUuid,
+                    existingPaymentMethod: paymentDetailQuery.data.paymentMethod,
                   });
                   setIsCheckoutOpen(true);
                 }}

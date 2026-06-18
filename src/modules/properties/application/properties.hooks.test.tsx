@@ -176,7 +176,7 @@ describe("property application hooks and session helpers", () => {
       propertyUuid: "uuid-2",
     });
     vi.mocked(propertyPatchHttpAdapter.updateProperty).mockResolvedValue({
-      message: "updated",
+      message: "Property updated",
     });
     vi.mocked(propertyDeleteHttpAdapter.deleteProperty).mockResolvedValue(undefined);
     vi.mocked(propertyPricesHttpAdapter.updatePropertyPrices).mockResolvedValue(

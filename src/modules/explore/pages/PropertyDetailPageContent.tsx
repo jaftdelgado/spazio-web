@@ -805,16 +805,22 @@ export function PropertyDetailPageContent({
             setIsRentModalOpen(false);
 
             try {
+              // We only need to fetch the contract detail to get the numeric contractId
+              // required by the payment API. The amount is taken directly from the
+              // rental confirmation response, which already includes subtotal + deposit.
               const contractDetail = await contractsHttpAdapter.getById(
                 confirmation.contractUuid,
               );
 
+              // agreedAmount = rent price for ONE period (e.g. 1 month)
+              // securityDeposit = deposit, stored in DB (migration 000018 applied)
+              // DO NOT use confirmation.subtotal — that is the total of ALL periods combined.
               setCheckoutContext({
                 contractId: contractDetail.contractId,
-                contractUuid: contractDetail.contractUuid,
-                currency: contractDetail.currency,
-                amount: contractDetail.agreedAmount,
-                periodName: contractDetail.periodName,
+                contractUuid: confirmation.contractUuid,
+                currency: confirmation.currency,
+                amount: Number(contractDetail.agreedAmount) + Number(contractDetail.securityDeposit || 0),
+                periodName: confirmation.period,
               });
 
               setIsCheckoutOpen(true);

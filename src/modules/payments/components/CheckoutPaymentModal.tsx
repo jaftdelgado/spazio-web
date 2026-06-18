@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import QRCode from "qrcode";
 import { 
   CreditCardIcon, 
   UserIcon, 
@@ -24,8 +25,100 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/auth/useAuth";
+import { HttpError } from "@/lib/http/http-errors";
 import { useProcessPayment } from "../application/hooks/usePayments";
 import type { CheckoutContext } from "../domain/payments.entity";
+
+// Map of MercadoPago status_detail codes to friendly Spanish messages.
+// Covers all test scenarios from the MercadoPago sandbox.
+const MP_STATUS_DETAIL_MESSAGES: Record<string, string> = {
+  // Approved
+  accredited: "¡Pago aprobado y acreditado exitosamente!",
+
+  // Pending / in process
+  pending_contingency:
+    "El pago está pendiente. Te notificaremos cuando sea procesado (puede tardar hasta 2 días hábiles).",
+  pending_waiting_payment:
+    "El pago está pendiente de confirmación. Si pagaste en OXXO, puede tardar hasta 3 días hábiles.",
+  pending_review_manual:
+    "Tu pago está en revisión. Te notificaremos cuando sea aprobado.",
+
+  // Rejection reasons
+  cc_rejected_other_reason:
+    "Tu tarjeta fue rechazada por un error general. Intenta con otra tarjeta o contacta a tu banco.",
+  cc_rejected_call_for_authorize:
+    "Tu banco requiere que autorices este pago. Llama al número que aparece en el reverso de tu tarjeta y luego intenta de nuevo.",
+  cc_rejected_insufficient_amount:
+    "Fondos insuficientes. Verifica el saldo disponible en tu tarjeta e intenta de nuevo.",
+  cc_rejected_bad_cvv:
+    "El código de seguridad (CVV) es inválido. Revisa los 3 o 4 dígitos en el reverso de tu tarjeta.",
+  cc_rejected_bad_filled_date:
+    "La fecha de vencimiento es incorrecta. Verifica el mes y año de expiración.",
+  cc_rejected_bad_filled_card_number:
+    "El número de tarjeta es inválido. Revisa que los 16 dígitos sean correctos.",
+  cc_rejected_bad_filled_other:
+    "Algunos datos del formulario son incorrectos. Revisa la información de tu tarjeta e intenta de nuevo.",
+  cc_rejected_blacklist:
+    "Tu tarjeta no puede procesar este pago. Contacta a tu banco para más información.",
+  cc_rejected_high_risk:
+    "El pago fue rechazado por seguridad. Intenta con otra tarjeta o método de pago.",
+  cc_rejected_card_disabled:
+    "Tu tarjeta está desactivada. Actívala desde la app de tu banco o solicita una nueva.",
+  cc_rejected_duplicated_payment:
+    "Ya existe un pago idéntico reciente. Espera unos minutos antes de intentarlo de nuevo.",
+  cc_rejected_max_attempts:
+    "Superaste el límite de intentos. Intenta de nuevo en 24 horas o usa otra tarjeta.",
+  cc_rejected_card_error:
+    "Error al procesar la tarjeta. Verifica los datos o intenta con otra tarjeta.",
+  cc_amount_rate_limit_exceeded:
+    "Superaste el límite de monto permitido para esta tarjeta. Intenta con un monto menor o usa otra tarjeta.",
+
+  // Bank transfer / offline
+  bank_rejected: "El pago fue rechazado por el banco. Contacta a tu banco para más información.",
+
+  // Generic
+  rejected_by_bank:
+    "Tu banco rechazó el pago. Contacta a tu banco o intenta con otra tarjeta.",
+};
+
+/**
+ * Resolves a user-friendly error message from a backend error string.
+ * The backend sends errors in two formats:
+ *   1. Rejections: "el pago fue rechazado por la pasarela (Motivo: <status_detail>)"
+ *   2. Gateway errors: "error al procesar pago en pasarela: <raw MP error JSON>"
+ */
+function resolveGatewayErrorMessage(rawError: string): string {
+  // Try to extract the status_detail code from the rejection format
+  const motivoMatch = rawError.match(/\(Motivo:\s*([^)]+)\)/);
+  if (motivoMatch) {
+    const code = motivoMatch[1].trim();
+    if (MP_STATUS_DETAIL_MESSAGES[code]) {
+      return MP_STATUS_DETAIL_MESSAGES[code];
+    }
+    // Unknown code — still readable
+    return `Tu pago fue rechazado. Razón: ${code.replace(/_/g, " ")}. Intenta con otra tarjeta o contacta a tu banco.`;
+  }
+
+  // Gateway communication errors (bin_not_found, etc.)
+  if (rawError.includes("bin_not_found") || rawError.includes("Bin not found")) {
+    return "El número de tarjeta no fue reconocido. Verifica que sea correcto o usa una tarjeta diferente.";
+  }
+  if (rawError.includes("bad_request")) {
+    return "Los datos de la tarjeta son inválidos. Revisa el número, fecha y CVV.";
+  }
+
+  // Fall back to a generic but informative message stripping internal prefixes
+  const cleaned = rawError
+    .replace(/^error al procesar pago en pasarela:\s*/i, "")
+    .replace(/^el pago fue rechazado por la pasarela[^:]*:\s*/i, "")
+    .trim();
+
+  return cleaned.length > 0
+    ? `Error de pasarela: ${cleaned}`
+    : "Ocurrió un error al procesar el pago con la pasarela. Intenta de nuevo.";
+}
+
+// ─── MercadoPago SDK types ────────────────────────────────────────────────────
 
 // Extend global window type to include MercadoPago
 declare global {
@@ -72,12 +165,64 @@ export function CheckoutPaymentModal({
   const [payerEmail, setPayerEmail] = React.useState(user?.email || "");
 
   const [isProcessing, setIsProcessing] = React.useState(false);
+  const [isQrLoading, setIsQrLoading] = React.useState(true);
   const [paymentResult, setPaymentResult] = React.useState<{
     success: boolean;
     message: string;
     referenceNumber?: string | null;
     isOxxo?: boolean;
   } | null>(null);
+
+  const [newQrCodeUrl, setNewQrCodeUrl] = React.useState<string>("");
+  const [existingQrCodeUrl, setExistingQrCodeUrl] = React.useState<string>("");
+
+  // Generate QR code locally for new payment reference
+  React.useEffect(() => {
+    if (paymentResult?.referenceNumber) {
+      const timer = window.setTimeout(() => setIsQrLoading(true), 0);
+      QRCode.toDataURL(paymentResult.referenceNumber, { width: 150, margin: 1 })
+        .then((url) => {
+          setNewQrCodeUrl(url);
+          setIsQrLoading(false);
+        })
+        .catch((err) => {
+          console.error("Error generating QR code:", err);
+          setIsQrLoading(false);
+        });
+      return () => clearTimeout(timer);
+    } else {
+      const timer = window.setTimeout(() => setNewQrCodeUrl(""), 0);
+      return () => clearTimeout(timer);
+    }
+  }, [paymentResult?.referenceNumber]);
+
+  // Generate QR code locally for existing payment reference.
+  // isOpen is included so the QR regenerates each time the modal opens,
+  // even when the UUID hasn't changed (state was reset on close).
+  React.useEffect(() => {
+    if (!isOpen) return;
+
+    const ref = checkout?.existingPaymentUuid
+      ? "REF-" + checkout.existingPaymentUuid.slice(0, 8).toUpperCase()
+      : "";
+
+    if (ref) {
+      const timer = window.setTimeout(() => setIsQrLoading(true), 0);
+      QRCode.toDataURL(ref, { width: 150, margin: 1 })
+        .then((url) => {
+          setExistingQrCodeUrl(url);
+          setIsQrLoading(false);
+        })
+        .catch((err) => {
+          console.error("Error generating QR code:", err);
+          setIsQrLoading(false);
+        });
+      return () => clearTimeout(timer);
+    } else {
+      const timer = window.setTimeout(() => setExistingQrCodeUrl(""), 0);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, checkout?.existingPaymentUuid]);
 
   // Pre-populate email
   React.useEffect(() => {
@@ -88,6 +233,26 @@ export function CheckoutPaymentModal({
       return () => clearTimeout(timer);
     }
   }, [user]);
+
+  React.useEffect(() => {
+    const timer = window.setTimeout(() => {
+    if (isOpen && checkout?.existingPaymentMethod?.trim().toLowerCase() === "oxxo") {
+      setPaymentType("oxxo");
+    } else {
+      setPaymentType("card");
+    }
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [isOpen, checkout]);
+
+  // If checkout amount exceeds OXXO limit, force card payment type
+  React.useEffect(() => {
+    if (checkout && checkout.amount > 10000) {
+      const timer = window.setTimeout(() => setPaymentType("card"), 0);
+      return () => clearTimeout(timer);
+    }
+  }, [checkout]);
 
   // Load MercadoPago SDK script
   React.useEffect(() => {
@@ -112,6 +277,9 @@ export function CheckoutPaymentModal({
         setPaymentType("card");
         setIsProcessing(false);
         setPaymentResult(null);
+        setIsQrLoading(true);
+        setNewQrCodeUrl("");
+        setExistingQrCodeUrl("");
       }, 0);
       return () => clearTimeout(timer);
     }
@@ -254,12 +422,61 @@ export function CheckoutPaymentModal({
       }
     } catch (err: unknown) {
       console.error("Payment error:", err);
-      const errMsg = err instanceof Error ? err.message : "Ocurrió un error inesperado al procesar el pago.";
-      setPaymentResult({
-        success: false,
-        message: errMsg,
-      });
-      toast.error("Error al procesar el pago");
+      let errMsg = "Ocurrió un error inesperado al procesar el pago. Intenta de nuevo.";
+      let isRejection = false;
+
+      if (err instanceof HttpError) {
+        const body = err.body as { error?: string } | null;
+        const rawMsg = body?.error?.trim() ?? "";
+
+        if (rawMsg) {
+          isRejection = rawMsg.includes("rechazado") || rawMsg.includes("Motivo:");
+          errMsg = resolveGatewayErrorMessage(rawMsg);
+        } else {
+          errMsg = `Error del servidor (${err.status}): No se pudo procesar el pago.`;
+        }
+      } else if (err instanceof Error) {
+        errMsg = err.message;
+      } else if (err && typeof err === "object") {
+        // El SDK de MercadoPago lanza objetos planos (no instancias de Error)
+        // Estructura típica: { message: "...", cause: [{ code, description }] }
+        const mpErr = err as {
+          message?: string;
+          error?: string;
+          status?: number;
+          cause?: Array<{ description?: string; code?: number }>;
+        };
+
+        // Map known MP SDK error codes
+        const causeCode = mpErr.cause?.[0]?.code;
+        const causeDesc = mpErr.cause?.[0]?.description ?? "";
+
+        if (causeCode === 10105 || mpErr.message === "bin_not_found") {
+          errMsg = "El número de tarjeta no fue reconocido. Verifica los primeros dígitos o usa una tarjeta diferente.";
+        } else if (causeCode === 205 || causeDesc.toLowerCase().includes("cardNumber")) {
+          errMsg = "El número de tarjeta es inválido. Verifica que sean 15 o 16 dígitos correctos.";
+        } else if (causeCode === 208 || causeDesc.toLowerCase().includes("expirationMonth")) {
+          errMsg = "El mes de vencimiento es inválido. Usa el formato MM (01-12).";
+        } else if (causeCode === 209 || causeDesc.toLowerCase().includes("expirationYear")) {
+          errMsg = "El año de vencimiento es inválido.";
+        } else if (causeCode === 214 || causeDesc.toLowerCase().includes("securityCode")) {
+          errMsg = "El código de seguridad (CVV) es inválido.";
+        } else if (causeCode === 316 || causeDesc.toLowerCase().includes("cardholderName")) {
+          errMsg = "El nombre del titular es inválido. Usa el nombre como aparece en la tarjeta.";
+        } else if (causeCode === 324) {
+          errMsg = "El tipo de documento de identificación es inválido.";
+        } else if (mpErr.cause?.[0]?.description) {
+          errMsg = `Error de tarjeta: ${causeDesc}`;
+        } else if (mpErr.message) {
+          errMsg = resolveGatewayErrorMessage(mpErr.message);
+        } else {
+          errMsg = "Error al validar la tarjeta. Revisa los datos e intenta de nuevo.";
+        }
+        isRejection = true;
+      }
+
+      setPaymentResult({ success: false, message: errMsg });
+      toast.error(isRejection ? "Pago rechazado" : "Error al procesar el pago");
     } finally {
       setIsProcessing(false);
     }
@@ -295,15 +512,21 @@ export function CheckoutPaymentModal({
 
             {paymentResult.referenceNumber && (
               <div className="mt-6 flex flex-col items-center space-y-4 w-full">
-                <div className="rounded-2xl bg-white p-3 shadow-md border border-border">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${paymentResult.referenceNumber}`}
-                    alt="Código QR OXXO"
-                    width={150}
-                    height={150}
-                    className="mx-auto"
-                  />
+                <div className="relative rounded-2xl bg-white p-3 shadow-md border border-border flex items-center justify-center min-h-[174px] min-w-[174px]">
+                  {isQrLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white rounded-2xl">
+                      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+                    </div>
+                  )}
+                  {newQrCodeUrl && (
+                    <img
+                      src={newQrCodeUrl}
+                      alt="Código QR OXXO"
+                      width={150}
+                      height={150}
+                      className="mx-auto"
+                    />
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground max-w-[280px]">
                   Presenta este código QR o proporciona la siguiente referencia en caja para realizar tu pago en cualquier OXXO.
@@ -377,11 +600,14 @@ export function CheckoutPaymentModal({
                   </button>
                   <button
                     type="button"
+                    disabled={checkout !== null && checkout.amount > 10000}
                     onClick={() => setPaymentType("oxxo")}
-                    className={`flex flex-col items-center justify-center p-4 rounded-3xl border transition-all cursor-pointer ${
-                      paymentType === "oxxo"
-                        ? "border-primary bg-primary/5 text-primary shadow-sm"
-                        : "border-border/80 bg-background text-muted-foreground hover:bg-muted/10"
+                    className={`flex flex-col items-center justify-center p-4 rounded-3xl border transition-all ${
+                      checkout !== null && checkout.amount > 10000
+                        ? "border-border/40 bg-muted/20 text-muted-foreground/40 cursor-not-allowed opacity-50"
+                        : paymentType === "oxxo"
+                          ? "border-primary bg-primary/5 text-primary shadow-sm cursor-pointer"
+                          : "border-border/80 bg-background text-muted-foreground hover:bg-muted/10 cursor-pointer"
                     }`}
                   >
                     <HugeiconsIcon icon={Mail01Icon} size={22} className="mb-2" />
@@ -390,93 +616,131 @@ export function CheckoutPaymentModal({
                 </div>
               </div>
 
-              {/* Payer Email */}
-              <div className="space-y-1.5">
-                <label htmlFor="checkout-payer-email" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
-                  <HugeiconsIcon icon={Mail01Icon} size={12} />
-                  <span>Correo Electrónico de Contacto</span>
-                </label>
-                <Input
-                  id="checkout-payer-email"
-                  type="email"
-                  required
-                  placeholder="ejemplo@correo.com"
-                  value={payerEmail}
-                  onChange={(e) => setPayerEmail(e.target.value)}
-                  className="rounded-2xl"
-                />
-              </div>
+              {checkout !== null && checkout.amount > 10000 && (
+                <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-3.5 flex gap-2.5 text-xs text-amber-600 dark:text-amber-500 animate-fade-in">
+                  <HugeiconsIcon icon={Alert02Icon} size={16} className="shrink-0 mt-0.5" />
+                  <p className="leading-normal">
+                    El pago por **OXXO (Efectivo)** tiene un límite máximo de **$10,000.00 MXN**. Para montos superiores, por favor utiliza una tarjeta de crédito o débito.
+                  </p>
+                </div>
+              )}
 
-              {paymentType === "card" && (
+              {paymentType === "oxxo" && checkout?.existingPaymentMethod?.trim().toLowerCase() === "oxxo" ? (
+                <div className="flex flex-col items-center text-center animate-fade-in space-y-4 py-2">
+                  <div className="relative rounded-2xl bg-white p-3 shadow-md border border-border flex items-center justify-center min-h-[174px] min-w-[174px]">
+                    {isQrLoading && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-white rounded-2xl">
+                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+                      </div>
+                    )}
+                    {existingQrCodeUrl && (
+                      <img
+                        src={existingQrCodeUrl}
+                        alt="Código QR OXXO"
+                        width={150}
+                        height={150}
+                        className="mx-auto"
+                      />
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground max-w-[280px]">
+                    Esta referencia ya fue generada. Presenta este código QR o proporciona la siguiente referencia en caja para realizar tu pago en cualquier OXXO.
+                  </p>
+                  <div className="rounded-2xl bg-muted/40 px-5 py-2.5 text-sm font-bold font-mono text-foreground border border-border/70 select-all">
+                    Referencia: {"REF-" + checkout.existingPaymentUuid?.slice(0, 8).toUpperCase()}
+                  </div>
+                </div>
+              ) : (
                 <>
-                  {/* Card Number */}
+                  {/* Payer Email */}
                   <div className="space-y-1.5">
-                    <label htmlFor="checkout-card-number" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
-                      <HugeiconsIcon icon={CreditCardIcon} size={12} />
-                      <span>Número de Tarjeta</span>
+                    <label htmlFor="checkout-payer-email" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
+                      <HugeiconsIcon icon={Mail01Icon} size={12} />
+                      <span>Correo Electrónico de Contacto</span>
                     </label>
                     <Input
-                      id="checkout-card-number"
-                      type="text"
+                      id="checkout-payer-email"
+                      type="email"
                       required
-                      placeholder="0000 0000 0000 0000"
-                      value={cardNumber}
-                      onChange={handleCardNumberChange}
+                      placeholder="ejemplo@correo.com"
+                      value={payerEmail}
+                      onChange={(e) => setPayerEmail(e.target.value)}
                       className="rounded-2xl"
                     />
                   </div>
 
-                  {/* Cardholder Name */}
-                  <div className="space-y-1.5">
-                    <label htmlFor="checkout-cardholder-name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
-                      <HugeiconsIcon icon={UserIcon} size={12} />
-                      <span>Nombre del Titular</span>
-                    </label>
-                    <Input
-                      id="checkout-cardholder-name"
-                      type="text"
-                      required
-                      placeholder="Escribe como aparece en la tarjeta"
-                      value={cardholderName}
-                      onChange={(e) => setCardholderName(e.target.value)}
-                      className="rounded-2xl"
-                    />
-                  </div>
+                  {paymentType === "card" && (
+                    <>
+                      {/* Card Number */}
+                      <div className="space-y-1.5">
+                        <label htmlFor="checkout-card-number" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
+                          <HugeiconsIcon icon={CreditCardIcon} size={12} />
+                          <span>Número de Tarjeta</span>
+                        </label>
+                        <Input
+                          id="checkout-card-number"
+                          type="text"
+                          required
+                          placeholder="0000 0000 0000 0000"
+                          value={cardNumber}
+                          onChange={handleCardNumberChange}
+                          className="rounded-2xl"
+                        />
+                      </div>
 
-                  {/* Expiry and CVV */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label htmlFor="checkout-card-expiry" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
-                        <HugeiconsIcon icon={Calendar01Icon} size={12} />
-                        <span>Vencimiento</span>
-                      </label>
-                      <Input
-                        id="checkout-card-expiry"
-                        type="text"
-                        required
-                        placeholder="MM/AA"
-                        value={expiry}
-                        onChange={handleExpiryChange}
-                        className="rounded-2xl"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label htmlFor="checkout-card-cvv" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
-                        <HugeiconsIcon icon={AccessIcon} size={12} />
-                        <span>CVV</span>
-                      </label>
-                      <Input
-                        id="checkout-card-cvv"
-                        type="password"
-                        required
-                        placeholder="123"
-                        maxLength={4}
-                        value={cvv}
-                        onChange={(e) => setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                        className="rounded-2xl"
-                      />
-                    </div>
-                  </div>
+                      {/* Cardholder Name */}
+                      <div className="space-y-1.5">
+                        <label htmlFor="checkout-cardholder-name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
+                          <HugeiconsIcon icon={UserIcon} size={12} />
+                          <span>Nombre del Titular</span>
+                        </label>
+                        <Input
+                          id="checkout-cardholder-name"
+                          type="text"
+                          required
+                          placeholder="Escribe como aparece en la tarjeta"
+                          value={cardholderName}
+                          onChange={(e) => setCardholderName(e.target.value)}
+                          className="rounded-2xl"
+                        />
+                      </div>
+
+                      {/* Expiry and CVV */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label htmlFor="checkout-card-expiry" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
+                            <HugeiconsIcon icon={Calendar01Icon} size={12} />
+                            <span>Vencimiento</span>
+                          </label>
+                          <Input
+                            id="checkout-card-expiry"
+                            type="text"
+                            required
+                            placeholder="MM/AA"
+                            value={expiry}
+                            onChange={handleExpiryChange}
+                            className="rounded-2xl"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label htmlFor="checkout-card-cvv" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 cursor-pointer">
+                            <HugeiconsIcon icon={AccessIcon} size={12} />
+                            <span>CVV</span>
+                          </label>
+                          <Input
+                            id="checkout-card-cvv"
+                            type="password"
+                            required
+                            placeholder="123"
+                            maxLength={4}
+                            value={cvv}
+                            onChange={(e) => setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                            className="rounded-2xl"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </>
               )}
             </div>
@@ -489,19 +753,23 @@ export function CheckoutPaymentModal({
                 onClick={() => onOpenChange(false)}
                 className="rounded-2xl px-5"
               >
-                Pagar luego
+                {paymentType === "oxxo" && checkout?.existingPaymentMethod?.trim().toLowerCase() === "oxxo" ? "Cerrar" : "Pagar luego"}
               </Button>
-              <Button
-                type="submit"
-                disabled={!isFormValid || isProcessing}
-                className="rounded-2xl flex-1 py-5 text-sm font-semibold cursor-pointer"
-              >
-                {isProcessing
-                  ? "Procesando pago..."
-                  : paymentType === "card"
-                    ? "Confirmar y Pagar"
-                    : "Generar Referencia OXXO"}
-              </Button>
+              {!(paymentType === "oxxo" && checkout?.existingPaymentMethod?.trim().toLowerCase() === "oxxo") && (
+                <Button
+                  type="submit"
+                  disabled={!isFormValid || isProcessing}
+                  className="rounded-2xl flex-1 py-5 text-sm font-semibold cursor-pointer"
+                >
+                  {isProcessing
+                    ? "Procesando pago..."
+                    : paymentType === "card"
+                      ? checkout?.existingPaymentMethod
+                        ? "Pagar de una vez"
+                        : "Confirmar y Pagar"
+                      : "Generar Referencia OXXO"}
+                </Button>
+              )}
             </AlertDialogFooter>
           </form>
         )}

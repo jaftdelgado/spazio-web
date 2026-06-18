@@ -1,5 +1,14 @@
 import * as React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+
+// Mock qrcode library
+vi.mock("qrcode", () => ({
+  default: {
+    toDataURL: () => Promise.resolve("data:image/png;base64,mocked-qr-code-url"),
+  },
+  toDataURL: () => Promise.resolve("data:image/png;base64,mocked-qr-code-url"),
+}));
+
 import { CheckoutPaymentModal } from "./CheckoutPaymentModal";
 import { useProcessPayment } from "../application/hooks/usePayments";
 import { useAuth } from "@/lib/auth/useAuth";

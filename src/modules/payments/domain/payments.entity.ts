@@ -73,4 +73,6 @@ export interface CheckoutContext {
   /** Amount in decimal format (e.g. 15000.00) */
   amount: number;
   periodName?: string;
+  existingPaymentUuid?: string;
+  existingPaymentMethod?: string;
 }
