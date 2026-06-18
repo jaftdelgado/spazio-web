@@ -179,7 +179,7 @@ export function CheckoutPaymentModal({
   // Generate QR code locally for new payment reference
   React.useEffect(() => {
     if (paymentResult?.referenceNumber) {
-      setIsQrLoading(true);
+      const timer = window.setTimeout(() => setIsQrLoading(true), 0);
       QRCode.toDataURL(paymentResult.referenceNumber, { width: 150, margin: 1 })
         .then((url) => {
           setNewQrCodeUrl(url);
@@ -189,8 +189,10 @@ export function CheckoutPaymentModal({
           console.error("Error generating QR code:", err);
           setIsQrLoading(false);
         });
+      return () => clearTimeout(timer);
     } else {
-      setNewQrCodeUrl("");
+      const timer = window.setTimeout(() => setNewQrCodeUrl(""), 0);
+      return () => clearTimeout(timer);
     }
   }, [paymentResult?.referenceNumber]);
 
@@ -205,7 +207,7 @@ export function CheckoutPaymentModal({
       : "";
 
     if (ref) {
-      setIsQrLoading(true);
+      const timer = window.setTimeout(() => setIsQrLoading(true), 0);
       QRCode.toDataURL(ref, { width: 150, margin: 1 })
         .then((url) => {
           setExistingQrCodeUrl(url);
@@ -215,8 +217,10 @@ export function CheckoutPaymentModal({
           console.error("Error generating QR code:", err);
           setIsQrLoading(false);
         });
+      return () => clearTimeout(timer);
     } else {
-      setExistingQrCodeUrl("");
+      const timer = window.setTimeout(() => setExistingQrCodeUrl(""), 0);
+      return () => clearTimeout(timer);
     }
   }, [isOpen, checkout?.existingPaymentUuid]);
 
@@ -231,17 +235,22 @@ export function CheckoutPaymentModal({
   }, [user]);
 
   React.useEffect(() => {
+    const timer = window.setTimeout(() => {
     if (isOpen && checkout?.existingPaymentMethod?.trim().toLowerCase() === "oxxo") {
       setPaymentType("oxxo");
     } else {
       setPaymentType("card");
     }
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [isOpen, checkout]);
 
   // If checkout amount exceeds OXXO limit, force card payment type
   React.useEffect(() => {
     if (checkout && checkout.amount > 10000) {
-      setPaymentType("card");
+      const timer = window.setTimeout(() => setPaymentType("card"), 0);
+      return () => clearTimeout(timer);
     }
   }, [checkout]);
 

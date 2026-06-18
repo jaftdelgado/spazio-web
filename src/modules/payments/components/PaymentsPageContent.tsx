@@ -446,9 +446,7 @@ export function PaymentsPageContent() {
 
       if (contractsQuery.data) {
         const matchedContract = contractsQuery.data.find((c) =>
-        const matchedContract = contractsQuery.data.find((c) =>
           isPaymentForContract(row, c, row.billingPeriod, isSameDate(row.billingPeriod, c.startDate))
-        );
         );
 
         if (matchedContract) {
@@ -820,7 +818,7 @@ export function PaymentsPageContent() {
           return null;
       }
     },
-    [intlLocale, propertyTitleById, t, role, contractsQuery.data, paymentsQuery.data],
+    [intlLocale, t, role, contractsQuery.data, paymentsQuery.data, getPropertyTitle],
   );
 
   if (!canAccess) {

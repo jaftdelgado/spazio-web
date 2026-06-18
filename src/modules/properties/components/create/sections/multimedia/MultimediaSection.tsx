@@ -78,6 +78,7 @@ export function MultimediaSection({
   const [selectedIndex, setSelectedIndex] = React.useState(0);
 
   React.useEffect(() => {
+    const timer = window.setTimeout(() => {
     if (form.photos.length === 0) {
       setSelectedIndex(0);
       return;
@@ -86,6 +87,9 @@ export function MultimediaSection({
     if (selectedIndex >= form.photos.length) {
       setSelectedIndex(form.photos.length - 1);
     }
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [form.photos.length, selectedIndex]);
 
   const handleFilesAdded = (files: File[]) => {
