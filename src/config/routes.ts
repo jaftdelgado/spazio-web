@@ -12,6 +12,7 @@ export const ROUTES = {
     propertyDetail: (uuid: string) => `/admin/properties/${uuid}`,
     propertiesCreate: "/admin/properties/new",
     propertiesEdit: "/admin/properties/edit",
+    contracts: "/admin/contracts",
     visits: "/admin/visits",
     payments: "/admin/payments",
     users: "/admin/users",

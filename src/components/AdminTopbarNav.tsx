@@ -5,6 +5,7 @@ import {
   Building03Icon,
   Calendar03Icon,
   CreditCardIcon,
+  File01Icon,
   UserGroupIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
@@ -20,11 +21,12 @@ type TopbarNavItem = {
   href: string;
   icon: IconSvgElement;
   labelKey:
-    | "adminTopbarNav.items.explore"
-    | "adminTopbarNav.items.properties"
-    | "adminTopbarNav.items.visits"
-    | "adminTopbarNav.items.payments"
-    | "adminTopbarNav.items.users";
+  | "adminTopbarNav.items.explore"
+  | "adminTopbarNav.items.properties"
+  | "adminTopbarNav.items.contracts"
+  | "adminTopbarNav.items.visits"
+  | "adminTopbarNav.items.payments"
+  | "adminTopbarNav.items.users";
   allowedRoles: number[];
 };
 
@@ -41,6 +43,12 @@ const adminNavItems: readonly TopbarNavItem[] = [
     labelKey: "adminTopbarNav.items.properties",
     allowedRoles: [1, 2],
   },
+  {
+  href: ROUTES.admin.contracts,
+  icon: File01Icon,
+  labelKey: "adminTopbarNav.items.contracts",
+  allowedRoles: [1, 2],
+},
   {
     href: ROUTES.admin.visits,
     icon: Calendar03Icon,
