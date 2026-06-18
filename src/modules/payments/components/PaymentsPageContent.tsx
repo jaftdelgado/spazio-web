@@ -117,15 +117,21 @@ const isPaymentForContract = (
   contract: {
     contractId: number;
     agreedAmount: number;
+    securityDeposit?: number;
     currency: string;
   },
-  expectedPeriod: string
+  expectedPeriod: string,
+  isFirstPayment: boolean
 ): boolean => {
   if (p.contractId && contract.contractId) {
     return p.contractId === contract.contractId && isSameDate(p.billingPeriod, expectedPeriod);
   }
   
-  const amountMatch = Math.round(Number(p.amount)) === Math.round(Number(contract.agreedAmount));
+  const expectedAmount = isFirstPayment 
+    ? Number(contract.agreedAmount) + Number(contract.securityDeposit || 0)
+    : Number(contract.agreedAmount);
+
+  const amountMatch = Math.round(Number(p.amount)) === Math.round(expectedAmount);
   const currencyMatch = p.currency?.toUpperCase() === contract.currency?.toUpperCase();
   const periodMatch = isSameDate(p.billingPeriod, expectedPeriod);
   
@@ -471,7 +477,7 @@ export function PaymentsPageContent() {
       
       if (isDraft) {
         const hasActualPayment = activeActualPayments.some(p => 
-          isPaymentForContract(p, contract, contract.startDate)
+          isPaymentForContract(p, contract, contract.startDate, true)
         );
         if (!hasActualPayment) {
           list.push({
@@ -482,7 +488,7 @@ export function PaymentsPageContent() {
             propertyTitle: contract.propertyTitle,
             billingPeriod: contract.startDate,
             dueDate: contract.startDate,
-            amount: contract.agreedAmount,
+            amount: Number(contract.agreedAmount) + Number(contract.securityDeposit || 0),
             currency: contract.currency,
             paymentMethod: "-",
             gateway: "-",
@@ -493,9 +499,14 @@ export function PaymentsPageContent() {
         }
       } else if (isActiveRent) {
         const completed = activeActualPayments.filter(p => {
+          const isFirst = isSameDate(p.billingPeriod, contract.startDate);
+          const expectedAmt = isFirst 
+            ? Number(contract.agreedAmount) + Number(contract.securityDeposit || 0)
+            : Number(contract.agreedAmount);
+
           const isMatch = p.contractId && contract.contractId
             ? p.contractId === contract.contractId
-            : (Math.round(Number(p.amount)) === Math.round(Number(contract.agreedAmount)) &&
+            : (Math.round(Number(p.amount)) === Math.round(expectedAmt) &&
                p.currency?.toUpperCase() === contract.currency?.toUpperCase());
           return isMatch && p.status && 
             ["completed", "completado", "approved", "aprobado", "success", "exitoso"].includes(p.status.toLowerCase());
@@ -519,7 +530,7 @@ export function PaymentsPageContent() {
         }
         
         const alreadyHasPayment = activeActualPayments.some(p => 
-          isPaymentForContract(p, contract, nextBillingPeriod)
+          isPaymentForContract(p, contract, nextBillingPeriod, false)
         );
         
         if (!alreadyHasPayment) {

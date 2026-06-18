@@ -10,6 +10,7 @@ type ContractDetailDto = {
   owner_name: string;
   client_name: string;
   agreed_amount: number;
+  security_deposit: number;
   currency: string;
   period_name?: string;
   start_date: string;
@@ -24,6 +25,7 @@ export type ContractListItemDto = {
   transaction_type: string;
   property_title: string;
   agreed_amount: number;
+  security_deposit: number;
   currency: string;
   start_date: string;
   end_date?: string | null;
@@ -40,6 +42,7 @@ export function mapContract(dto: ContractDetailDto): ContractsEntity {
     ownerName: dto.owner_name,
     clientName: dto.client_name,
     agreedAmount: dto.agreed_amount,
+    securityDeposit: dto.security_deposit,
     currency: dto.currency,
     periodName: dto.period_name,
     startDate: dto.start_date,
@@ -58,6 +61,7 @@ export function mapContractListItem(
     transactionType: dto.transaction_type,
     propertyTitle: dto.property_title,
     agreedAmount: dto.agreed_amount,
+    securityDeposit: dto.security_deposit,
     currency: dto.currency,
     startDate: dto.start_date,
     endDate: dto.end_date ?? null,
