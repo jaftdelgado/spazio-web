@@ -14,7 +14,6 @@ import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,32 +49,22 @@ export function TopbarUserMenu({
   const { user } = useAuth();
   const logoutMutation = useLogout();
 
-  const fullName = user ? `${user.firstName} ${user.lastName}`.trim() : "Usuario";
+  const fullName = user
+    ? `${user.firstName} ${user.lastName}`.trim()
+    : "Usuario";
   const initials = getInitials(fullName || user?.email || "U");
   const canAccessPanel = user?.roleId === 1 || user?.roleId === 2;
   const isClient = user?.roleId === 3;
 
   return (
     <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild>
-        <Button
-          aria-label={t("topbarUserMenu.triggerLabel")}
-          className="h-10 border-border/70 px-2.5"
-          size="sm"
-          variant="outline"
-        >
-          <Avatar className="size-7 border-border/70 bg-muted/70">
-            {user?.profilePictureUrl ? (
-              <AvatarImage alt={user.email} src={user.profilePictureUrl} />
-            ) : null}
-            <AvatarFallback>{initials}</AvatarFallback>
-          </Avatar>
-          {showName ? (
-            <span className="hidden max-w-28 truncate text-sm md:inline">
-              {fullName || user?.email || "Usuario"}
-            </span>
+      <DropdownMenuTrigger>
+        <Avatar className="size-9 border-border/70 bg-muted/70">
+          {user?.profilePictureUrl ? (
+            <AvatarImage alt={user.email} src={user.profilePictureUrl} />
           ) : null}
-        </Button>
+          <AvatarFallback>{initials}</AvatarFallback>
+        </Avatar>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-72">
@@ -103,7 +92,9 @@ export function TopbarUserMenu({
         {/* Perfil */}
         <DropdownMenuItem
           onClick={() =>
-            router.push(ROUTES.settings.withSource(ROUTES.settings.account, source))
+            router.push(
+              ROUTES.settings.withSource(ROUTES.settings.account, source),
+            )
           }
         >
           <HugeiconsIcon
@@ -131,7 +122,9 @@ export function TopbarUserMenu({
           <>
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem onClick={() => router.push(ROUTES.client.myVisits)}>
+            <DropdownMenuItem
+              onClick={() => router.push(ROUTES.client.myVisits)}
+            >
               <HugeiconsIcon
                 className="text-muted-foreground"
                 icon={Calendar03Icon}
@@ -141,7 +134,9 @@ export function TopbarUserMenu({
               <span>{t("topbarUserMenu.actions.myVisits")}</span>
             </DropdownMenuItem>
 
-            <DropdownMenuItem onClick={() => router.push(ROUTES.client.myPayments)}>
+            <DropdownMenuItem
+              onClick={() => router.push(ROUTES.client.myPayments)}
+            >
               <HugeiconsIcon
                 className="text-muted-foreground"
                 icon={CreditCardIcon}
@@ -151,7 +146,9 @@ export function TopbarUserMenu({
               <span>{t("topbarUserMenu.actions.myPayments")}</span>
             </DropdownMenuItem>
 
-            <DropdownMenuItem onClick={() => router.push(ROUTES.client.myContracts)}>
+            <DropdownMenuItem
+              onClick={() => router.push(ROUTES.client.myContracts)}
+            >
               <HugeiconsIcon
                 className="text-muted-foreground"
                 icon={NoteIcon}

@@ -20,7 +20,10 @@
       },
       "footer": {
         "rights": "© 2026 Spazio. Todos los derechos reservados.",
-        "accessibilityLabel": "Opciones de accesibilidad"
+        "accessibilityLabel": "Opciones de accesibilidad",
+        "accessibilityMenuTitle": "Accesibilidad",
+        "dyslexicFontTitle": "Fuente para dislexia",
+        "dyslexicFontDescription": "Activa OpenDyslexic para mejorar la legibilidad."
       },
       "menu": {
         "profile": "Mi perfil",
@@ -270,6 +273,35 @@
       "dialogWarning": "Esta accion puede afectar tu informacion y revocar tu acceso de manera inmediata.",
       "dialogInput": "Escribe ELIMINAR para continuar"
     }
+  },
+  "preferences": {
+    "header": {
+      "title": "Preferencias",
+      "description": "Ajusta el idioma y la apariencia de Spazio para que se sienta mas comodo para ti."
+    },
+    "language": {
+      "sectionTitle": "Idioma",
+      "sectionHint": "Elige el idioma con el que prefieres usar la app.",
+      "cardTitle": "Idioma de la app",
+      "cardDescription": "Cambia el idioma de menus, botones y mensajes en cualquier momento."
+    },
+    "appearance": {
+      "sectionTitle": "Apariencia",
+      "sectionHint": "Haz que la app se vea como a ti te resulta mas agradable.",
+      "themeTitle": "Tema",
+      "themeDescription": "Elige si prefieres una vista clara, oscura o dejar que siga la configuracion de tu dispositivo.",
+      "themeOptions": {
+        "system": "Auto",
+        "light": "Claro",
+        "dark": "Oscuro"
+      },
+      "fontTitle": "Fuente para dislexia",
+      "fontDescription": "Activa una fuente pensada para hacer la lectura mas comoda en toda la app."
+    }
+  },
+  "settingsSidebar": {
+    "account": "Cuenta y perfil",
+    "preferences": "Preferencias"
   },
   "staff": {
     "title": "Crear usuario staff",
