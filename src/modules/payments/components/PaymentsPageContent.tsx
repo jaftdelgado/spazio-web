@@ -55,7 +55,21 @@ import { PaymentsDataGridFooter } from "./PaymentsDataGridFooter";
 import { CheckoutPaymentModal } from "./CheckoutPaymentModal";
 import { useContractsList } from "@/modules/contracts/application/hooks/useContracts";
 import { contractsHttpAdapter } from "@/modules/contracts/infra/contracts.http-adapter";
-
+import {
+  buildPaymentPropertyOptions,
+  buildPaymentStatusOptions,
+  filterPaymentRows,
+  paginatePaymentRows,
+  type PaymentFilterFormState,
+  type PaymentPropertyOption,
+} from "./payments-page.filters";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type PaymentColumnId =
   | "property"
@@ -74,31 +88,15 @@ type LoadingPaymentGridRow = DataGridRowBase & {
   isLoading: true;
 };
 type PaymentsTableRow = PaymentGridRow | LoadingPaymentGridRow;
-type PaymentFilterFormState = {
-  propertyId: string;
-  statusId: string;
-  dateFrom: string;
-  dateTo: string;
-};
 
 const DEFAULT_PAGE_SIZE = 20;
+const RAW_FETCH_LIMIT = 100;
 const LOADING_ROW_COUNT = 8;
 const chipClassName =
   "inline-flex rounded-full border border-border/70 bg-muted/30 px-2.5 py-1 text-xs font-medium text-muted-foreground";
 
 function isLoadingRow(row: PaymentsTableRow): row is LoadingPaymentGridRow {
   return "isLoading" in row;
-}
-
-function parseOptionalNumber(value: string) {
-  const trimmed = value.trim();
-
-  if (trimmed.length === 0) {
-    return undefined;
-  }
-
-  const parsed = Number(trimmed);
-  return Number.isFinite(parsed) ? parsed : undefined;
 }
 
 function getPaymentErrorKey(error: unknown) {
@@ -145,6 +143,46 @@ function formatDate(
   }
 
   return new Intl.DateTimeFormat(locale, options).format(date);
+}
+
+function extractCalendarDate(value: string | null) {
+  if (!value) {
+    return null;
+  }
+
+  const match = value.trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+  if (!match) {
+    return null;
+  }
+
+  return {
+    year: Number(match[1]),
+    month: Number(match[2]),
+    day: Number(match[3]),
+  };
+}
+
+function formatCalendarDate(
+  value: string | null,
+  locale: string,
+  fallback: string,
+  options?: Intl.DateTimeFormatOptions,
+) {
+  const calendarDate = extractCalendarDate(value);
+
+  if (!calendarDate) {
+    return formatDate(value, locale, fallback, options);
+  }
+
+  const date = new Date(
+    Date.UTC(calendarDate.year, calendarDate.month - 1, calendarDate.day),
+  );
+
+  return new Intl.DateTimeFormat(locale, {
+    ...options,
+    timeZone: "UTC",
+  }).format(date);
 }
 
 function formatCurrency(value: number, currency: string, locale: string) {
@@ -217,7 +255,7 @@ function PaymentDetailFields({
     },
     {
       label: t("detail.fields.billingPeriod"),
-      value: formatDate(
+      value: formatCalendarDate(
         detail.billingPeriod,
         locale,
         fallback,
@@ -226,7 +264,7 @@ function PaymentDetailFields({
     },
     {
       label: t("detail.fields.dueDate"),
-      value: formatDate(
+      value: formatCalendarDate(
         detail.dueDate,
         locale,
         fallback,
@@ -273,7 +311,7 @@ function PaymentDetailFields({
       {fields.map((field) => (
         <div
           key={field.label}
-                className="border border-border/70 bg-muted/15 px-4 py-3"
+          className="border border-border/70 bg-muted/15 px-4 py-3"
         >
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             {field.label}
@@ -314,38 +352,38 @@ export function PaymentsPageContent() {
   const { t, intlLocale } = usePaymentsTranslation();
   const { role } = useAuth();
   const canAccess = role === 1 || role === 2 || role === 3;
+  const isSpanish = intlLocale.toLowerCase().startsWith("es");
 
   const [page, setPage] = React.useState(1);
   const [isRetrying, setIsRetrying] = React.useState(false);
   const [selectedPaymentUuid, setSelectedPaymentUuid] = React.useState("");
   const [isDetailOpen, setIsDetailOpen] = React.useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = React.useState(false);
-  const [checkoutContext, setCheckoutContext] = React.useState<CheckoutContext | null>(null);
-  const [payingContractUuid, setPayingContractUuid] = React.useState<string | null>(null);
+  const [checkoutContext, setCheckoutContext] =
+    React.useState<CheckoutContext | null>(null);
+  const [payingContractUuid, setPayingContractUuid] = React.useState<string | null>(
+    null,
+  );
   const [filterForm, setFilterForm] = React.useState<PaymentFilterFormState>({
-    propertyId: "",
-    statusId: "",
+    propertyValue: "",
+    statusValue: "",
     dateFrom: "",
     dateTo: "",
   });
   const [appliedFilters, setAppliedFilters] =
     React.useState<PaymentFilterFormState>({
-    propertyId: "",
-    statusId: "",
-    dateFrom: "",
-    dateTo: "",
-  });
+      propertyValue: "",
+      statusValue: "",
+      dateFrom: "",
+      dateTo: "",
+    });
 
   const queryFilters = React.useMemo<PaymentListFilters>(
     () => ({
-      propertyId: parseOptionalNumber(appliedFilters.propertyId),
-      statusId: parseOptionalNumber(appliedFilters.statusId),
-      dateFrom: appliedFilters.dateFrom || undefined,
-      dateTo: appliedFilters.dateTo || undefined,
-      limit: DEFAULT_PAGE_SIZE,
-      offset: (page - 1) * DEFAULT_PAGE_SIZE,
+      limit: RAW_FETCH_LIMIT,
+      offset: 0,
     }),
-    [appliedFilters, page],
+    [],
   );
 
   const paymentsQuery = usePaymentsList(queryFilters);
@@ -380,17 +418,19 @@ export function PaymentsPageContent() {
 
   const simulatedRows = React.useMemo<PaymentGridRow[]>(() => {
     if (!canAccess || !contractsQuery.data) return [];
-    
+
     const list: PaymentGridRow[] = [];
     const actualPayments = paymentsQuery.data?.data ?? [];
-    
+
     for (const contract of contractsQuery.data) {
       const statusLower = contract.status.toLowerCase();
       const isDraft = statusLower === "draft" || statusLower === "borrador";
-      const isActiveRent = (statusLower === "active" || statusLower === "activo") && contract.transactionType === "rent";
-      
+      const isActiveRent =
+        (statusLower === "active" || statusLower === "activo") &&
+        contract.transactionType === "rent";
+
       if (isDraft) {
-        const hasActualPayment = actualPayments.some(p => {
+        const hasActualPayment = actualPayments.some((p) => {
           const pTitle = propertyTitleById[p.propertyId];
           return pTitle === contract.propertyTitle && p.currency === contract.currency;
         });
@@ -413,25 +453,35 @@ export function PaymentsPageContent() {
           });
         }
       } else if (isActiveRent) {
-        const completed = actualPayments.filter(p => {
+        const completed = actualPayments.filter((p) => {
           const pTitle = propertyTitleById[p.propertyId];
           const isMatch = pTitle === contract.propertyTitle && p.currency === contract.currency;
-          return isMatch && p.status && ["completed", "completado", "approved", "aprobado", "success", "exitoso"].includes(p.status.toLowerCase());
+          return (
+            isMatch &&
+            p.status &&
+            ["completed", "completado", "approved", "aprobado", "success", "exitoso"].includes(
+              p.status.toLowerCase(),
+            )
+          );
         });
-        
+
         let lastBillingPeriod = contract.startDate;
         if (completed.length > 0) {
-          completed.sort((a, b) => new Date(b.billingPeriod).getTime() - new Date(a.billingPeriod).getTime());
+          completed.sort(
+            (a, b) =>
+              new Date(b.billingPeriod).getTime() -
+              new Date(a.billingPeriod).getTime(),
+          );
           lastBillingPeriod = completed[0].billingPeriod;
         }
-        
+
         const nextBillingPeriod = addPeriodToDate(lastBillingPeriod, undefined);
-        
-        const alreadyHasPayment = actualPayments.some(p => {
+
+        const alreadyHasPayment = actualPayments.some((p) => {
           const pTitle = propertyTitleById[p.propertyId];
           return pTitle === contract.propertyTitle && p.billingPeriod === nextBillingPeriod;
         });
-        
+
         if (!alreadyHasPayment) {
           list.push({
             id: contract.contractUuid,
@@ -452,28 +502,92 @@ export function PaymentsPageContent() {
         }
       }
     }
-    
+
     return list;
   }, [canAccess, contractsQuery.data, paymentsQuery.data?.data, propertyTitleById]);
 
-  const rows = React.useMemo<PaymentGridRow[]>(
-    () => {
-      const actual = (paymentsQuery.data?.data ?? []).map((item) => ({
+  const allRows = React.useMemo<PaymentGridRow[]>(
+    () => [
+      ...simulatedRows,
+      ...(paymentsQuery.data?.data ?? []).map((item) => ({
         id: item.paymentUuid,
         ...item,
-      }));
-      if (page === 1) {
-        return [...simulatedRows, ...actual];
-      }
-      return actual;
-    },
-    [paymentsQuery.data?.data, simulatedRows, page],
+        propertyTitle: propertyTitleById[item.propertyId],
+      })),
+    ],
+    [paymentsQuery.data?.data, propertyTitleById, simulatedRows],
   );
 
-  const totalCount = (paymentsQuery.data?.meta.total ?? 0) + simulatedRows.length;
+  const propertyOptions = React.useMemo(
+    () =>
+      buildPaymentPropertyOptions({
+        properties: propertiesQuery.data?.data ?? [],
+        rows: allRows,
+        contracts: contractsQuery.data ?? [],
+      }),
+    [allRows, contractsQuery.data, propertiesQuery.data?.data],
+  );
+
+  const statusOptions = React.useMemo(
+    () =>
+      buildPaymentStatusOptions(allRows).map((option) => ({
+        ...option,
+        label:
+          option.value === "pending"
+            ? isSpanish
+              ? "Pendiente"
+              : "Pending"
+            : option.value === "completed"
+              ? isSpanish
+                ? "Completado"
+                : "Completed"
+              : option.value === "approved"
+                ? isSpanish
+                  ? "Aprobado"
+                  : "Approved"
+                : option.value === "failed"
+                  ? isSpanish
+                    ? "Fallido"
+                    : "Failed"
+                  : option.value === "cancelled"
+                    ? isSpanish
+                      ? "Cancelado"
+                      : "Cancelled"
+                    : option.label,
+      })),
+    [allRows, isSpanish],
+  );
+
+  const selectedAppliedProperty = React.useMemo<PaymentPropertyOption | undefined>(
+    () =>
+      propertyOptions.find(
+        (option) => option.value === appliedFilters.propertyValue,
+      ),
+    [appliedFilters.propertyValue, propertyOptions],
+  );
+
+  const filteredRows = React.useMemo(
+    () =>
+      filterPaymentRows({
+        rows: allRows,
+        filters: appliedFilters,
+        selectedProperty: selectedAppliedProperty,
+      }),
+    [allRows, appliedFilters, selectedAppliedProperty],
+  );
+
+  const currentPage = Math.min(page, Math.max(1, Math.ceil(filteredRows.length / DEFAULT_PAGE_SIZE)));
+
+  const rows = React.useMemo(
+    () => paginatePaymentRows(filteredRows, currentPage, DEFAULT_PAGE_SIZE),
+    [currentPage, filteredRows],
+  );
+
+  const totalCount = filteredRows.length;
   const totalPages = Math.max(1, Math.ceil(totalCount / DEFAULT_PAGE_SIZE));
 
-  const isLoadingAll = paymentsQuery.isLoading || (role === 3 && contractsQuery.isLoading);
+  const isLoadingAll =
+    paymentsQuery.isLoading || (role === 3 && contractsQuery.isLoading);
 
   const rowsToRender = React.useMemo<PaymentsTableRow[]>(
     () =>
@@ -554,8 +668,8 @@ export function PaymentsPageContent() {
 
   const handleClearFilters = React.useCallback(() => {
     const cleared = {
-      propertyId: "",
-      statusId: "",
+      propertyValue: "",
+      statusValue: "",
       dateFrom: "",
       dateTo: "",
     };
@@ -581,14 +695,14 @@ export function PaymentsPageContent() {
             </span>
           );
         case "billingPeriod":
-          return formatDate(
+          return formatCalendarDate(
             row.billingPeriod,
             intlLocale,
             t("labels.notAvailable"),
             { year: "numeric", month: "long" },
           );
         case "dueDate":
-          return formatDate(
+          return formatCalendarDate(
             row.dueDate,
             intlLocale,
             t("labels.notAvailable"),
@@ -609,7 +723,7 @@ export function PaymentsPageContent() {
             </span>
           );
         case "actions": {
-          const isPending = !row.paymentDate || 
+          const isPending = !row.paymentDate ||
             ["pending", "pendiente", "unpaid"].includes(row.status?.toLowerCase());
           const isPayingThis = payingContractUuid === row.id;
 
@@ -684,7 +798,7 @@ export function PaymentsPageContent() {
           return null;
       }
     },
-    [intlLocale, propertyTitleById, t, role],
+    [intlLocale, payingContractUuid, propertyTitleById, role, t],
   );
 
   if (!canAccess) {
@@ -702,18 +816,29 @@ export function PaymentsPageContent() {
             >
               {t("filters.propertyId")}
             </label>
-            <Input
-              id="payments-property-id"
-              inputMode="numeric"
-              placeholder={t("filters.propertyIdPlaceholder")}
-              value={filterForm.propertyId}
-              onChange={(event) =>
+            <Select
+              value={filterForm.propertyValue || undefined}
+              onValueChange={(value) =>
                 setFilterForm((current) => ({
                   ...current,
-                  propertyId: event.target.value,
+                  propertyValue: value,
                 }))
               }
-            />
+            >
+              <SelectTrigger
+                id="payments-property-id"
+                className="h-10 rounded-2xl"
+              >
+                <SelectValue placeholder={t("filters.propertyIdPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {propertyOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
@@ -723,18 +848,29 @@ export function PaymentsPageContent() {
             >
               {t("filters.statusId")}
             </label>
-            <Input
-              id="payments-status-id"
-              inputMode="numeric"
-              placeholder={t("filters.statusIdPlaceholder")}
-              value={filterForm.statusId}
-              onChange={(event) =>
+            <Select
+              value={filterForm.statusValue || undefined}
+              onValueChange={(value) =>
                 setFilterForm((current) => ({
                   ...current,
-                  statusId: event.target.value,
+                  statusValue: value,
                 }))
               }
-            />
+            >
+              <SelectTrigger
+                id="payments-status-id"
+                className="h-10 rounded-2xl"
+              >
+                <SelectValue placeholder={t("filters.statusIdPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {statusOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
@@ -852,7 +988,7 @@ export function PaymentsPageContent() {
             <div className="shrink-0">
               {paymentsQuery.data ? (
                 <PaymentsDataGridFooter
-                  currentPage={page}
+                  currentPage={currentPage}
                   onPageChange={setPage}
                   totalCount={totalCount}
                   totalPages={totalPages}
