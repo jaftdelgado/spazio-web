@@ -5,6 +5,7 @@ export const APP_NAMESPACES = [
   "users",
   "clauses",
   "payments",
+  "contracts",
 ] as const;
 export const DEFAULT_LOCALE = "es";
 export const APP_LOCALE_STORAGE_KEY = "spazio.locale";

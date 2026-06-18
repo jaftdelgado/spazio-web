@@ -5,10 +5,15 @@ import type {
   PaymentDetail,
   PaymentListFilters,
   PaymentListResponse,
+  RegisterPaymentInput,
+  PaymentResponse,
 } from "../domain/payments.entity";
 import {
   mapPaymentDetail,
   mapPaymentListResponse,
+  mapRegisterPaymentInputToDto,
+  mapPaymentResponse,
+  type PaymentResponseDto,
 } from "./payments.mapper";
 
 type PaymentListResponseDto = Parameters<typeof mapPaymentListResponse>[0];
@@ -58,5 +63,15 @@ export const paymentsHttpAdapter = {
     );
 
     return mapPaymentDetail(response);
+  },
+
+  async process(input: RegisterPaymentInput): Promise<PaymentResponse> {
+    const dtoInput = mapRegisterPaymentInputToDto(input);
+    const response = await httpClient.post<PaymentResponseDto>(
+      "/api/v1/payments",
+      dtoInput,
+    );
+
+    return mapPaymentResponse(response);
   },
 } satisfies PaymentsRepository;

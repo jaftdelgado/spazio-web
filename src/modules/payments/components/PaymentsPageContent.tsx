@@ -41,6 +41,7 @@ import { HttpError } from "@/lib/http/http-errors";
 import { useAuth } from "@/lib/auth/useAuth";
 import { usePropertyList } from "@/modules/properties/application/get/hooks/useProperty";
 import {
+  type CheckoutContext,
   type PaymentDetail,
   type PaymentListFilters,
   type PaymentListItem,
@@ -51,6 +52,10 @@ import {
 } from "../application/hooks/usePayments";
 import { usePaymentsTranslation } from "../i18n/usePaymentsTranslation";
 import { PaymentsDataGridFooter } from "./PaymentsDataGridFooter";
+import { CheckoutPaymentModal } from "./CheckoutPaymentModal";
+import { useContractsList } from "@/modules/contracts/application/hooks/useContracts";
+import { contractsHttpAdapter } from "@/modules/contracts/infra/contracts.http-adapter";
+
 
 type PaymentColumnId =
   | "property"
@@ -61,7 +66,10 @@ type PaymentColumnId =
   | "paymentMethod"
   | "actions";
 
-type PaymentGridRow = DataGridRowBase & PaymentListItem;
+type PaymentGridRow = DataGridRowBase & PaymentListItem & {
+  isSimulated?: boolean;
+  propertyTitle?: string;
+};
 type LoadingPaymentGridRow = DataGridRowBase & {
   isLoading: true;
 };
@@ -279,15 +287,41 @@ function PaymentDetailFields({
   );
 }
 
+function formatDateUTC(date: Date): string {
+  const y = date.getUTCFullYear();
+  const m = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(date.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function addPeriodToDate(dateStr: string, periodName: string | undefined): string {
+  const date = new Date(dateStr);
+  const normalized = (periodName || "").toLowerCase().trim();
+  if (normalized.includes("daily") || normalized.includes("diario")) {
+    date.setUTCDate(date.getUTCDate() + 1);
+  } else if (normalized.includes("weekly") || normalized.includes("semanal")) {
+    date.setUTCDate(date.getUTCDate() + 7);
+  } else if (normalized.includes("yearly") || normalized.includes("anual")) {
+    date.setUTCFullYear(date.getUTCFullYear() + 1);
+  } else {
+    // default: monthly
+    date.setUTCMonth(date.getUTCMonth() + 1);
+  }
+  return formatDateUTC(date);
+}
+
 export function PaymentsPageContent() {
   const { t, intlLocale } = usePaymentsTranslation();
   const { role } = useAuth();
-  const canAccess = role === 1 || role === 2;
+  const canAccess = role === 1 || role === 2 || role === 3;
 
   const [page, setPage] = React.useState(1);
   const [isRetrying, setIsRetrying] = React.useState(false);
   const [selectedPaymentUuid, setSelectedPaymentUuid] = React.useState("");
   const [isDetailOpen, setIsDetailOpen] = React.useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = React.useState(false);
+  const [checkoutContext, setCheckoutContext] = React.useState<CheckoutContext | null>(null);
+  const [payingContractUuid, setPayingContractUuid] = React.useState<string | null>(null);
   const [filterForm, setFilterForm] = React.useState<PaymentFilterFormState>({
     propertyId: "",
     statusId: "",
@@ -328,18 +362,11 @@ export function PaymentsPageContent() {
     selectedPaymentUuid,
     isDetailOpen && selectedPaymentUuid.length > 0,
   );
-
-  const totalCount = paymentsQuery.data?.meta.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(totalCount / DEFAULT_PAGE_SIZE));
-
-  const rows = React.useMemo<PaymentGridRow[]>(
-    () =>
-      (paymentsQuery.data?.data ?? []).map((item) => ({
-        id: item.paymentUuid,
-        ...item,
-      })),
-    [paymentsQuery.data?.data],
+  const contractsQuery = useContractsList(
+    { page: 1, limit: 100 },
+    canAccess && role === 3,
   );
+
   const propertyTitleById = React.useMemo(
     () =>
       Object.fromEntries(
@@ -351,15 +378,112 @@ export function PaymentsPageContent() {
     [propertiesQuery.data?.data],
   );
 
+  const simulatedRows = React.useMemo<PaymentGridRow[]>(() => {
+    if (!canAccess || !contractsQuery.data) return [];
+    
+    const list: PaymentGridRow[] = [];
+    const actualPayments = paymentsQuery.data?.data ?? [];
+    
+    for (const contract of contractsQuery.data) {
+      const statusLower = contract.status.toLowerCase();
+      const isDraft = statusLower === "draft" || statusLower === "borrador";
+      const isActiveRent = (statusLower === "active" || statusLower === "activo") && contract.transactionType === "rent";
+      
+      if (isDraft) {
+        const hasActualPayment = actualPayments.some(p => {
+          const pTitle = propertyTitleById[p.propertyId];
+          return pTitle === contract.propertyTitle && p.currency === contract.currency;
+        });
+        if (!hasActualPayment) {
+          list.push({
+            id: contract.contractUuid,
+            paymentUuid: `simulated-${contract.contractUuid}-initial`,
+            contractId: 0,
+            propertyId: 0,
+            propertyTitle: contract.propertyTitle,
+            billingPeriod: contract.startDate,
+            dueDate: contract.startDate,
+            amount: contract.agreedAmount,
+            currency: contract.currency,
+            paymentMethod: "-",
+            gateway: "-",
+            status: "Pending",
+            paymentDate: null,
+            isSimulated: true,
+          });
+        }
+      } else if (isActiveRent) {
+        const completed = actualPayments.filter(p => {
+          const pTitle = propertyTitleById[p.propertyId];
+          const isMatch = pTitle === contract.propertyTitle && p.currency === contract.currency;
+          return isMatch && p.status && ["completed", "completado", "approved", "aprobado", "success", "exitoso"].includes(p.status.toLowerCase());
+        });
+        
+        let lastBillingPeriod = contract.startDate;
+        if (completed.length > 0) {
+          completed.sort((a, b) => new Date(b.billingPeriod).getTime() - new Date(a.billingPeriod).getTime());
+          lastBillingPeriod = completed[0].billingPeriod;
+        }
+        
+        const nextBillingPeriod = addPeriodToDate(lastBillingPeriod, undefined);
+        
+        const alreadyHasPayment = actualPayments.some(p => {
+          const pTitle = propertyTitleById[p.propertyId];
+          return pTitle === contract.propertyTitle && p.billingPeriod === nextBillingPeriod;
+        });
+        
+        if (!alreadyHasPayment) {
+          list.push({
+            id: contract.contractUuid,
+            paymentUuid: `simulated-${contract.contractUuid}-${nextBillingPeriod}`,
+            contractId: 0,
+            propertyId: 0,
+            propertyTitle: contract.propertyTitle,
+            billingPeriod: nextBillingPeriod,
+            dueDate: nextBillingPeriod,
+            amount: contract.agreedAmount,
+            currency: contract.currency,
+            paymentMethod: "-",
+            gateway: "-",
+            status: "Pending",
+            paymentDate: null,
+            isSimulated: true,
+          });
+        }
+      }
+    }
+    
+    return list;
+  }, [canAccess, contractsQuery.data, paymentsQuery.data?.data, propertyTitleById]);
+
+  const rows = React.useMemo<PaymentGridRow[]>(
+    () => {
+      const actual = (paymentsQuery.data?.data ?? []).map((item) => ({
+        id: item.paymentUuid,
+        ...item,
+      }));
+      if (page === 1) {
+        return [...simulatedRows, ...actual];
+      }
+      return actual;
+    },
+    [paymentsQuery.data?.data, simulatedRows, page],
+  );
+
+  const totalCount = (paymentsQuery.data?.meta.total ?? 0) + simulatedRows.length;
+  const totalPages = Math.max(1, Math.ceil(totalCount / DEFAULT_PAGE_SIZE));
+
+  const isLoadingAll = paymentsQuery.isLoading || (role === 3 && contractsQuery.isLoading);
+
   const rowsToRender = React.useMemo<PaymentsTableRow[]>(
     () =>
-      paymentsQuery.isLoading
+      isLoadingAll
         ? Array.from({ length: LOADING_ROW_COUNT }, (_, index) => ({
             id: `loading-${index}`,
             isLoading: true as const,
           }))
         : rows,
-    [paymentsQuery.isLoading, rows],
+    [isLoadingAll, rows],
   );
 
   const columns = React.useMemo<DataGridColumn<PaymentColumnId>[]>(
@@ -404,8 +528,8 @@ export function PaymentsPageContent() {
       {
         id: "actions",
         label: "",
-        width: 148,
-        minWidth: 148,
+        width: 240,
+        minWidth: 240,
         align: "right",
         sticky: "right",
       },
@@ -451,7 +575,9 @@ export function PaymentsPageContent() {
         case "property":
           return (
             <span className="font-medium text-foreground">
-              {propertyTitleById[row.propertyId] || t("labels.property")}
+              {row.isSimulated
+                ? row.propertyTitle || t("labels.property")
+                : propertyTitleById[row.propertyId] || t("labels.property")}
             </span>
           );
         case "billingPeriod":
@@ -482,33 +608,83 @@ export function PaymentsPageContent() {
               {row.paymentMethod || t("labels.notAvailable")}
             </span>
           );
-        case "actions":
+        case "actions": {
+          const isPending = !row.paymentDate || 
+            ["pending", "pendiente", "unpaid"].includes(row.status?.toLowerCase());
+          const isPayingThis = payingContractUuid === row.id;
+
           return (
-            <div className="flex w-full justify-end">
-              <Button
-                className="rounded-2xl"
-                size="sm"
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setSelectedPaymentUuid(row.paymentUuid);
-                  setIsDetailOpen(true);
-                }}
-              >
-                <HugeiconsIcon
-                  icon={ArrowRight01Icon}
-                  size={16}
-                  strokeWidth={1.8}
-                />
-                <span>{t("actions.viewDetails")}</span>
-              </Button>
+            <div className="flex w-full justify-end gap-2">
+              {isPending && role === 3 && (
+                <Button
+                  className="rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90"
+                  size="sm"
+                  type="button"
+                  disabled={payingContractUuid !== null}
+                  onClick={async () => {
+                    if (row.isSimulated) {
+                      setPayingContractUuid(row.id);
+                      try {
+                        const detail = await contractsHttpAdapter.getById(row.id);
+                        setCheckoutContext({
+                          contractId: detail.contractId,
+                          contractUuid: detail.contractUuid,
+                          currency: detail.currency,
+                          amount: Number(detail.agreedAmount),
+                        });
+                        setIsCheckoutOpen(true);
+                      } catch (err) {
+                        console.error(err);
+                      } finally {
+                        setPayingContractUuid(null);
+                      }
+                    } else {
+                      setCheckoutContext({
+                        contractId: row.contractId,
+                        contractUuid: "",
+                        currency: row.currency,
+                        amount: Number(row.amount),
+                      });
+                      setIsCheckoutOpen(true);
+                    }
+                  }}
+                >
+                  <HugeiconsIcon
+                    icon={isPayingThis ? NoteIcon : CreditCardIcon}
+                    size={16}
+                    strokeWidth={1.8}
+                    className={isPayingThis ? "animate-spin" : ""}
+                  />
+                  <span>{isPayingThis ? "Cargando..." : "Pagar"}</span>
+                </Button>
+              )}
+              {!row.isSimulated && (
+                <Button
+                  className="rounded-2xl"
+                  size="sm"
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedPaymentUuid(row.paymentUuid);
+                    setIsDetailOpen(true);
+                  }}
+                >
+                  <HugeiconsIcon
+                    icon={ArrowRight01Icon}
+                    size={16}
+                    strokeWidth={1.8}
+                  />
+                  <span>{t("actions.viewDetails")}</span>
+                </Button>
+              )}
             </div>
           );
+        }
         default:
           return null;
       }
     },
-    [intlLocale, propertyTitleById, t],
+    [intlLocale, propertyTitleById, t, role],
   );
 
   if (!canAccess) {
@@ -664,6 +840,8 @@ export function PaymentsPageContent() {
                 getRowLabel={(row) =>
                   isLoadingRow(row)
                     ? t("states.loadingRowLabel")
+                    : row.isSimulated
+                    ? row.propertyTitle || t("labels.property")
                     : propertyTitleById[row.propertyId] || t("labels.property")
                 }
                 renderCell={renderCell}
@@ -733,7 +911,32 @@ export function PaymentsPageContent() {
             />
           ) : null}
 
-          <AlertDialogFooter>
+          <AlertDialogFooter className="flex items-center gap-2">
+            {paymentDetailQuery.data && role === 3 &&
+              (!paymentDetailQuery.data.paymentDate || 
+               ["pending", "pendiente", "unpaid"].includes(paymentDetailQuery.data.status?.toLowerCase())) && (
+              <Button
+                className="rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90"
+                type="button"
+                onClick={() => {
+                  setIsDetailOpen(false);
+                  setCheckoutContext({
+                    contractId: paymentDetailQuery.data.contractId,
+                    contractUuid: "",
+                    currency: paymentDetailQuery.data.currency,
+                    amount: Number(paymentDetailQuery.data.amount),
+                  });
+                  setIsCheckoutOpen(true);
+                }}
+              >
+                <HugeiconsIcon
+                  icon={CreditCardIcon}
+                  size={16}
+                  strokeWidth={1.8}
+                />
+                <span>Pagar Ahora</span>
+              </Button>
+            )}
             <Button
               className="rounded-2xl"
               type="button"
@@ -745,6 +948,18 @@ export function PaymentsPageContent() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <CheckoutPaymentModal
+        isOpen={isCheckoutOpen}
+        onOpenChange={setIsCheckoutOpen}
+        checkout={checkoutContext}
+        onSuccess={() => {
+          void paymentsQuery.refetch();
+          if (selectedPaymentUuid) {
+            void paymentDetailQuery.refetch();
+          }
+        }}
+      />
     </>
   );
 }

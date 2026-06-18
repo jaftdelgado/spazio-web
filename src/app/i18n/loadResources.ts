@@ -10,6 +10,8 @@ import enPayments from "@payments/i18n/en.json";
 import esPayments from "@payments/i18n/es.json";
 import enUsers from "@users/i18n/en.json";
 import esUsers from "@users/i18n/es.json";
+import enContracts from "@contracts/i18n/en.json";
+import esContracts from "@contracts/i18n/es.json";
 
 export const appResources: Resource = {
   es: {
@@ -18,6 +20,7 @@ export const appResources: Resource = {
     payments: esPayments,
     properties: esProperties,
     users: esUsers,
+    contracts: esContracts,
   },
   en: {
     app: enApp,
@@ -25,6 +28,7 @@ export const appResources: Resource = {
     payments: enPayments,
     properties: enProperties,
     users: enUsers,
+    contracts: enContracts,
   },
 };
 

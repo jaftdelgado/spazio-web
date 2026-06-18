@@ -1,0 +1,33 @@
+{
+  "title": "Mis contratos",
+  "description": "Consulta tus contratos de compra y renta digitalizados.",
+  "table": {
+    "columns": {
+      "property": "Propiedad",
+      "type": "Tipo",
+      "amount": "Monto acordado",
+      "startDate": "Fecha de inicio",
+      "status": "Estado",
+      "client": "Cliente",
+      "actions": "Acciones"
+    },
+    "types": {
+      "rent": "Renta",
+      "sale": "Venta"
+    },
+    "actions": {
+      "download": "Descargar PDF",
+      "view": "Ver",
+      "pay": "Pagar"
+    },
+    "empty": "No tienes contratos registrados.",
+    "emptyDescription": "Cuando rentes o compres una propiedad, tu contrato digital aparecerá aquí."
+  },
+  "status": {
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "pending": "Pendiente",
+    "completed": "Completado",
+    "closed": "Cerrado"
+  }
+}
