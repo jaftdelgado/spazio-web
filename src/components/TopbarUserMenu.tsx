@@ -1,10 +1,12 @@
 "use client";
 
 import {
-  AccountSetting01Icon,
   AiMail01Icon,
+  Calendar03Icon,
+  CreditCardIcon,
   DashboardCircleIcon,
   Logout02Icon,
+  NoteIcon,
   UserCircleIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -51,6 +53,7 @@ export function TopbarUserMenu({
   const fullName = user ? `${user.firstName} ${user.lastName}`.trim() : "Usuario";
   const initials = getInitials(fullName || user?.email || "U");
   const canAccessPanel = user?.roleId === 1 || user?.roleId === 2;
+  const isClient = user?.roleId === 3;
 
   return (
     <DropdownMenu modal={false}>
@@ -97,6 +100,7 @@ export function TopbarUserMenu({
 
         <DropdownMenuSeparator />
 
+        {/* Perfil */}
         <DropdownMenuItem
           onClick={() =>
             router.push(ROUTES.settings.withSource(ROUTES.settings.account, source))
@@ -111,6 +115,7 @@ export function TopbarUserMenu({
           <span>{t("topbarUserMenu.actions.profile")}</span>
         </DropdownMenuItem>
 
+        {/* Email (solo informativo) */}
         <DropdownMenuItem disabled>
           <HugeiconsIcon
             className="text-muted-foreground"
@@ -121,20 +126,44 @@ export function TopbarUserMenu({
           <span className="truncate">{user?.email ?? "Usuario"}</span>
         </DropdownMenuItem>
 
-        <DropdownMenuItem
-          onClick={() =>
-            router.push(ROUTES.settings.withSource(ROUTES.settings.account, source))
-          }
-        >
-          <HugeiconsIcon
-            className="text-muted-foreground"
-            icon={AccountSetting01Icon}
-            size={16}
-            strokeWidth={1.8}
-          />
-          <span>{t("topbarUserMenu.actions.settings")}</span>
-        </DropdownMenuItem>
+        {/* Opciones exclusivas de cliente */}
+        {isClient ? (
+          <>
+            <DropdownMenuSeparator />
 
+            <DropdownMenuItem onClick={() => router.push(ROUTES.client.myVisits)}>
+              <HugeiconsIcon
+                className="text-muted-foreground"
+                icon={Calendar03Icon}
+                size={16}
+                strokeWidth={1.8}
+              />
+              <span>{t("topbarUserMenu.actions.myVisits")}</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem onClick={() => router.push(ROUTES.client.myPayments)}>
+              <HugeiconsIcon
+                className="text-muted-foreground"
+                icon={CreditCardIcon}
+                size={16}
+                strokeWidth={1.8}
+              />
+              <span>{t("topbarUserMenu.actions.myPayments")}</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem onClick={() => router.push(ROUTES.client.myContracts)}>
+              <HugeiconsIcon
+                className="text-muted-foreground"
+                icon={NoteIcon}
+                size={16}
+                strokeWidth={1.8}
+              />
+              <span>{t("topbarUserMenu.actions.myContracts")}</span>
+            </DropdownMenuItem>
+          </>
+        ) : null}
+
+        {/* Panel de admin/agente */}
         {canAccessPanel ? (
           <>
             <DropdownMenuSeparator />

@@ -23,4 +23,9 @@ export const ROUTES = {
     withSource: (path: "/settings" | "/settings/account" | "/settings/preferences", source: "admin" | "explore") =>
       `${path}?from=${source}`,
   },
+  client: {
+    myVisits: "/my-visits",
+    myPayments: "/my-payments",
+    myContracts: "/my-contracts",
+  },
 } as const;

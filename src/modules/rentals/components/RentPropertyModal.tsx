@@ -15,6 +15,8 @@ import { HttpError } from "@lib/http/http-errors";
 import { usePropertiesTranslation } from "@properties/i18n/usePropertiesTranslation";
 import { useConfirmRental, useRentalPreview } from "../application/hooks/useRentals";
 
+import type { RentalConfirmation } from "../domain/rentals.entity";
+
 type RentPropertyModalProps = {
   availablePeriodIds: number[];
   clientUuid: string | null;
@@ -22,6 +24,7 @@ type RentPropertyModalProps = {
   onOpenChange: (isOpen: boolean) => void;
   propertyTitle: string;
   propertyUuid: string;
+  onSuccess?: (confirmation: RentalConfirmation) => void;
 };
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
@@ -161,6 +164,7 @@ export function RentPropertyModal({
   onOpenChange,
   propertyTitle,
   propertyUuid,
+  onSuccess,
 }: RentPropertyModalProps) {
   const { intlLocale, t } = usePropertiesTranslation();
   const confirmRental = useConfirmRental();
@@ -293,7 +297,7 @@ export function RentPropertyModal({
     setConfirmationErrorMessage(null);
 
     try {
-      await confirmRental.mutateAsync({
+      const confirmation = await confirmRental.mutateAsync({
         propertyUuid,
         clientUuid,
         periodId: selectedPeriodId,
@@ -308,6 +312,9 @@ export function RentPropertyModal({
       });
 
       onOpenChange(false);
+      if (onSuccess) {
+        onSuccess(confirmation);
+      }
     } catch (error) {
       setConfirmationErrorMessage(
         getRentalErrorMessage(

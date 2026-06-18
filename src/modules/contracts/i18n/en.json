@@ -1,0 +1,33 @@
+{
+  "title": "My contracts",
+  "description": "View your digitized purchase and rent contracts.",
+  "table": {
+    "columns": {
+      "property": "Property",
+      "type": "Type",
+      "amount": "Agreed amount",
+      "startDate": "Start date",
+      "status": "Status",
+      "client": "Client",
+      "actions": "Actions"
+    },
+    "types": {
+      "rent": "Rent",
+      "sale": "Sale"
+    },
+    "actions": {
+      "download": "Download PDF",
+      "view": "View",
+      "pay": "Pay"
+    },
+    "empty": "No registered contracts found.",
+    "emptyDescription": "When you rent or buy a property, your digital contract will appear here."
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "pending": "Pending",
+    "completed": "Completed",
+    "closed": "Closed"
+  }
+}

@@ -31,10 +31,14 @@ import { usePropertyClauses } from "@/modules/properties/application/clauses/hoo
 import { usePropertiesTranslation } from "@/modules/properties/i18n/usePropertiesTranslation";
 import { PropertyLocationMap } from "@/modules/properties/components/show/components/PropertyLocationMap";
 import { RentPropertyModal } from "@/modules/rentals/components/RentPropertyModal";
+import { toast } from "sonner";
+import { CheckoutPaymentModal } from "@/modules/payments/components/CheckoutPaymentModal";
 import {
   exploreTypeMeta,
   type ExploreListingType,
 } from "@/modules/explore/data/explore-listings";
+import { contractsHttpAdapter } from "@/modules/contracts/infra/contracts.http-adapter";
+import type { CheckoutContext } from "@/modules/payments/domain/payments.entity";
 
 type PropertyDetailPageContentProps = {
   uuid: string;
@@ -234,6 +238,8 @@ export function PropertyDetailPageContent({
   const { role, user } = useAuth();
   const { intlLocale, t } = usePropertiesTranslation();
   const [isRentModalOpen, setIsRentModalOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [checkoutContext, setCheckoutContext] = useState<CheckoutContext | null>(null);
 
   const propertyQuery = useProperty(uuid);
   const pricesQuery = usePropertyPrices(uuid);
@@ -766,6 +772,32 @@ export function PropertyDetailPageContent({
         propertyTitle={property.title}
         propertyUuid={property.propertyUuid}
         onOpenChange={setIsRentModalOpen}
+        onSuccess={async (confirmation) => {
+          setIsRentModalOpen(false);
+          try {
+            const contractDetail = await contractsHttpAdapter.getById(confirmation.contractUuid);
+            setCheckoutContext({
+              contractId: contractDetail.contractId,
+              contractUuid: contractDetail.contractUuid,
+              currency: contractDetail.currency,
+              amount: contractDetail.agreedAmount,
+              periodName: contractDetail.periodName,
+            });
+            setIsCheckoutOpen(true);
+          } catch (err) {
+            console.error("Error fetching contract detail", err);
+            toast.error("La renta se confirmó, pero no se pudo abrir la pasarela de pago. Busca tu contrato en 'Mis pagos'.");
+          }
+        }}
+      />
+
+      <CheckoutPaymentModal
+        isOpen={isCheckoutOpen}
+        onOpenChange={setIsCheckoutOpen}
+        checkout={checkoutContext}
+        onSuccess={() => {
+          void propertyQuery.refetch();
+        }}
       />
     </main>
   );

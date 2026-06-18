@@ -1,21 +1,27 @@
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { contractsHttpAdapter } from "../../infra/contracts.http-adapter";
 
-export function useContracts() {
-  const contractsQuery = useQuery({
-    queryKey: ["contracts"],
-    queryFn: () => contractsHttpAdapter.list(),
+export function useContractDetail(contractUuid: string, enabled = true) {
+  return useQuery({
+    queryKey: ["contracts", "detail", contractUuid],
+    queryFn: () => contractsHttpAdapter.getById(contractUuid),
+    enabled: enabled && contractUuid.length > 0,
   });
-
-  const createContractsMutation = useMutation({
-    mutationFn: () => Promise.resolve({}),
-  });
-
-  return {
-    contractsQuery,
-    createContractsMutation,
-  };
 }
+
+import type { ContractListFilters } from "../../domain/contracts.entity";
+
+export function useContractsList(
+  filters?: ContractListFilters,
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: ["contracts", "list", filters],
+    queryFn: () => contractsHttpAdapter.list(filters),
+    enabled,
+  });
+}
+
