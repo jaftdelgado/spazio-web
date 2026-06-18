@@ -56,8 +56,7 @@ export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
   const rentPrice =
     pricesQuery.data?.rentPrices.find((price) => price.rentPrice > 0) ?? null;
 
-  const displayMode: ExploreListing["mode"] =
-    isClient && rentPrice ? "rent" : listing.mode;
+  const displayMode: ExploreListing["mode"] = listing.mode;
 
   const displayPrice =
     displayMode === "rent"
@@ -81,11 +80,6 @@ export function ExploreListingCard({ listing }: { listing: ExploreListing }) {
         : t("explore.cards.buy");
 
   const handleAction = () => {
-    if (!isAuthenticated) {
-      router.push("/auth/login");
-      return;
-    }
-
     if (isClient) {
       router.push(`/explore/${listing.id}`);
       return;
