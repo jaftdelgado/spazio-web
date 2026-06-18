@@ -38,3 +38,39 @@ export interface PaymentListFilters {
   limit?: number;
   offset?: number;
 }
+
+export interface RegisterPaymentInput {
+  contractId: number;
+  paymentMethodId: number;
+  gatewayId: number;
+  amount: number; // in cents
+  currency: string;
+  token?: string;
+  gatewayMethodId?: string;
+  issuerId?: string;
+  installments?: number;
+  payerEmail: string;
+}
+
+export interface PaymentResponse {
+  paymentUuid: string;
+  status: string;
+  statusId: number;
+  amount: number; // in cents
+  paymentDate?: string | null;
+  gatewayPaymentId?: string;
+  referenceNumber?: string | null;
+}
+
+/**
+ * Context passed to CheckoutPaymentModal directly after rental confirmation.
+ * This avoids searching for an existing payment record (which doesn't exist yet).
+ */
+export interface CheckoutContext {
+  contractId: number;
+  contractUuid: string;
+  currency: string;
+  /** Amount in decimal format (e.g. 15000.00) */
+  amount: number;
+  periodName?: string;
+}

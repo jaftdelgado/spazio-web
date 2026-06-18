@@ -1,3 +1,10 @@
+import type {
+  ContractsEntity,
+  ContractListItemEntity,
+  ContractListFilters,
+} from "./contracts.entity";
+
 export interface ContractsRepository {
-  // TODO: definir metodos
+  getById(uuid: string): Promise<ContractsEntity>;
+  list(filters?: ContractListFilters): Promise<ContractListItemEntity[]>;
 }

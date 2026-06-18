@@ -3,6 +3,8 @@ import type {
   PaymentListItem,
   PaymentListMeta,
   PaymentListResponse,
+  RegisterPaymentInput,
+  PaymentResponse,
 } from "../domain/payments.entity";
 
 type PaymentListItemDto = {
@@ -84,5 +86,57 @@ export function mapPaymentListResponse(
   return {
     data: dto.data.map(mapPaymentListItem),
     meta: mapPaymentListMeta(dto.meta),
+  };
+}
+
+export type RegisterPaymentRequestDto = {
+  contract_id: number;
+  payment_method_id: number;
+  gateway_id: number;
+  amount: number;
+  currency: string;
+  token?: string;
+  gateway_method_id?: string;
+  issuer_id?: string;
+  installments?: number;
+  payer_email: string;
+};
+
+export type PaymentResponseDto = {
+  payment_uuid: string;
+  status: string;
+  status_id: number;
+  amount: number;
+  payment_date?: string | null;
+  gateway_payment_id?: string;
+  reference_number?: string | null;
+};
+
+export function mapRegisterPaymentInputToDto(
+  input: RegisterPaymentInput,
+): RegisterPaymentRequestDto {
+  return {
+    contract_id: input.contractId,
+    payment_method_id: input.paymentMethodId,
+    gateway_id: input.gatewayId,
+    amount: input.amount,
+    currency: input.currency,
+    token: input.token,
+    gateway_method_id: input.gatewayMethodId,
+    issuer_id: input.issuerId,
+    installments: input.installments,
+    payer_email: input.payerEmail,
+  };
+}
+
+export function mapPaymentResponse(dto: PaymentResponseDto): PaymentResponse {
+  return {
+    paymentUuid: dto.payment_uuid,
+    status: dto.status,
+    statusId: dto.status_id,
+    amount: dto.amount,
+    paymentDate: dto.payment_date,
+    gatewayPaymentId: dto.gateway_payment_id,
+    referenceNumber: dto.reference_number,
   };
 }

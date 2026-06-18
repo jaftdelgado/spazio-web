@@ -11,7 +11,9 @@
     },
     "actions": {
       "profile": "Perfil",
-      "settings": "Configuración",
+      "myVisits": "Mis visitas",
+      "myPayments": "Mis pagos",
+      "myContracts": "Mis contratos",
       "panel": "Ir al panel",
       "explore": "Vista pública",
       "logout": "Cerrar sesión"
